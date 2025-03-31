@@ -24,8 +24,8 @@ MarkupSafe==3.0.2
 matplotlib==3.10.1
 mpmath==1.3.0
 networkx==3.4.2
-numpy==2.1.1
-opencv-python==4.11.0.86
+numpy==1.26.4
+opencv-python-headless==4.8.0.76
 packaging==24.2
 pandas==2.2.3
 pillow==11.1.0

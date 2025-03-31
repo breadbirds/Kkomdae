@@ -60,6 +60,23 @@ user32.SetWindowLongPtrW.argtypes = [wintypes.HWND, wintypes.INT, LONG_PTR]
 user32.CallWindowProcW.restype = LRESULT
 user32.CallWindowProcW.argtypes = [LONG_PTR, wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
 
+class GUID(ctypes.Structure):
+    _fields_ = [
+        ("Data1", wintypes.DWORD),
+        ("Data2", wintypes.WORD),
+        ("Data3", wintypes.WORD),
+        ("Data4", wintypes.BYTE * 8)
+    ]
+
+class DEV_BROADCAST_DEVICEINTERFACE(ctypes.Structure):
+    _fields_ = [
+        ("dbcc_size", wintypes.DWORD),
+        ("dbcc_devicetype", wintypes.DWORD),
+        ("dbcc_reserved", wintypes.DWORD),
+        ("dbcc_classguid", GUID),
+        ("dbcc_name", wintypes.WCHAR * 1)
+    ]
+
 # Raw Input 관련 구조체 정의
 class RAWINPUTDEVICE(ctypes.Structure):
     _fields_ = [
@@ -199,12 +216,28 @@ def unregister_raw_input() -> None:
     rid.hwndTarget = 0
     if not user32.RegisterRawInputDevices(ctypes.byref(rid), 1, ctypes.sizeof(rid)):
         raise ctypes.WinError()
+    
+# 디버깅 로그를 파일에 기록하기 위한 설정
+def setup_debugging_log():
+    """
+    디버깅 로그를 파일에 기록하기 위한 설정을 합니다.
+    """
+    downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
+    log_file_path = os.path.join(downloads_path, "example.txt")
+    logging.basicConfig(
+        filename=log_file_path,
+        level=logging.DEBUG,
+        format="%(asctime)s - %(levelname)s - %(message)s",
+        filemode="w",  # 파일 모드를 'w'로 설정하여 덮어쓰기
+    )
+    logging.debug("디버깅 로그 시작")
 
 # ===============================
 # TestApp 클래스 정의 (메인 GUI 애플리케이션)
 # ===============================
 class TestApp(ttkb.Window):
     def __init__(self):
+        setup_debugging_log()  # 디버깅 로그 설정
         super().__init__(themename="flatly")
         self.title("KkomDae Diagnostics")
         self.geometry("1700x950")
@@ -596,26 +629,57 @@ class TestApp(ttkb.Window):
 
     def get_all_usb_ports(self) -> dict:
         """
-        시스템의 모든 USB 포트(숨겨진 포트 포함)를 검색하여 초기 상태를 설정합니다.
-        반환값은 예시로 {'port1': 상태, 'port3': 상태} 형태로 출력됩니다.
+        PowerShell 단계에서도 'USB Composite Device' 이름만 필터링하도록 변경한 예시 코드.
         """
         usb_ports = {}
         try:
-            # PowerShell 출력 인코딩을 UTF-8로 설정한 후,
-            # 모든 USB 장치(숨긴 장치 포함)를 가져옵니다.
+            # ---------------------------
+            # 1) WMI를 사용하여 USB 장치 정보 가져오기
+            # ---------------------------
+            wmi_obj = win32com.client.GetObject("winmgmts:")
+            pnp_entities = wmi_obj.InstancesOf("Win32_PnPEntity")
+
+            for entity in pnp_entities:
+                # WMI 단에서도 Name이 'USB Composite Device'인지 체크
+                if hasattr(entity, 'Name') and entity.Name == 'USB Composite Device':
+                    if hasattr(entity, 'PNPDeviceID') and entity.PNPDeviceID:
+                        device_path = entity.PNPDeviceID.upper()
+                        
+                        # USB 장치만 처리
+                        if device_path.startswith("USB\\"):
+                            logging.debug(f"디버깅: WMI - 장치 정보: {entity}")
+                            # 포트 번호 추출
+                            match = re.search(r'&0&(\d)$', device_path)
+                            if match:
+                                port_number = int(match.group(1))
+                                if port_number in [1, 2, 3]:
+                                    key = f'port{port_number}'
+                                    if key not in usb_ports:
+                                        usb_ports[key] = False
+                                        logging.debug(f"디버깅: WMI - 새로운 포트 추가: {key}, 상태: False")
+                            
+                            # DeviceID와 LocationInformation을 로그에 기록
+                            if hasattr(entity, 'DeviceID'):
+                                logging.debug(f"디버깅: WMI - DeviceID: {entity.DeviceID}")
+                            if hasattr(entity, 'LocationInformation'):
+                                logging.debug(f"디버깅: WMI - LocationInformation: {entity.LocationInformation}")
+
+            # ---------------------------
+            # 2) PowerShell(숨겨진 장치 포함) - Composite 필터 추가
+            # ---------------------------
             cmd = (
-                    'powershell.exe -WindowStyle Hidden -Command "'
-                    '$OutputEncoding = [System.Text.UTF8Encoding]::new(); '
-                    'Get-PnpDevice -Class USB -PresentOnly:$false | '
-                    'Select-Object InstanceId | '
-                    'ConvertTo-Json'
-                    '"'
-                )
-            # CREATE_NO_WINDOW 플래그 추가하여 콘솔 창 숨기기
+                'powershell.exe -WindowStyle Hidden -Command "'
+                '$OutputEncoding = [System.Text.UTF8Encoding]::new(); '
+                'Get-PnpDevice -Class USB -PresentOnly:$false '
+                '| Where-Object { $_.FriendlyName -like \'*Composite Device*\' -or $_.Name -like \'*Composite Device*\' } '
+                '| Select-Object InstanceId, FriendlyName, Name '
+                '| ConvertTo-Json'
+                '"'
+            )
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             startupinfo.wShowWindow = subprocess.SW_HIDE
-            
+
             result = subprocess.run(
                 cmd,
                 capture_output=True,
@@ -624,45 +688,55 @@ class TestApp(ttkb.Window):
                 errors='replace',
                 startupinfo=startupinfo
             )
+            logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 실행 결과 (숨겨진 장치 포함):")
+            logging.debug(f"  - 반환 코드: {result.returncode}")
+            logging.debug(f"  - 표준 출력: {result.stdout}")
+            logging.debug(f"  - 표준 에러: {result.stderr}")
             
             if result.returncode == 0:
                 try:
                     devices = json.loads(result.stdout)
-                    if not devices:
-                        pass
-                    else:
-                        # 단일 장치인 경우 리스트로 변환
+                    logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 JSON 파싱 결과:")
+                    logging.debug(f"  - 파싱된 데이터: {devices}")
+                    if devices:
                         if isinstance(devices, dict):
                             devices = [devices]
                         
                         for device in devices:
-                            if 'InstanceId' in device:
-                                instance_id = device['InstanceId']
-                                # USB 장치인지 확인 (앞부분이 "USB\\"여야 함)
-                                if instance_id.startswith("USB\\"):
-                                    # 정규 표현식으로 "&0&숫자" 패턴을 추출 (숫자는 한 자리 이상)
-                                    match = re.search(r'&0&(\d)$', instance_id)
-                                    if match:
-                                        port_number = int(match.group(1))
-                                        # 여기서 원하는 포트 번호만 처리 (예: 1, 2, 3번)
-                                        if port_number in [1, 2, 3]:
-                                            key = f'port{port_number}'
-                                            # 첫번째 명령어에서는 기본 상태 False
-                                            if key not in usb_ports:
-                                                usb_ports[key] = False
-                except json.JSONDecodeError:
-                    return usb_ports
+                            logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - 장치 정보 처리 시작: {device}")
+                            instance_id = device.get("InstanceId", "")
+                            friendly_name = device.get("FriendlyName", "")
+                            name_field = device.get("Name", "")
+                            logging.debug(f"디버깅:  → FriendlyName={friendly_name}, Name={name_field}")
+
+                            if instance_id.startswith("USB\\"):
+                                match = re.search(r'&0&(\d)$', instance_id)
+                                if match:
+                                    port_number = int(match.group(1))
+                                    if port_number in [1, 2, 3]:
+                                        key = f'port{port_number}'
+                                        if key not in usb_ports:
+                                            usb_ports[key] = False
+                                            logging.debug(f"  → 새로운 포트: {key} (상태: False)")
+                    else:
+                        logging.debug("디버깅: 첫 번째 PowerShell 명령어 결과 - USB 장치 없음(Composite 없음)")
+                except json.JSONDecodeError as e:
+                    logging.debug(f"JSON 파싱 오류: {e}")
+            else:
+                logging.debug(f"PowerShell 오류 발생: {result.stderr}")
             
-            # 연결된 USB 장치 상태 확인
+            # ---------------------------
+            # 3) PowerShell(연결된 장치만) - Composite 필터 추가
+            # ---------------------------
             cmd_connected = (
                 'powershell.exe -WindowStyle Hidden -NonInteractive -Command "'
                 '$OutputEncoding = [System.Text.UTF8Encoding]::new(); '
-                'Get-PnpDevice -Class USB -PresentOnly:$true | '
-                'Select-Object InstanceId | '
-                'ConvertTo-Json'
+                'Get-PnpDevice -Class USB -PresentOnly:$true '
+                '| Where-Object { $_.FriendlyName -like \'*Composite Device*\' -or $_.Name -like \'*Composite Device*\' } '
+                '| Select-Object InstanceId, FriendlyName, Name '
+                '| ConvertTo-Json'
                 '"'
             )
-            
             result_connected = subprocess.run(
                 cmd_connected,
                 capture_output=True,
@@ -672,48 +746,44 @@ class TestApp(ttkb.Window):
                 creationflags=subprocess.CREATE_NO_WINDOW,
                 startupinfo=startupinfo
             )
-            
+            logging.debug(f"디버깅: 두 번째 PowerShell 명령어 실행 결과 (연결된 장치):")
+            logging.debug(f"  - 반환 코드: {result_connected.returncode}")
+            logging.debug(f"  - 표준 출력: {result_connected.stdout}")
+            logging.debug(f"  - 표준 에러: {result_connected.stderr}")
+
             if result_connected.returncode == 0:
                 try:
                     connected_devices = json.loads(result_connected.stdout)
-                    if isinstance(connected_devices, dict):
-                        connected_devices = [connected_devices]
-                    
-                    for device in connected_devices:
-                        if 'InstanceId' in device:
-                            instance_id = device['InstanceId']
+                    logging.debug(f"디버깅: 두 번째 PowerShell 명령어 JSON 파싱 결과: {connected_devices}")
+
+                    if connected_devices:
+                        if isinstance(connected_devices, dict):
+                            connected_devices = [connected_devices]
+                        
+                        for device in connected_devices:
+                            instance_id = device.get("InstanceId", "")
+                            friendly_name = device.get("FriendlyName", "")
+                            name_field = device.get("Name", "")
+                            logging.debug(f"디버깅(연결된): InstanceId={instance_id}, FriendlyName={friendly_name}, Name={name_field}")
+
                             if instance_id.startswith("USB\\"):
                                 match = re.search(r'&0&(\d)$', instance_id)
                                 if match:
                                     port_number = int(match.group(1))
-                                    # 원하는 포트 번호만 처리
                                     if port_number in [1, 2, 3]:
                                         key = f'port{port_number}'
-                                        # 연결된 장치이면 상태를 True로 업데이트
                                         usb_ports[key] = True
-                except json.JSONDecodeError:
-                    pass
+                                        logging.debug(f"  → {key} 상태 True로 업데이트")
+                    else:
+                        logging.debug("디버깅: 두 번째 PowerShell 명령어 결과 - 연결된 Composite 없음")
+                except json.JSONDecodeError as e:
+                    logging.debug(f"두 번째 PowerShell JSON 파싱 오류: {e}")
                     
-        except Exception:
-            pass
-        
+        except Exception as e:
+            logging.debug(f"예외 발생: {e}")
+
+        logging.debug(f"디버깅: 최종 USB 포트 상태: {usb_ports}")
         return usb_ports
-        
-    def first_usb_port_display(self) -> None:
-        """
-        USB 포트 상태를 초기화합니다.
-        """
-        # USB 포트 딕셔너리를 정렬하여 왼쪽부터 순서대로 배치 (예: port1, port3)
-        for key in sorted(self.usb_ports.keys(), key=lambda x: int(x.replace("port", ""))):
-            port_num = int(key.replace("port", ""))
-            # 상태에 따라 이미지를 선택합니다.
-            img = self.status_images["USB테스트 전"][port_num]
-            # 각 포트를 담을 프레임 생성 후 포트 레이블 배치
-            port_frame = ttkb.Frame(self.usb_ports_frame)
-            port_frame.pack(side="left", padx=5, expand=True, fill="both")
-            port_label = ttkb.Label(port_frame, image=img)
-            port_label.image = img  # 이미지 참조 유지
-            port_label.pack(expand=True, fill="both")
 
 
     # -------------------------------
@@ -1137,22 +1207,26 @@ class TestApp(ttkb.Window):
 
             # USB 장치 순회하면서 연결된 포트 번호 추출 (정규 표현식으로 "&0&숫자" 패턴)
             for entity in pnp_entities:
-                if hasattr(entity, 'PNPDeviceID') and entity.PNPDeviceID:
-                    device_path = entity.PNPDeviceID.upper()
+                # USB Composite Device 필터링
+                if hasattr(entity, 'Name') and entity.Name == 'USB Composite Device':
+                    # USB 장치의 PNPDeviceID 속성 확인
+                    # PNPDeviceID가 존재하고 USB 장치인 경우에만 처리
+                    if hasattr(entity, 'PNPDeviceID') and entity.PNPDeviceID:
+                        device_path = entity.PNPDeviceID.upper()
 
-                    # USB 장치 필터링
-                    if not device_path.startswith("USB\\"):
-                        continue
+                        # USB 장치 필터링
+                        if not device_path.startswith("USB\\"):
+                            continue
 
-                    # 정규 표현식으로 "&0&숫자" 패턴을 추출
-                    match = re.search(r'&0&(\d)$', device_path)
-                    if match:
-                        port_number = int(match.group(1))
-                        if port_number in [1, 2, 3]:
-                            key = f"port{port_number}"
-                            
-                            # 해당 포트의 연결 상태를 업데이트트
-                            self.usb_ports[key] = True
+                        # 정규 표현식으로 "&0&숫자" 패턴을 추출
+                        match = re.search(r'&0&(\d)$', device_path)
+                        if match:
+                            port_number = int(match.group(1))
+                            if port_number in [1, 2, 3]:
+                                key = f"port{port_number}"
+                                
+                                # 해당 포트의 연결 상태를 업데이트트
+                                self.usb_ports[key] = True
 
             # 동적으로 USB 포트 표시를 업데이트
             self.update_usb_port_display()
