@@ -8,14 +8,20 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import androidx.appcompat.widget.AppCompatButton
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.pizza.kkomdae.MainActivity
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
-import com.pizza.kkomdae.data.Submission
+import com.pizza.kkomdae.presenter.model.Submission
 import com.pizza.kkomdae.databinding.FragmentMainBinding
+import com.pizza.kkomdae.presenter.viewmodel.LoginViewModel
+import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
+import com.pizza.kkomdae.ui.guide.Step1GuideFragment
+import com.pizza.kkomdae.ui.guide.Step2GuideFragment
+import com.pizza.kkomdae.ui.step3.LaptopInfoInputFragment
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -35,7 +41,11 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+
+    private var step =0 // 기기등록 단계
+
     private lateinit var mainActivity: MainActivity
+    private val viewModel : MainViewModel by activityViewModels()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -48,6 +58,9 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+        viewModel.getUserInfo()
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -57,26 +70,52 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
         binding.rvSubmission.adapter =adapter
         binding.rvSubmission.layoutManager = LinearLayoutManager(mainActivity)
 
-        val data = mutableListOf<Submission>()
-        data.add(Submission("sladjlfjasldf"))
-        data.add(Submission("sladjlfjasldf"))
-        data.add(Submission("sladjlfjasldf"))
-        data.add(Submission("sladjlfjasldf"))
-        data.add(Submission("sladjlfjasldf"))
 
-        adapter.submitList(data)
+        adapter.submitList(viewModel.userInfoResult.value?.userRentTestRes)
 
         binding.btnLogout.setOnClickListener {
             mainActivity.logout()
         }
 
+        // 서버에서 받아온 유저 정보
+        viewModel.userInfoResult.observe(viewLifecycleOwner){
+            step=it.stage
+            binding.tvWelcomeMessage.text="${it.name}님 안녕하세요!"
+        }
+
         // 노트북 카드뷰 클릭 이벤트
         binding.cvLaptop.setOnClickListener {
-            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.fl_main, OathFragment())
-            transaction.addToBackStack(null)
-            transaction.commit()
+            when(step){
+                0->{
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.fl_main, OathFragment())
+                    transaction.addToBackStack(null)
+                    transaction.commit()
+                }
+                1->{
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.fl_main, Step1GuideFragment())
+                    transaction.addToBackStack(null)
+                    transaction.commit()
+                }
+                2->{
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.fl_main, Step2GuideFragment())
+                    transaction.addToBackStack(null)
+                    transaction.commit()
+                }
+                3->{
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.fl_main, LaptopInfoInputFragment())
+                    transaction.addToBackStack(null)
+                    transaction.commit()
+                }
+
+            }
+
         }
+
+
 
         // 모바일 카드뷰 클릭 이벤트
         binding.cvMobile.setOnClickListener {

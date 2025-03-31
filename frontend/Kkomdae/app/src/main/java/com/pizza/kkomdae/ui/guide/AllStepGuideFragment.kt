@@ -2,19 +2,12 @@ package com.pizza.kkomdae.ui.guide
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.TextView
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
-import com.pizza.kkomdae.data.Submission
 import com.pizza.kkomdae.databinding.FragmentAllStepGuideBinding
-import com.pizza.kkomdae.databinding.FragmentMainBinding
-import com.pizza.kkomdae.ui.MainFragment
 import com.pizza.kkomdae.ui.OathFragment
-import com.pizza.kkomdae.ui.SubmissionAdapter
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER

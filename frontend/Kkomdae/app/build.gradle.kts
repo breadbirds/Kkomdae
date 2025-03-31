@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
    // id("com.google.gms.google-services")
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
 }
 
 val localProperties = Properties()
@@ -131,4 +133,8 @@ dependencies {
 
     // 바텀 시트
     implementation("com.google.android.material:material:1.2.1")
+
+    // hilt
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.48")
 }

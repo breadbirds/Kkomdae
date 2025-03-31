@@ -10,4 +10,5 @@ import java.util.List;
 public interface CustomLapTopTestResultRepository {
     List<LaptopTestResult> findByStudentOrDevice(Student student, Device device);
 
+    LaptopTestResult findByIdWithStudentAndDeviceAndPhotos(long testId);
 }

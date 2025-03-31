@@ -2,14 +2,52 @@ package pizza.kkomdae.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import pizza.kkomdae.entity.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
 public class PdfInfo {
     private String name;
     private String region;
-    private String studentId;
+    private String email;
     private String serial;
     private String barcode;
-    private String birthday;
+    private int laptopCount;
+    private int powerCableCount;
+    private int adapterCount;
+    private int mouseCount;
+    private int bagCount;
+    private int mousePadCount;
+    private LocalDate returnDate;
+    private LocalDate rentDate;
+    private List<Photo>photos;
+
+    public PdfInfo(LaptopTestResult result) {
+        Student student = result.getStudent();
+        this.name = student.getName();
+        this.region = student.getRegion();
+        this.email = student.getEmail();
+        Device device = result.getDevice();
+        this.serial = device.getSerialNum();
+        Laptop laptop = (Laptop) device;
+        this.barcode = laptop.getLaptopBarcodeNum();
+        this.laptopCount = result.getLaptop();
+        this.powerCableCount = result.getPowerCable();
+        this.adapterCount = result.getAdapter();
+        this.mouseCount = result.getMouse();
+        this.bagCount = result.getBag();
+        this.mousePadCount = result.getBag();
+        this.photos = result.getPhotos();
+        if (result.getRelease()) {
+            this.returnDate = result.getDate();
+        }else{
+            this.rentDate = result.getDate();
+        }
+
+    }
+
+
 }

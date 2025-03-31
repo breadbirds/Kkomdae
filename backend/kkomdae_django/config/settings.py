@@ -64,12 +64,14 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 
-# 개발 환경
+# # 개발 환경
 # CORS_ORIGIN_ALLOW_ALL = True
 
 # 배포
 CORS_ALLOWED_ORIGINS = [
     "https://j12d101.p.ssafy.io",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
 ]
 
 TEMPLATES = [

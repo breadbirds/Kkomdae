@@ -12,20 +12,24 @@ import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.pizza.kkomdae.data.local.SecureTokenManager
-import com.pizza.kkomdae.data.local.TokenManager
+import com.pizza.kkomdae.data.source.local.SecureTokenManager
+import com.pizza.kkomdae.data.source.local.TokenManager
 import com.pizza.kkomdae.databinding.ActivityLoginBinding
-import com.pizza.kkomdae.databinding.ActivityMainBinding
-import com.pizza.kkomdae.remote.RetrofitUtil.Companion.loginService
+import com.pizza.kkomdae.presenter.viewmodel.LoginViewModel
+import com.pizza.kkomdae.util.RetrofitUtil.Companion.loginService
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import retrofit2.Response
 
 private const val TAG = "LoginActivity"
+
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
+    private val viewModel : LoginViewModel by viewModels()
     private val binding by lazy { ActivityLoginBinding.inflate(layoutInflater) }
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,19 +114,10 @@ class LoginActivity : AppCompatActivity() {
         binding.wvLogin.settings.domStorageEnabled = true // 로컬 스토리지 지원
         binding.wvLogin.settings.userAgentString = "Mozilla/5.0 (Android)" // 유저 에이전트 설정
 
-        // SSO 로그인 페이지 로드
-
-    }
-
-    // 로그인
-    fun getLogin(code: String){
-        lifecycleScope.launch {
-            try {
-                val response = loginService.getLogin(code)
-                if (response.isSuccessful){
-                    Log.d(TAG, "getLogin: ${response.body()}")
-                    val data = response.body()
-                    data?.let {
+        viewModel.loginResult.observe(this){ result->
+            result.onSuccess { loginResponse ->
+                // 로그인 성공 시 실제 데이터 처리
+                loginResponse?.let {
                         saveRefreshToken(it.jwt, it.refreshToken)
                     }
 
@@ -130,19 +125,45 @@ class LoginActivity : AppCompatActivity() {
                     val intent = Intent(this@LoginActivity, MainActivity::class.java)
                     startActivity(intent)
                     finish()
-                } else {
-                    // 로그인 실패 시 로딩 화면 숨기기
-                    binding.clLoading.isVisible = false
-                    Log.d(TAG, "getLogin: $response")
-                    Toast.makeText(this@LoginActivity, "로그인에 실패했습니다.", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                // 예외 발생 시 로딩 화면 숨기기
+            }.onFailure { exception ->
+                // 로그인 실패 시 오류 처리
                 binding.clLoading.isVisible = false
-                Log.d(TAG, "getLogin: $e")
-                Toast.makeText(this@LoginActivity, "오류가 발생했습니다: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LoginActivity, "로그인에 실패했습니다.", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    // 로그인
+    fun getLogin(code: String){
+
+        viewModel.login(code)
+//        lifecycleScope.launch {
+//            try {
+//                val response = loginService.getLogin(code)
+//                if (response.isSuccessful){
+//                    Log.d(TAG, "getLogin: ${response.body()}")
+//                    val data = response.body()
+//                    data?.let {
+//                        saveRefreshToken(it.jwt, it.refreshToken)
+//                    }
+//
+//                    // 로딩 후 메인 액티비티로 이동
+//                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
+//                    startActivity(intent)
+//                    finish()
+//                } else {
+//                    // 로그인 실패 시 로딩 화면 숨기기
+//                    binding.clLoading.isVisible = false
+//                    Log.d(TAG, "getLogin: $response")
+//                    Toast.makeText(this@LoginActivity, "로그인에 실패했습니다.", Toast.LENGTH_SHORT).show()
+//                }
+//            } catch (e: Exception) {
+//                // 예외 발생 시 로딩 화면 숨기기
+//                binding.clLoading.isVisible = false
+//                Log.d(TAG, "getLogin: $e")
+//                Toast.makeText(this@LoginActivity, "오류가 발생했습니다: ${e.message}", Toast.LENGTH_SHORT).show()
+//            }
+//        }
     }
 
     fun saveRefreshToken(jwt:String, refreshToken: String){

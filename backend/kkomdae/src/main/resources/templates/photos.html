@@ -49,6 +49,11 @@
             height: auto;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .laptop-image:hover {
+            transform: scale(1.02);
+            cursor: pointer;
         }
         .no-images {
             text-align: center;
@@ -59,116 +64,49 @@
         .back-button {
             margin-bottom: 20px;
         }
-        .clickable-image {
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .clickable-image:hover {
-            transform: scale(1.02);
-        }
-        .image-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-        }
-        .modal-image {
-            max-width: 90%;
-            max-height: 90vh;
-            object-fit: contain; /* 이미지 비율 유지 */
-        }
-        .close-button {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 1010;
-        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="back-button">
-        <a th:href="@{/api/admin/laptop-test-results}" class="btn btn-primary">결과 목록으로 돌아가기</a>
+        <div class="back-button">
+            <a href="javascript:void(0);" onclick="history.back()" class="btn btn-primary">결과 목록으로 돌아가기</a>
+        </div>
     </div>
 
     <h1>노트북 사진 목록</h1>
 
-    <div th:if="${#lists.isEmpty(photoUrls)}" class="no-images">
+    <div th:if="${#lists.isEmpty(photos)}" class="no-images">
         등록된 사진이 없습니다.
     </div>
 
-    <div th:unless="${#lists.isEmpty(photoUrls)}">
+    <div th:unless="${#lists.isEmpty(photos)}">
         <table class="image-table">
             <tbody>
-            <!-- 각 이미지에 대한 행을 반복 -->
-            <tr th:each="url, stat : ${photoUrls}">
+            <tr th:each="photo : ${photos}">
                 <td>
-                    <div class="image-title" th:text="${'사진 ' + (stat.index + 1)}">사진 제목</div>
+                    <div class="image-title">
+                        <span th:switch="${photo.getType()}">
+                            <span th:case="1">전면 사진</span>
+                            <span th:case="2">후면 사진</span>
+                            <span th:case="3">좌측면 사진</span>
+                            <span th:case="4">우측면 사진</span>
+                            <span th:case="5">상단 사진</span>
+                            <span th:case="6">하단 사진</span>
+                        </span>
+                    </div>
                     <div class="image-container">
-                        <img th:src="${url}"
-                             th:alt="${'노트북 사진 ' + (stat.index + 1)}"
-                             class="laptop-image clickable-image"
-                             onclick="openModal(this.src)">
+                        <a th:href="${photo.getUrl()}" target="_blank">
+                            <img th:src="${photo.getUrl()}"
+                                 th:alt="${photo.getName()}"
+                                 class="laptop-image">
+                        </a>
                     </div>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
-
-    <!-- 모달 (이미지 클릭시 확대) -->
-    <div id="imageModal" class="image-modal">
-        <span class="close-button" onclick="closeModal()">&times;</span>
-        <div class="modal-content">
-            <img id="modalImage" class="modal-image">
-        </div>
-    </div>
 </div>
-
-<script>
-    // 이미지 모달 기능
-    function openModal(src) {
-        const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('modalImage');
-        modal.style.display = 'flex';
-        modalImg.src = src;
-    }
-
-    function closeModal() {
-        document.getElementById('imageModal').style.display = 'none';
-    }
-
-    // ESC 키로 모달 닫기
-    window.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            closeModal();
-        }
-    });
-
-    // 모달 배경 클릭시 닫기
-    document.getElementById('imageModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-            closeModal();
-        }
-    });
-</script>
 </body>
 </html>

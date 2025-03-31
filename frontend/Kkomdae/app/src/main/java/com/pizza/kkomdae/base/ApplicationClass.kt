@@ -6,13 +6,15 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.pizza.kkomdae.BuildConfig
-import com.pizza.kkomdae.remote.TokenAuthenticator
+import com.pizza.kkomdae.util.TokenAuthenticator
+import dagger.hilt.android.HiltAndroidApp
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
+@HiltAndroidApp
 class ApplicationClass : Application() {
     companion object {
 

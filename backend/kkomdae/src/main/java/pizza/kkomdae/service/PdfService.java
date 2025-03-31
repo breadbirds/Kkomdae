@@ -17,35 +17,48 @@ import com.itextpdf.layout.properties.*;
 import org.springframework.stereotype.Service;
 import pizza.kkomdae.controller.PdfController;
 import pizza.kkomdae.dto.PdfInfo;
+import pizza.kkomdae.entity.LaptopTestResult;
+import pizza.kkomdae.entity.Photo;
+import pizza.kkomdae.repository.laptopresult.LapTopTestResultRepository;
 import pizza.kkomdae.s3.S3Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class PdfService {
     private final S3Service s3Service;
+    private final LapTopTestResultRepository lapTopTestResultRepository;
 
-    public PdfService(S3Service s3Service) {
+    public PdfService(S3Service s3Service, LapTopTestResultRepository lapTopTestResultRepository) {
         this.s3Service = s3Service;
+        this.lapTopTestResultRepository = lapTopTestResultRepository;
     }
 
-    public void makePdf() {
+    public String makeAndUploadPdf(long testId) {
+        LaptopTestResult result = lapTopTestResultRepository.findByIdWithStudentAndDeviceAndPhotos(testId);
+        String fileName;
         try{
-            PdfInfo pdfInfo = new PdfInfo();
+            PdfInfo pdfInfo = new PdfInfo(result);
             ByteArrayOutputStream baso = initPdf(pdfInfo);
-            s3Service.uploadPdf();
+            fileName = s3Service.uploadPdf(baso,result);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        result.setPdfFileName(fileName);
+        result.setStage(5);
+        lapTopTestResultRepository.save(result);
+        return fileName;
     }
 
-    private ByteArrayOutputStream initPdf(PdfInfo form) throws IOException {
+    private ByteArrayOutputStream initPdf(PdfInfo info) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PdfWriter writer = new PdfWriter(baos);
+
         PdfDocument pdf = new PdfDocument(writer);
         Document document = new Document(pdf, PageSize.A4);
         document.setMargins(50, 50, 50, 50);
@@ -76,33 +89,28 @@ public class PdfService {
                 Paragraph("\n"));
 
         // 노트북 구성품 테이블
-        addComponentsTable(document, koreanFont);
+        addComponentsTable(document, koreanFont,info);
         document.add(new
 
                 Paragraph("\n"));
 
         // 서명 섹션
-        addSignatureSection(document, koreanFont, form);
+        addSignatureSection(document, koreanFont, info);
         document.add(new
 
                 Paragraph("\n\n"));
 
         // 노트북 촬영 섹션
-        addPhotoSection(document, koreanFont);
+        addPhotoSection(document, koreanFont, info.getPhotos());
 
         document.close();
         return baos;
     }
+
     private void addRegulations(Document document, PdfFont font, DeviceRgb redColor) {
         // 노트북 수령 규정 목록
-        List<String> regulations = Arrays.asList(
-                "1. 분실 또는 도난 당하였을 경우 동일한 성능의 노트북으로 변상한다.",
-                "※ 노트북 기종: NT850XCJ-XB72B(10세대) 단가: 2,770,000원",
-                "※ 노트북 기종: NT761XDA-X07/C(11세대) 단가: 2,452,000원",
-                "※ 노트북 기종: NT961XFH-X01/C(13세대) 단가: 2,682,000원",
-                "※ 노트북 기종: NT961XGL-COM(14세대) 단가: 2,999,655원"
-        );
-
+        String regulation = "1. 분실 또는 도난 당하였을 경우 동일한 성능의 노트북으로 변상한다.";
+        String regulation1 = "※ 노트북 기종: NT850XCJ-XB72B(10세대) 단가: 2,770,000원\n※ 노트북 기종: NT761XDA-X07/C(11세대) 단가: 2,452,000원\n※ 노트북 기종: NT961XFH-X01/C(13세대) 단가: 2,682,000원\n※ 노트북 기종: NT961XGL-COM(14세대) 단가: 2,999,655원";
         // 특별한 색상 처리가 필요한 규정 (2번과 9번 빨간색)
         String regulation2 = "2. 노트북을 파손하였을 경우 전액 수령자 비용부담으로 수리하여 원 상태로 반납하여야 한다.\n   실금, 흠집 등 사용상의 문제가 없는 미세 하자 역시 파손에 포함되므로 최초 수령 시 외관 상태 촬영 必";
 
@@ -118,12 +126,15 @@ public class PdfService {
         String regulation9 = "9. 아래 노트북(구성품 포함)이 이상 없음을 확인하며 수령 후 이상 여부가 확인된 경우 즉시 고지하고\n   확인 작업에 적극 협조한다.";
 
         // 일반 규정 추가
-        for (String regulation : regulations) {
-            Paragraph p = new Paragraph(regulation)
-                    .setFont(font)
-                    .setFontSize(10);
-            document.add(p);
-        }
+        Paragraph p0 = new Paragraph(regulation)
+                .setFont(font)
+                .setFontSize(10);
+        document.add(p0);
+
+        Paragraph p1 = new Paragraph(regulation1)
+                .setFont(font)
+                .setFontSize(9);
+        document.add(p1);
 
         // 2번 규정 (빨간색)
         Paragraph p2 = new Paragraph(regulation2)
@@ -133,8 +144,8 @@ public class PdfService {
         document.add(p2);
 
         // 일반 규정 추가 (3-8번)
-        for (String regulation : regularRegulations) {
-            Paragraph p = new Paragraph(regulation)
+        for (String normalRegulation : regularRegulations) {
+            Paragraph p = new Paragraph(normalRegulation)
                     .setFont(font)
                     .setFontSize(10);
             document.add(p);
@@ -148,7 +159,7 @@ public class PdfService {
         document.add(p9);
     }
 
-    private void addComponentsTable(Document document, PdfFont font) {
+    private void addComponentsTable(Document document, PdfFont font, PdfInfo info) {
         // 노트북 구성품 테이블 생성
         Table table = new Table(UnitValue.createPercentArray(new float[]{2, 1, 1, 1, 2, 1, 1, 1}));
         table.setWidth(UnitValue.createPercentValue(100));
@@ -164,13 +175,13 @@ public class PdfService {
         addHeaderCell(table, font, "반납", 1, 1);
 
         // 테이블 내용 - 첫 번째 행
-        addComponentRow(table, font, "노트북", "1", "마우스\n*리시버 포함", "1");
+        addComponentRow(table, font, "노트북", Integer.toString(info.getLaptopCount()), "마우스\n*리시버 포함", Integer.toString(info.getMouseCount()));
 
         // 테이블 내용 - 두 번째 행
-        addComponentRow(table, font, "전원선", "1", "가방\n*가방끈 포함", "1");
+        addComponentRow(table, font, "전원선", Integer.toString(info.getPowerCableCount()), "가방\n*가방끈 포함", Integer.toString(info.getBagCount()));
 
         // 테이블 내용 - 세 번째 행
-        addComponentRow(table, font, "어댑터", "1", "마우스패드", "1");
+        addComponentRow(table, font, "어댑터", Integer.toString(info.getAdapterCount()), "마우스패드", Integer.toString(info.getMousePadCount()));
 
         // 특이사항 행
         Cell specialCell = new Cell(1, 8)
@@ -258,7 +269,7 @@ public class PdfService {
         table.addCell(cell8);
     }
 
-    private void addSignatureSection(Document document, PdfFont font, PdfInfo form) {
+    private void addSignatureSection(Document document, PdfFont font, PdfInfo info) {
         // 서명 문구
         Paragraph signParagraph = new Paragraph("본인은 노트북을 지급 받아 사용하는 데에 따른 위 사항에 동의하고 준수할 것을 확인합니다.")
                 .setFont(font)
@@ -271,17 +282,29 @@ public class PdfService {
         Table signatureTable = new Table(UnitValue.createPercentArray(new float[]{2, 3, 2, 3}));
         signatureTable.setWidth(UnitValue.createPercentValue(100));
 
+        String rentDate;
+        if (info.getReturnDate() == null) {
+            rentDate = "";
+        }else{
+            rentDate = info.getRentDate().toString();
+        }
+        String returnDate;
+        if (info.getReturnDate() == null) {
+            returnDate = "";
+        }else{
+            returnDate = info.getReturnDate().toString();
+        }
         // 첫 번째 행
-        addSignatureRow(signatureTable, font, "수 령 일 자 :", "2025/01/06", "반 납 일 자 :", "");
+        addSignatureRow(signatureTable, font, "수 령 일 자 :", rentDate, "반 납 일 자 :", returnDate);
 
         // 두 번째 행
-        addSignatureRow(signatureTable, font, "수 령 서 명 :", form.getName(), "반 납 서 명 :", "");
+        addSignatureRow(signatureTable, font, "수 령 서 명 :", info.getName(), "반 납 서 명 :", "");
 
         // 세 번째 행
-        addSignatureRow(signatureTable, font, "시 리 얼 번 호 :", "KUYR99YTB00036", "성 명 :", form.getName());
+        addSignatureRow(signatureTable, font, "시 리 얼 번 호 :", info.getSerial(), "성 명 :", info.getName());
 
         // 네 번째 행
-        addSignatureRow(signatureTable, font, "바 코 드 번 호 :", "A40300136A", "생 년 월 일 :", "1999/06/29");
+        addSignatureRow(signatureTable, font, "바 코 드 번 호 :", info.getBarcode(), "이 메 일 :", info.getEmail());
 
         document.add(signatureTable);
     }
@@ -290,7 +313,7 @@ public class PdfService {
         // 첫 번째 라벨
         Cell labelCell1 = new Cell()
                 .add(new Paragraph(label1).setFont(font).setFontSize(10))
-                .setTextAlignment(TextAlignment.RIGHT)
+                .setTextAlignment(TextAlignment.LEFT)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                 .setBorder(Border.NO_BORDER);
         table.addCell(labelCell1);
@@ -306,7 +329,7 @@ public class PdfService {
         // 두 번째 라벨
         Cell labelCell2 = new Cell()
                 .add(new Paragraph(label2).setFont(font).setFontSize(10))
-                .setTextAlignment(TextAlignment.RIGHT)
+                .setTextAlignment(TextAlignment.LEFT)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                 .setBorder(Border.NO_BORDER);
         table.addCell(labelCell2);
@@ -320,7 +343,7 @@ public class PdfService {
         table.addCell(valueCell2);
     }
 
-    private void addPhotoSection(Document document, PdfFont font) throws MalformedURLException {
+    private void addPhotoSection(Document document, PdfFont font, List<Photo> photos) throws MalformedURLException {
         // 사진 섹션 제목 (밑줄 추가)
         Paragraph photoTitle = new Paragraph("삼성 청년 S/W 아카데미 노트북 수령 상태 촬영")
                 .setFont(font)
@@ -331,19 +354,28 @@ public class PdfService {
         document.add(photoTitle);
         document.add(new Paragraph("\n"));
 
+
+
         // 첫 번째 페이지: 전면부와 후면부 사진
-        addPhotoItem(document, font, "[전면부 사진/옆면포함]");
-        addPhotoItem(document, font, "[후면부 사진/옆면포함]");
+        addPhotoItem(document, font, "[전면부 사진]", s3Service.generatePresignedUrl(photos.get(0).getName()));
+        addPhotoItem(document, font, "[후면부 사진]", s3Service.generatePresignedUrl(photos.get(1).getName()));
 
-        // 첫 페이지 후 페이지 나누기
+        // 두 번째 페이지 후 페이지 나누기
         document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+        addPhotoItem(document, font, "[우측 사진]", s3Service.generatePresignedUrl(photos.get(2).getName()));
+        document.add(new Paragraph("\n"));
+        document.add(new Paragraph("\n"));
+        addPhotoItem(document, font, "[좌측 사진]", s3Service.generatePresignedUrl(photos.get(3).getName()));
+        document.add(new Paragraph("\n"));
+        document.add(new Paragraph("\n"));
+        // 세 번째 페이지: 액정과 키판 사진
+        addPhotoItem(document, font, "[액정 사진/카메라 랜즈 포함]", s3Service.generatePresignedUrl(photos.get(4).getName()));
+        document.add(new Paragraph("\n"));
+        addPhotoItem(document, font, "[키판 사진]", s3Service.generatePresignedUrl(photos.get(5).getName()));
 
-        // 두 번째 페이지: 액정과 키판 사진
-        addPhotoItem(document, font, "[액정 사진/카메라 랜즈 포함]");
-        addPhotoItem(document, font, "[키판 사진]");
 
         // 기타 확인 사진을 위한 변수 n
-        int n = 5; // 여기서 필요한 기타 사진 개수 설정
+        /*int n = 5; // 여기서 필요한 기타 사진 개수 설정
 
         // 기타 확인 사진 추가 (n개)
         if (n > 0) {
@@ -358,11 +390,11 @@ public class PdfService {
 
                 addPhotoItem(document, font, "[기타 확인이 필요하다고 판단되는 사진]");
             }
-        }
+        }*/
     }
 
     // 사진 항목 하나를 추가하는 헬퍼 메소드
-    private void addPhotoItem(Document document, PdfFont font, String description) throws MalformedURLException {
+    private void addPhotoItem(Document document, PdfFont font, String description, String url) throws MalformedURLException {
         // 제목을 Paragraph로 추가 (왼쪽 정렬)
         Paragraph descParagraph = new Paragraph(description)
                 .setFont(font)
@@ -383,8 +415,9 @@ public class PdfService {
                 .setVerticalAlignment(VerticalAlignment.MIDDLE);
 
         // 이미지 추가
-        String imagePath = PdfController.class.getClassLoader().getResource("static/test.jpg").getPath();
-        Image image = new Image(ImageDataFactory.create(imagePath));
+
+        String imagePath = PdfController.class.getClassLoader().getResource("static/image/test.jpg").getPath();
+        Image image = new Image(ImageDataFactory.create(new URL(url)));
 
         // 이미지 크기와 정렬 설정
         image.setHeight(260);
@@ -397,9 +430,7 @@ public class PdfService {
 
         // 문서에 테이블 추가
         document.add(photoTable);
-
-        // 항목 간 간격 추가
-        if (!description.equals("[후면부 사진/옆면포함]")) document.add(new Paragraph("\n"));
     }
+
 
 }

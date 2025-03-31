@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -23,24 +22,26 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.pizza.kkomdae.AppData
 import com.pizza.kkomdae.CameraActivity
-import com.pizza.kkomdae.MainActivity
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
-import com.pizza.kkomdae.databinding.FragmentBackShotGuideBinding
 import com.pizza.kkomdae.databinding.FragmentScreenShotGuideBinding
-import com.pizza.kkomdae.ui.MyAndroidViewModel
+import com.pizza.kkomdae.presenter.viewmodel.CameraViewModel
 import java.io.File
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 private var imageCapture: ImageCapture? = null
+private var cameraProvider: ProcessCameraProvider? = null
 private var camera: Camera? = null
-private lateinit var viewModel: MyAndroidViewModel
+private var cameraExecutor: ExecutorService? = null
 private lateinit var cameraActivity: CameraActivity
 
 
@@ -56,6 +57,7 @@ class ScreenShotGuideFragment :  BaseFragment<FragmentScreenShotGuideBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private val viewModel: CameraViewModel by activityViewModels()
     override fun onAttach(context: Context) {
         super.onAttach(context)
         cameraActivity = context as CameraActivity
@@ -71,16 +73,18 @@ class ScreenShotGuideFragment :  BaseFragment<FragmentScreenShotGuideBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // 카메라 초기화
+        cameraExecutor = Executors.newSingleThreadExecutor()
         startCamera()
 
-        viewModel = ViewModelProvider(requireActivity()).get(MyAndroidViewModel::class.java)
+
         // 가이드 닫기 버튼 눌렀을 때
         binding.btnCancel?.setOnClickListener {
             binding.clGuide?.isVisible = false
             binding.overlayView?.isVisible=true
             binding.btnBack?.isVisible = true
             binding.btnShot?.isVisible = true
-            binding?.btnGuide?.isVisible = true
+            binding.btnGuide?.isVisible = true
         }
 
         // 가이드 보기 버튼 눌렀을 떄
@@ -89,7 +93,7 @@ class ScreenShotGuideFragment :  BaseFragment<FragmentScreenShotGuideBinding>(
             binding.overlayView?.isVisible=false
             binding.btnBack?.isVisible = false
             binding.btnShot?.isVisible = false
-            binding?.btnGuide?.isVisible = false
+            binding.btnGuide?.isVisible = false
         }
 
         // 뒤로 가기 버튼 눌렀을 때
@@ -155,7 +159,7 @@ class ScreenShotGuideFragment :  BaseFragment<FragmentScreenShotGuideBinding>(
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
         cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
+            cameraProvider = cameraProviderFuture.get()
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             // ✅ ImageCapture 설정 (16:9 비율 유지)
@@ -173,8 +177,8 @@ class ScreenShotGuideFragment :  BaseFragment<FragmentScreenShotGuideBinding>(
                 }
 
             try {
-                cameraProvider.unbindAll()
-                camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
+                cameraProvider?.unbindAll()
+                camera = cameraProvider?.bindToLifecycle(this, cameraSelector, preview, imageCapture)
             } catch (e: Exception) {
                 Log.e("CameraFragment", "카메라 실행 오류: ${e.message}")
             }
@@ -199,10 +203,9 @@ class ScreenShotGuideFragment :  BaseFragment<FragmentScreenShotGuideBinding>(
                     // ✅ ViewModel에 사진 저장
                     viewModel.setScreen(savedUri)
                     viewModel.setStep(5)
-                    AppData.screenUri = savedUri
-                    AppData.step=5
 
 
+                    shutdownCamera()
                     cameraActivity.changeFragment(0)
                 }
 
@@ -210,6 +213,21 @@ class ScreenShotGuideFragment :  BaseFragment<FragmentScreenShotGuideBinding>(
                     Log.e("CameraFragment", "사진 촬영 실패: ${exception.message}")
                 }
             })
+    }
+
+    private fun shutdownCamera() {
+        try {
+            // 카메라 사용 중지
+            camera?.cameraControl?.enableTorch(false) // 플래시 사용 중이면 종료
+            cameraProvider?.unbindAll() // 모든 카메라 바인딩 해제
+
+            // 실행자 종료
+            cameraExecutor?.shutdown()
+            cameraExecutor = null
+            camera = null
+        } catch (e: Exception) {
+
+        }
     }
 
 

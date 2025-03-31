@@ -6,17 +6,17 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.pizza.kkomdae.R
-import com.pizza.kkomdae.data.Submission
+import com.pizza.kkomdae.presenter.model.Submission
 import com.pizza.kkomdae.databinding.ItemSubmissionBinding
+import com.pizza.kkomdae.presenter.model.UserRentTestResponse
 
 
-class SubmissionAdapter: ListAdapter<Submission, SubmissionAdapter.SubmissionViewHolder>(object : DiffUtil.ItemCallback<Submission>(){
-    override fun areContentsTheSame(oldItem: Submission, newItem: Submission): Boolean {
+class SubmissionAdapter: ListAdapter<UserRentTestResponse, SubmissionAdapter.SubmissionViewHolder>(object : DiffUtil.ItemCallback<UserRentTestResponse>(){
+    override fun areContentsTheSame(oldItem: UserRentTestResponse, newItem: UserRentTestResponse): Boolean {
         return oldItem==newItem
     }
 
-    override fun areItemsTheSame(oldItem: Submission, newItem: Submission): Boolean {
+    override fun areItemsTheSame(oldItem: UserRentTestResponse, newItem: UserRentTestResponse): Boolean {
         return oldItem === newItem
     }
 }){

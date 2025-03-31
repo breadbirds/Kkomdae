@@ -12,6 +12,7 @@ import pizza.kkomdae.dto.request.DeviceCond;
 import pizza.kkomdae.dto.request.StudentWithRentCond;
 import pizza.kkomdae.dto.respond.DeviceWithStatus;
 import pizza.kkomdae.dto.respond.LaptopTestResultWithStudent;
+import pizza.kkomdae.dto.respond.PhotoWithUrl;
 import pizza.kkomdae.dto.respond.StudentWithRent;
 import pizza.kkomdae.entity.*;
 import pizza.kkomdae.service.*;
@@ -95,14 +96,11 @@ public class AdminController {
 
     @GetMapping("/photos")
     public String photos(@RequestParam long testResultId, Model model) {
-        List<String> photoUrls = new ArrayList<>();
-        photoUrls.add("/test.jpg");
-        photoUrls.add("/test.jpg");
-        photoUrls.add("/test.jpg");
-        photoUrls.add("/test.jpg");
-        photoUrls.add("/test.jpg");
-        log.info("urls size : {}", photoUrls.size());
-        model.addAttribute("photoUrls", photoUrls);
+//        TODO 실제 사진 링크로 변경
+        List<PhotoWithUrl> photos = testResultService.getPhotos(testResultId);
+
+        log.info("urls size : {}", photos.size());
+        model.addAttribute("photos", photos);
         return "photos";
     }
 

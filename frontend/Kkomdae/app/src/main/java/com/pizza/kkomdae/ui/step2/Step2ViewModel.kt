@@ -1,12 +1,11 @@
 package com.pizza.kkomdae.ui.step2
 
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.pizza.kkomdae.data.dto.ComponentStatus
-import com.pizza.kkomdae.data.dto.KeyboardStatus
-import com.pizza.kkomdae.data.dto.UsbStatus
+import com.pizza.kkomdae.presenter.model.ComponentStatus
+import com.pizza.kkomdae.presenter.model.KeyboardStatus
+import com.pizza.kkomdae.presenter.model.UsbStatus
 
 class Step2ViewModel: ViewModel() {
 

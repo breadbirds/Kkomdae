@@ -24,14 +24,11 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
-import com.pizza.kkomdae.CameraActivity
 import com.pizza.kkomdae.MainActivity
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
-import com.pizza.kkomdae.data.dto.DeviceReport
+import com.pizza.kkomdae.presenter.model.DeviceReport
 import com.pizza.kkomdae.databinding.FragmentQrScanBinding
-import com.pizza.kkomdae.ui.MyAndroidViewModel
-import com.pizza.kkomdae.ui.guide.Step1GuideFragment
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -75,7 +72,7 @@ class QrScanFragment : BaseFragment<FragmentQrScanBinding>(
                             val rawValue = barcode.rawValue
                             if(isValidJson("$rawValue")){
                                 Log.d(TAG, "Scanned QR Code: $rawValue")
-                                val report = Gson().fromJson(rawValue,DeviceReport::class.java)
+                                val report = Gson().fromJson(rawValue, DeviceReport::class.java)
                                 viewModel.apply {
                                     setUsbStatus(report.usb)
                                     setCameraStatus(report.camera)

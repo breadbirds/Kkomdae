@@ -30,16 +30,16 @@ public class LaptopTestResult {
     private Boolean batteryReport;
     private String batteryReportUrl;
     private LocalDate date;
-    private String pdfUrl;
+    private String pdfFileName;
     private Integer laptop;
     private Integer powerCable;
     private Integer adapter;
     private Integer mouse;
     private Integer bag;
     private Integer mousePad;
+    private Integer stage = 1;
+    private Integer picStage = 0;
 
-    private int stage = 0;
-    private int picStage = 0;
 
     @OneToMany(mappedBy = "laptopTestResult")
     private List<Photo> photos;

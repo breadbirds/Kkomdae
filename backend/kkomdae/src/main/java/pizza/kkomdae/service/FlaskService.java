@@ -1,5 +1,6 @@
 package pizza.kkomdae.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -11,13 +12,15 @@ public class FlaskService {
 
     private final RestTemplate restTemplate;
 
+    @Value("${flask.url}")
+    private String flaskUrl;
+    
     public FlaskService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
-
+    
     public FlaskResponse analyzeImage(FlaskRequest flaskRequest) {
-        String flaskUrl = "http://flask:5000/analyze"; // Flask 서버 URL
-
+        
         // HTTP 요청 생성
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

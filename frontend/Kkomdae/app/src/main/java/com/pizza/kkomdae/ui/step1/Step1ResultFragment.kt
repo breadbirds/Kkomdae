@@ -3,9 +3,7 @@ package com.pizza.kkomdae.ui.step1
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -13,21 +11,20 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.pizza.kkomdae.AppData
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
-import com.pizza.kkomdae.data.Step1Result
-import com.pizza.kkomdae.databinding.FragmentFontResultBinding
+import com.pizza.kkomdae.presenter.model.Step1Result
 import com.pizza.kkomdae.databinding.FragmentStep1ResultBinding
-import com.pizza.kkomdae.ui.MyAndroidViewModel
-import com.pizza.kkomdae.ui.guide.Step1GuideFragment
+import com.pizza.kkomdae.presenter.viewmodel.CameraViewModel
 import com.pizza.kkomdae.ui.guide.Step2GuideFragment
 import android.content.Context
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.activityViewModels
 import com.pizza.kkomdae.MainActivity
+import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
-private lateinit var viewModel: MyAndroidViewModel
 private const val TAG = "Step1ResultFragment"
 
 /**
@@ -40,6 +37,7 @@ class Step1ResultFragment : BaseFragment<FragmentStep1ResultBinding>(
     R.layout.fragment_step1_result
 ) {
     private lateinit var mainActivity: MainActivity
+    private val viewModel : MainViewModel by activityViewModels()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -50,6 +48,7 @@ class Step1ResultFragment : BaseFragment<FragmentStep1ResultBinding>(
     private var param1: String? = null
     private var param2: String? = null
     private var step = 1
+    private var imageList : List<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,8 +60,8 @@ class Step1ResultFragment : BaseFragment<FragmentStep1ResultBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(requireActivity()).get(MyAndroidViewModel::class.java)
-        Log.d(TAG, "onViewCreated: ${viewModel.frontUri.value}")
+
+        viewModel.getPhoto(1)
 
         binding.topBar.tvTitle.text = "STEP 1"
         binding.topBar.pbStep.progress=100/3
@@ -81,8 +80,9 @@ class Step1ResultFragment : BaseFragment<FragmentStep1ResultBinding>(
         }
 
         Glide.with(binding.ivImage)
-            .load(AppData.frontUri)
+            .load("")
             .into(binding.ivImage)
+
         val data = listOf(
             Step1Result(R.drawable.ic_front_laptop, "전면부"),
             Step1Result(R.drawable.ic_guide_back, "후면부"),
@@ -107,6 +107,11 @@ class Step1ResultFragment : BaseFragment<FragmentStep1ResultBinding>(
         // X 클릭 이벤트 설정
         binding.topBar.backButtonContainer.setOnClickListener {
             showQuitBottomSheet()
+        }
+
+        viewModel.resultImage.observe(viewLifecycleOwner){
+            imageList = it
+            changeImage(0)
         }
 
     }
@@ -139,23 +144,22 @@ class Step1ResultFragment : BaseFragment<FragmentStep1ResultBinding>(
 
     fun changeImage(it: Int){
         Log.d(TAG, "changeImage: $it")
-        var a = AppData.frontUri
-        step=it+1
-        if(step ==1){
-            a=AppData.frontUri
-        }else if(step == 2){
-            a=AppData.backUri
-        }else if (step ==3){
-            a=AppData.leftUri
-        }else if (step ==4){
-            a=AppData.rightUri
-        }else if (step ==5){
-            a=AppData.screenUri
-        }else if (step ==6){
-            a=AppData.keypadUri
-        }
+        step=it
+//        if(step ==1){
+//            a=AppData.frontUri
+//        }else if(step == 2){
+//            a=AppData.backUri
+//        }else if (step ==3){
+//            a=AppData.leftUri
+//        }else if (step ==4){
+//            a=AppData.rightUri
+//        }else if (step ==5){
+//            a=AppData.screenUri
+//        }else if (step ==6){
+//            a=AppData.keypadUri
+//        }
         Glide.with(binding.ivImage)
-            .load(a)
+            .load(imageList?.get(step) ?:"")
             .into(binding.ivImage)
     }
 

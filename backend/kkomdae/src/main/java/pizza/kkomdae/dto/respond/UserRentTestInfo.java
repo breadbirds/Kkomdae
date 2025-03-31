@@ -12,4 +12,5 @@ public class UserRentTestInfo {
     private long onGoingTestId = 0;
     private int stage = 0;
     private int picStage = 0;
+    private String name;
 }

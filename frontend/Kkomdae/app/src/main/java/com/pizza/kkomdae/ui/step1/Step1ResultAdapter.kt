@@ -1,15 +1,13 @@
 package com.pizza.kkomdae.ui.step1
 
-import android.content.res.ColorStateList
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.card.MaterialCardView
 import com.pizza.kkomdae.R
-import com.pizza.kkomdae.data.Step1Result
+import com.pizza.kkomdae.presenter.model.Step1Result
 import com.pizza.kkomdae.databinding.ItemStep1ResultBinding
 
 class Step1ResultAdapter(val list: List<Step1Result>, val listen:(Int)->Unit): RecyclerView.Adapter<Step1ResultAdapter.Step1ResultViewHolder>() {

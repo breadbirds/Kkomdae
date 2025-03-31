@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.pizza.kkomdae.AppData
 import com.pizza.kkomdae.MainActivity
@@ -20,6 +22,8 @@ import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentLaptopInfoInputBinding
 import com.pizza.kkomdae.databinding.FragmentMainBinding
 import com.pizza.kkomdae.databinding.FragmentStep1GuideBinding
+import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
+import kotlin.math.log
 
 private lateinit var mainActivity: MainActivity
 
@@ -47,6 +51,7 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private val viewModel : MainViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +63,9 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
 
     override fun onResume() {
         super.onResume()
-        step =AppData.step
+
+            step=viewModel.getPhotoStage()
+
         val color = ContextCompat.getColorStateList(requireContext(), R.color.blue500)
 
 

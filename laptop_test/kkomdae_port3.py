@@ -10,7 +10,8 @@ import time
 import ctypes
 from ctypes import wintypes
 import json
-
+from datetime import datetime
+import requests
 # 외부 라이브러리
 from tkinter import messagebox
 import ttkbootstrap as ttkb
@@ -20,7 +21,6 @@ import cv2
 import win32com.client
 import psutil
 import qrcode
-
 
 # ===============================
 # Windows API 상수 및 구조체 정의
@@ -249,7 +249,7 @@ class TestApp(ttkb.Window):
             "배터리": "생성 중",
             "QR코드": "생성 중"
         }
-        
+
         # 테스트 상태 라벨 저장 딕셔너리
         self.test_status_labels = {}
 
@@ -421,7 +421,7 @@ class TestApp(ttkb.Window):
         text_y = ((size[1] - text_height) // 2) - 6
         draw.text((text_x, text_y), key, font=font, fill=text_color, align='center')
         return ImageTk.PhotoImage(img)
-    
+
 
     def update_status(self, test_name, new_status):
         """
@@ -498,7 +498,7 @@ class TestApp(ttkb.Window):
     def create_test_item(self, parent, name: str, row: int, col: int) -> None:
         """
         각 테스트 항목의 UI를 생성하고, 격자에 배치합니다.
-        """ 
+        """
         # 컨테이너 프레임을 고정 크기로 생성 (크기는 원하는 대로 조정)
         frame = ttkb.Frame(parent, padding=10, width=250, height=200) # width를 250으로 수정
         frame.grid(row=row, column=col, padx=10, pady=10, sticky="nsew") # sticky 옵션 추가로 전체 격자 채우기
@@ -506,7 +506,7 @@ class TestApp(ttkb.Window):
         # [Row 0] 아이콘 전용 프레임 (고정 크기, 최상단에 배치)
         icon_frame = ttkb.Frame(frame, width=55, height=55)
         icon_frame.grid(row=0, column=0,sticky= "n", pady=(0, 5), padx=10)
-        
+
         # 아이콘 이미지 로드 및 명암(채도) 낮추기
         icon_path = self.test_icons.get(name, "default.png")
         icon_img = Image.open(icon_path).resize((50, 50), Image.LANCZOS)
@@ -568,7 +568,7 @@ class TestApp(ttkb.Window):
             self.usb_status_label = status_label
             # USB 포트 상태 레이블들을 담을 프레임
             usb_ports_frame = ttkb.Frame(frame)
-            usb_ports_frame.grid(row=3, column=0 ) 
+            usb_ports_frame.grid(row=3, column=0 )
             usb_ports_frame.grid_columnconfigure(0, weight=1)
             usb_ports_frame.grid_columnconfigure(1, weight=1)
             usb_ports_frame.grid_columnconfigure(2, weight=1)
@@ -665,7 +665,7 @@ class TestApp(ttkb.Window):
             del self.active_test_windows[test_name]
 
     # -------------------------------
-    # 키보드 테스트 관련 메서드 
+    # 키보드 테스트 관련 메서드
     # -------------------------------
 
     def open_keyboard_test(self) -> None:
@@ -751,16 +751,16 @@ class TestApp(ttkb.Window):
         pixel_width = width_unit * 10
         size = (pixel_width, height)
         key_upper = key.upper()
-        
+
         # normal, pressed 상태 이미지 생성
         normal_img = self.create_key_image(key, size, pressed=False)
         pressed_img = self.create_key_image(key, size, pressed=True)
-        
+
         # 각 키의 이미지 정보를 딕셔너리에 저장 (추후 상태 업데이트에 사용)
         if not hasattr(self, "key_images"):
             self.key_images = {}
         self.key_images[key_upper] = {"normal": normal_img, "pressed": pressed_img}
-        
+
         # normal 이미지로 위젯 생성
         if key in self.pressed_keys:
             widget = ttkb.Label(parent, image=pressed_img)
@@ -909,7 +909,7 @@ class TestApp(ttkb.Window):
             self.failed_keys = list(self.keys_not_pressed)
             self.update_status("키보드", "오류 발생")
             self.failed_keys_button.config(
-                state="normal", 
+                state="normal",
                 image=self.button_images["누르지 못한 키 보기"]["normal"]
             )
         self.close_keyboard_window()
@@ -1027,7 +1027,7 @@ class TestApp(ttkb.Window):
             # 1. WMI를 통해 USB  장치 정보 획득
             wmi_obj = win32com.client.GetObject("winmgmts:")
             pnp_entities = wmi_obj.InstancesOf("Win32_PnPEntity")
-            
+
             # 2. USB 기기를 탐지했는지 확인하기 위한 flag와 한 번에 탐지한 usb 수를 기록하는 임시 리스트트
             usb_found = False
             temp_usb_alram = []
@@ -1058,7 +1058,7 @@ class TestApp(ttkb.Window):
                             temp_usb_alram.append(port_number)
 
 
-            # 5. USB 기기를 하나도 찾지 못했을 경우 
+            # 5. USB 기기를 하나도 찾지 못했을 경우
             if usb_found == False and all(self.usb_ports.values()) == False:
                 usb_found = True
                 messagebox.showinfo("USB Test", "USB를 연결을 확인해주세요.")
@@ -1158,7 +1158,7 @@ class TestApp(ttkb.Window):
         if hasattr(self, "camera_update_after_id") and self.camera_update_after_id is not None:
             self.after_cancel(self.camera_update_after_id)
             self.camera_update_after_id = None
-            
+
         try:
             # 카메라 객체가 존재하면 해제하고 None으로 초기화
             if hasattr(self, "cap") and self.cap is not None:
@@ -1220,25 +1220,54 @@ class TestApp(ttkb.Window):
         try:
             # 다운로드 폴더 경로를 가져옵니다.
             downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
-            
+
             # 다운로드 폴더가 없는 경우, 생성합니다.
             if not os.path.exists(downloads_path):
                 os.makedirs(downloads_path)
 
-            self.report_path = os.path.join(downloads_path, "battery_report.html")
-            subprocess.run(["powercfg", "/batteryreport", "/output", self.report_path],
+            # 컴퓨터 이름 가져오기
+            computer_name = os.getenv("COMPUTERNAME")
+            if computer_name is None:
+                computer_name = "Unknown"
+            # 현재 시간 가져오기
+            now = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            # 배터리 리포트 파일명 생성
+            new_report_name = f"battery_report_{computer_name}_{now}.html"
+            new_report_path = os.path.join(downloads_path, new_report_name)
+
+            # 리포트 생성
+            temp_report_path = os.path.join(downloads_path, "battery_report.html")
+            subprocess.run(["powercfg", "/batteryreport", "/output", temp_report_path],
                            check=True, capture_output=True, text=True)
+            # 리포트 파일 이름 변경
+            os.rename(temp_report_path, new_report_path)
+
+            self.report_path = new_report_path
             messagebox.showinfo("배터리 리포트", f"배터리 리포트가 생성되었습니다.\n파일 경로:\n{self.report_path}")
             self.battery_report_button.config(bootstyle="info")
             self.update_status("배터리", "생성 완료")
             self.mark_test_complete("배터리")
+            self.upload_battery_report(self.report_path)
         except subprocess.CalledProcessError as e:
             messagebox.showerror("배터리 리포트 오류", f"명령 실행 중 오류 발생:\n{e.stderr}")
             self.update_status("배터리", "오류 발생")
         except Exception as e:
             messagebox.showerror("배터리 리포트 오류", f"오류 발생:\n{e}")
             self.update_status("배터리", "오류 발생")
-            
+
+    def get_computer_name(self):
+        """
+        컴퓨터 이름을 가져옵니다.
+        """
+        try:
+            computer_name = os.getenv("COMPUTERNAME")
+            if computer_name is None:
+                computer_name = "Unknown"
+            return computer_name
+        except Exception as e:
+            messagebox.showerror("컴퓨터 이름 오류", f"컴퓨터 이름을 가져오는 중 오류 발생:\n{e}")
+            return "Unknown"
 
     def view_battery_report(self) -> None:
         """
@@ -1255,6 +1284,28 @@ class TestApp(ttkb.Window):
             messagebox.showwarning("리포트 없음", "아직 배터리 리포트가 생성되지 않았습니다.\n먼저 '배터리 리포트 생성' 버튼을 눌러주세요.")
             self.update_status("배터리", "생성 전")
 
+    def upload_battery_report(self, report_path):
+        """
+        (기존) S3 직접 업로드 -> (변경) Django 서버로 업로드
+        """
+        # Django 서버 endpoint
+        # 실제 주소/포트를 맞춰서 기입: 예) https://j12d101.p.ssafy.io/s3app/upload_battery/
+        django_url = "https://j12d101.p.ssafy.io/django/s3app/upload_battery/"
+        # django_url = "http://localhost:8000/s3app/upload_battery/"
+
+        try:
+            with open(report_path, 'rb') as f:
+                # 파일 전송
+                files = {'file': (os.path.basename(report_path), f, 'text/html')}
+                resp = requests.post(django_url, files=files)
+
+                if resp.status_code == 200:
+                    data = resp.json()
+                    messagebox.showinfo("업로드 완료", f"Django에 업로드 성공: {data}")
+                else:
+                    messagebox.showerror("업로드 오류", f"status={resp.status_code}, body={resp.text}")
+        except Exception as e:
+            messagebox.showerror("업로드 예외", f"Django 서버 업로드 중 오류 발생: {e}")
 
     # -------------------------------
     # QR 코드 생성 관련 메서드

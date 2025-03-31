@@ -52,9 +52,26 @@
 
 아래는 PyInstaller를 사용하여 단일 실행 파일로 빌드하는 예시입니다:
 
-```bash
 ##  pyinstaller 빌드 명령 예시
+### port의 수를 인식
+```bash
+python -m PyInstaller --onefile --windowed \
+--add-data "./resource/image/ssafy_logo.png;resource/image/" \
+--add-data "./resource/image/keyboard.png;resource/image" \
+--add-data "./resource/image/camera.png;resource/image" \
+--add-data "./resource/image/usb.png;resource/image" \
+--add-data "./resource/image/charging.png;resource/image" \
+--add-data "./resource/image/battery.png;resource/image" \
+--add-data "./resource/image/qrcode.png;resource/image" \
+--add-data "./resource/font/SamsungSharpSans-Bold.ttf;resource/font" \
+--add-data "./resource/font/SamsungOne-400.ttf;resource/font" \
+--add-data "./resource/font/SamsungOne-700.ttf;resource/font" \
+--add-data "./resource/font/NotoSansKR-VariableFont_wght.ttf;resource/font" \
+kkomdae_diagnostics.py
+```
+---
 ### port 3개
+```bash
 python -m PyInstaller --onefile --windowed \
 --add-data "./resource/image/ssafy_logo.png;resource/image/" \
 --add-data "./resource/image/keyboard.png;resource/image" \
@@ -69,8 +86,9 @@ python -m PyInstaller --onefile --windowed \
 --add-data "./resource/font/NotoSansKR-VariableFont_wght.ttf;resource/font" \
 kkomdae_port3.py
 ```
-```bash
+---
 ### port 1개
+```bash
 python -m PyInstaller --onefile --windowed \
 --add-data "./resource/image/ssafy_logo.png;resource/image/" \
 --add-data "./resource/image/keyboard.png;resource/image" \

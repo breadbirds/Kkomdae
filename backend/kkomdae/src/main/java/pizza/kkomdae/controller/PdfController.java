@@ -14,21 +14,43 @@ import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.properties.*;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pizza.kkomdae.dto.PdfInfo;
+import pizza.kkomdae.entity.LaptopTestResult;
+import pizza.kkomdae.entity.Photo;
+import pizza.kkomdae.repository.laptopresult.LapTopTestResultRepository;
+import pizza.kkomdae.s3.S3Service;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/admin")
+@Hidden
+@RequiredArgsConstructor
 public class PdfController {
+
+    private final S3Service s3Service;
+    private final LapTopTestResultRepository lapTopTestResultRepository;
+
     @PostMapping("/pdf5")
     public void test5(HttpServletResponse response, PdfInfo form) throws Exception {// PDF 문서 생성
 
+
+        LaptopTestResult result = lapTopTestResultRepository.findById(16L).orElseThrow(() -> new RuntimeException("없는 테스트 아이디"));
+        List<Photo> photos = result.getPhotos();
+
         PdfWriter writer = new PdfWriter(response.getOutputStream());
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "inline; filename=pdf5.pdf");
+
         PdfDocument pdf = new PdfDocument(writer);
         Document document = new Document(pdf, PageSize.A4);
         document.setMargins(50, 50, 50, 50);
@@ -71,21 +93,15 @@ public class PdfController {
                 Paragraph("\n\n"));
 
         // 노트북 촬영 섹션
-        addPhotoSection(document, koreanFont);
+        addPhotoSection(document, koreanFont, photos);
 
         document.close();
     }
 
     private void addRegulations(Document document, PdfFont font, DeviceRgb redColor) {
         // 노트북 수령 규정 목록
-        List<String> regulations = Arrays.asList(
-                "1. 분실 또는 도난 당하였을 경우 동일한 성능의 노트북으로 변상한다.",
-                "※ 노트북 기종: NT850XCJ-XB72B(10세대) 단가: 2,770,000원",
-                "※ 노트북 기종: NT761XDA-X07/C(11세대) 단가: 2,452,000원",
-                "※ 노트북 기종: NT961XFH-X01/C(13세대) 단가: 2,682,000원",
-                "※ 노트북 기종: NT961XGL-COM(14세대) 단가: 2,999,655원"
-        );
-
+        String regulation = "1. 분실 또는 도난 당하였을 경우 동일한 성능의 노트북으로 변상한다.";
+        String regulation1 = "※ 노트북 기종: NT850XCJ-XB72B(10세대) 단가: 2,770,000원\n※ 노트북 기종: NT761XDA-X07/C(11세대) 단가: 2,452,000원\n※ 노트북 기종: NT961XFH-X01/C(13세대) 단가: 2,682,000원\n※ 노트북 기종: NT961XGL-COM(14세대) 단가: 2,999,655원";
         // 특별한 색상 처리가 필요한 규정 (2번과 9번 빨간색)
         String regulation2 = "2. 노트북을 파손하였을 경우 전액 수령자 비용부담으로 수리하여 원 상태로 반납하여야 한다.\n   실금, 흠집 등 사용상의 문제가 없는 미세 하자 역시 파손에 포함되므로 최초 수령 시 외관 상태 촬영 必";
 
@@ -101,12 +117,15 @@ public class PdfController {
         String regulation9 = "9. 아래 노트북(구성품 포함)이 이상 없음을 확인하며 수령 후 이상 여부가 확인된 경우 즉시 고지하고\n   확인 작업에 적극 협조한다.";
 
         // 일반 규정 추가
-        for (String regulation : regulations) {
-            Paragraph p = new Paragraph(regulation)
-                    .setFont(font)
-                    .setFontSize(10);
-            document.add(p);
-        }
+        Paragraph p0 = new Paragraph(regulation)
+                .setFont(font)
+                .setFontSize(10);
+        document.add(p0);
+
+        Paragraph p1 = new Paragraph(regulation1)
+                .setFont(font)
+                .setFontSize(9);
+        document.add(p1);
 
         // 2번 규정 (빨간색)
         Paragraph p2 = new Paragraph(regulation2)
@@ -116,8 +135,8 @@ public class PdfController {
         document.add(p2);
 
         // 일반 규정 추가 (3-8번)
-        for (String regulation : regularRegulations) {
-            Paragraph p = new Paragraph(regulation)
+        for (String normalRegulation : regularRegulations) {
+            Paragraph p = new Paragraph(normalRegulation)
                     .setFont(font)
                     .setFontSize(10);
             document.add(p);
@@ -303,7 +322,7 @@ public class PdfController {
         table.addCell(valueCell2);
     }
 
-    private void addPhotoSection(Document document, PdfFont font) throws MalformedURLException {
+    private void addPhotoSection(Document document, PdfFont font, List<Photo> photos) throws MalformedURLException {
         // 사진 섹션 제목 (밑줄 추가)
         Paragraph photoTitle = new Paragraph("삼성 청년 S/W 아카데미 노트북 수령 상태 촬영")
                 .setFont(font)
@@ -314,19 +333,28 @@ public class PdfController {
         document.add(photoTitle);
         document.add(new Paragraph("\n"));
 
+
+
         // 첫 번째 페이지: 전면부와 후면부 사진
-        addPhotoItem(document, font, "[전면부 사진/옆면포함]");
-        addPhotoItem(document, font, "[후면부 사진/옆면포함]");
+        addPhotoItem(document, font, "[전면부 사진]", s3Service.generatePresignedUrl(photos.get(0).getName()));
+        addPhotoItem(document, font, "[후면부 사진]", s3Service.generatePresignedUrl(photos.get(1).getName()));
 
-        // 첫 페이지 후 페이지 나누기
+        // 두 번째 페이지 후 페이지 나누기
         document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+        addPhotoItem(document, font, "[우측 사진]", s3Service.generatePresignedUrl(photos.get(2).getName()));
+        document.add(new Paragraph("\n"));
+        document.add(new Paragraph("\n"));
+        addPhotoItem(document, font, "[좌측 사진]", s3Service.generatePresignedUrl(photos.get(3).getName()));
+        document.add(new Paragraph("\n"));
+        document.add(new Paragraph("\n"));
+        // 세 번째 페이지: 액정과 키판 사진
+        addPhotoItem(document, font, "[액정 사진/카메라 랜즈 포함]", s3Service.generatePresignedUrl(photos.get(4).getName()));
+        document.add(new Paragraph("\n"));
+        addPhotoItem(document, font, "[키판 사진]", s3Service.generatePresignedUrl(photos.get(5).getName()));
 
-        // 두 번째 페이지: 액정과 키판 사진
-        addPhotoItem(document, font, "[액정 사진/카메라 랜즈 포함]");
-        addPhotoItem(document, font, "[키판 사진]");
 
         // 기타 확인 사진을 위한 변수 n
-        int n = 5; // 여기서 필요한 기타 사진 개수 설정
+        /*int n = 5; // 여기서 필요한 기타 사진 개수 설정
 
         // 기타 확인 사진 추가 (n개)
         if (n > 0) {
@@ -341,11 +369,11 @@ public class PdfController {
 
                 addPhotoItem(document, font, "[기타 확인이 필요하다고 판단되는 사진]");
             }
-        }
+        }*/
     }
 
     // 사진 항목 하나를 추가하는 헬퍼 메소드
-    private void addPhotoItem(Document document, PdfFont font, String description) throws MalformedURLException {
+    private void addPhotoItem(Document document, PdfFont font, String description, String url) throws MalformedURLException {
         // 제목을 Paragraph로 추가 (왼쪽 정렬)
         Paragraph descParagraph = new Paragraph(description)
                 .setFont(font)
@@ -366,8 +394,9 @@ public class PdfController {
                 .setVerticalAlignment(VerticalAlignment.MIDDLE);
 
         // 이미지 추가
-        String imagePath = PdfController.class.getClassLoader().getResource("static/test.jpg").getPath();
-        Image image = new Image(ImageDataFactory.create(imagePath));
+
+        String imagePath = PdfController.class.getClassLoader().getResource("static/image/test.jpg").getPath();
+        Image image = new Image(ImageDataFactory.create(new URL(url)));
 
         // 이미지 크기와 정렬 설정
         image.setHeight(260);
@@ -380,9 +409,6 @@ public class PdfController {
 
         // 문서에 테이블 추가
         document.add(photoTable);
-
-        // 항목 간 간격 추가
-        if (!description.equals("[후면부 사진/옆면포함]")) document.add(new Paragraph("\n"));
     }
 
 

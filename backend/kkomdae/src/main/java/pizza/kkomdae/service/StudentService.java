@@ -56,14 +56,15 @@ public class StudentService {
             results.add(new UserRentTestRes(rent));
         }
         UserRentTestInfo info = new UserRentTestInfo();
+        info.setName(student.getName());
         info.setUserRentTestRes(results);
         log.info("진행 중인 대여 절차 확인 쿼리");
         LaptopTestResult testResult = lapTopTestResultRepository.findByStudentAndStageIsLessThanAndDeviceIsNull(student, 5);
         if (testResult != null) {
             log.info("진행 중인 대여 절차 쿼리 정보 {} {}", testResult.getStage(), testResult.getLaptopTestResultId());
             info.setOnGoingTestId(testResult.getLaptopTestResultId());
-            info.setStage(testResult.getStage());//TODO 여기서 N+1 포토 리스트 한번에 fetchJoin하기
-            info.setPicStage(testResult.getPicStage()); //todo 나중에 laptopTestResult picStage 생기면 연결
+            info.setStage(testResult.getStage());
+            info.setPicStage(testResult.getPicStage());
         }
         return info;
 

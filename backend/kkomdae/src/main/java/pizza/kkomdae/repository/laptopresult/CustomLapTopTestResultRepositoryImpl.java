@@ -27,12 +27,27 @@ public class CustomLapTopTestResultRepositoryImpl implements CustomLapTopTestRes
                 ;
     }
 
+    @Override
+    public LaptopTestResult findByIdWithStudentAndDeviceAndPhotos(long testId) {
+        QLaptopTestResult result = QLaptopTestResult.laptopTestResult;
+        QStudent student = QStudent.student;
+        QDevice device = QDevice.device;
+        QPhoto photo = QPhoto.photo;
+        return query.selectFrom(result)
+                .leftJoin(result.student, student).fetchJoin()
+                .leftJoin(result.device, device).fetchJoin()
+                .leftJoin(result.photos,photo).fetchJoin()
+                .where(result.laptopTestResultId.eq(testId))
+                .orderBy(photo.type.asc())
+                .fetchOne();
+    }
+
     private Predicate isCond(Student student, Device device) {
-        if(student!=null && device!=null){
+        if (student != null && device != null) {
             return QStudent.student.eq(student).and(QDevice.device.eq(device));
-        } else if (student!=null) {
+        } else if (student != null) {
             return QStudent.student.eq(student);
-        } else if (device!=null) {
+        } else if (device != null) {
             return QDevice.device.eq(device);
         }
         return null;

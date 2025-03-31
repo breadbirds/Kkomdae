@@ -12,15 +12,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.pizza.kkomdae.CameraActivity
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentFontResultBinding
-import com.pizza.kkomdae.ui.MyAndroidViewModel
+import com.pizza.kkomdae.presenter.viewmodel.CameraViewModel
 import com.pizza.kkomdae.ui.guide.Step1GuideFragment
-import kotlin.math.log
 
 /**
  * A simple [Fragment] subclass.
@@ -36,7 +36,7 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
     FragmentFontResultBinding::bind,
     R.layout.fragment_font_result
 ){
-    private lateinit var viewModel: MyAndroidViewModel
+    private val viewModel: CameraViewModel by activityViewModels()
 
 
 
@@ -60,9 +60,9 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(requireActivity()).get(MyAndroidViewModel::class.java)
 
         Log.d(TAG, "onViewCreated: ${viewModel.frontUri.value}")
+        Log.d(TAG, "onViewCreated stage: ${viewModel.step.value}")
         var url :Uri? = null
         if(viewModel.step.value ==1){
             url = viewModel.frontUri.value
@@ -78,7 +78,7 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
             url = viewModel.keypadUri.value
         }
         binding.ivProduct?.let {
-            Log.d(TAG, "CameraFragment: ")
+            Log.d(TAG, "CameraFragment uri: $it")
             Glide.with(it)
                 .load(url)
                 .into(it)
@@ -88,11 +88,19 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
             cameraActivity.changeFragment(viewModel.step.value?:0)
         }
         binding.btnCheck?.setOnClickListener {
-            cameraActivity.changeFragment((viewModel.step.value?:-1)+1)
+            viewModel.postPhoto()
+//            cameraActivity.changeFragment((viewModel.step.value?:-1)+1)
         }
         // X 버튼 눌렀을 때
         binding.btnCancel?.setOnClickListener {
             showStopCameraDialog()
+        }
+
+        viewModel.postResult.observe(viewLifecycleOwner){
+            if(it?.success == true){
+                cameraActivity.changeFragment((viewModel.step.value?:-1)+1)
+                viewModel.clearResult()
+            }
         }
 
     }

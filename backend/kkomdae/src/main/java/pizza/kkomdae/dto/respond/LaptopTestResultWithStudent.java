@@ -15,7 +15,7 @@ public class LaptopTestResultWithStudent {
     private final String failedPorts;
     private final boolean cameraStatus;
     private final String batteryPdfUrl;
-    private final String resultPdfUrl;
+    private  String resultPdfUrl;
     private final LocalDate date;
 
     public LaptopTestResultWithStudent(LaptopTestResult laptopTestResult) {
@@ -28,9 +28,10 @@ public class LaptopTestResultWithStudent {
         this.failedPorts = laptopTestResult.getFailedPorts();
         this.cameraStatus = laptopTestResult.getCameraStatus();
         this.batteryPdfUrl = laptopTestResult.getBatteryReportUrl();
-        this.resultPdfUrl = laptopTestResult.getPdfUrl();
         this.date = laptopTestResult.getDate();
     }
 
-
+    public void setResultPdfUrl(String resultPdfUrl) {
+        this.resultPdfUrl = resultPdfUrl;
+    }
 }

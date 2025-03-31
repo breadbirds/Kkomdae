@@ -1,0 +1,45 @@
+package com.pizza.kkomdae.di
+
+import com.pizza.kkomdae.data.repository.InspectRepositoryImpl
+import com.pizza.kkomdae.data.repository.LoginRepositoryImpl
+import com.pizza.kkomdae.data.repository.Step1RepositoryImpl
+import com.pizza.kkomdae.data.repository.UserInfoRepositoryImpl
+import com.pizza.kkomdae.domain.model.TestResponse
+import com.pizza.kkomdae.domain.repository.InspectRepository
+import com.pizza.kkomdae.domain.repository.LoginRepository
+import com.pizza.kkomdae.domain.repository.Step1Repository
+import com.pizza.kkomdae.domain.repository.UserRepository
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepositoryModule {
+
+    @Binds
+    @Singleton
+    abstract fun bindLoginRepository(
+        impl: LoginRepositoryImpl
+    ): LoginRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindUserRepository(
+        impl: UserInfoRepositoryImpl
+    ): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindInspectRepository(
+        impl: InspectRepositoryImpl
+    ): InspectRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindStep1Repository(
+        impl: Step1RepositoryImpl
+    ): Step1Repository
+}

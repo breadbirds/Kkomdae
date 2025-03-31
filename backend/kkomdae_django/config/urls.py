@@ -15,11 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from s3app.views import presigned_url_view
-
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('django/presigned-url', presigned_url_view, name='presigned_url'),
+    path('django/s3app/', include('s3app.urls')),
 ]
+
