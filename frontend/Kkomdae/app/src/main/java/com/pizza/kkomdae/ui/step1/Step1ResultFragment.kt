@@ -47,7 +47,7 @@ class Step1ResultFragment : BaseFragment<FragmentStep1ResultBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    private var step = 1
+    private var step = 0
     private var imageList : List<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
