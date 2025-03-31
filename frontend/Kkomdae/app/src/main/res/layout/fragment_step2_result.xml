@@ -264,6 +264,20 @@
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/tvDetailedInfoGuide"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="* 자세한 진단 결과는 노트북에 설치된 자가진단 프로그램을 통해 확인하실 수 있습니다."
+            style="@style/Caption1"
+            android:textColor="@color/gray300"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintTop_toBottomOf="@id/card_diagnostic_results"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
