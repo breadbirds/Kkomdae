@@ -1,5 +1,6 @@
 package com.pizza.kkomdae.di
 
+import com.pizza.kkomdae.data.source.remote.FinalService
 import com.pizza.kkomdae.data.source.remote.InspectService
 import com.pizza.kkomdae.data.source.remote.LoginService
 import com.pizza.kkomdae.data.source.remote.Step1Service
@@ -41,4 +42,8 @@ object ServiceModule {
     @Singleton
     @Provides
     fun providesStep3Service(retrofit: Retrofit) : Step3Service = retrofit.create(Step3Service::class.java)
+
+    @Singleton
+    @Provides
+    fun providesFinalService(retrofit: Retrofit) : FinalService = retrofit.create(FinalService::class.java)
 }

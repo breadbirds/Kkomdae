@@ -1,5 +1,6 @@
 package com.pizza.kkomdae.di
 
+import com.pizza.kkomdae.data.repository.FinalRepositoryImpl
 import com.pizza.kkomdae.data.repository.InspectRepositoryImpl
 import com.pizza.kkomdae.data.repository.LoginRepositoryImpl
 import com.pizza.kkomdae.data.repository.Step1RepositoryImpl
@@ -7,6 +8,7 @@ import com.pizza.kkomdae.data.repository.Step2RepositoryImpl
 import com.pizza.kkomdae.data.repository.Step3RepositoryImpl
 import com.pizza.kkomdae.data.repository.UserInfoRepositoryImpl
 import com.pizza.kkomdae.domain.model.TestResponse
+import com.pizza.kkomdae.domain.repository.FinalRepository
 import com.pizza.kkomdae.domain.repository.InspectRepository
 import com.pizza.kkomdae.domain.repository.LoginRepository
 import com.pizza.kkomdae.domain.repository.Step1Repository
@@ -58,4 +60,10 @@ abstract class RepositoryModule {
     abstract fun bindStep3Repository(
         impl: Step3RepositoryImpl
     ): Step3Repository
+
+    @Binds
+    @Singleton
+    abstract fun bindFinalRepository(
+        impl: FinalRepositoryImpl
+    ): FinalRepository
 }
