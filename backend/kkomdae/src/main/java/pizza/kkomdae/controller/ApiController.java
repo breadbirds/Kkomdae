@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pizza.kkomdae.dto.request.ForthStageReq;
 import pizza.kkomdae.dto.request.PhotoReq;
 import pizza.kkomdae.dto.request.SecondStageReq;
 import pizza.kkomdae.dto.request.ThirdStageReq;
@@ -112,6 +113,12 @@ public class ApiController {
     @PostMapping("/thirdStage")
     public void thirdStage(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody ThirdStageReq thirdStageReq) {
         testResultService.thirdStage(userDetails, thirdStageReq);
+    }
+
+    @Operation(summary = "비고 입력",description = "기타 적고 싶은 사항을 적는 곳")
+    @PostMapping("/fourthStage")
+    public void fourthStage(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody ForthStageReq forthStageReq) {
+        testResultService.fourthStage(forthStageReq);
     }
 
     @Operation(summary = "pdf 생성", description = "testId로 절차를 종료하고 pdf를 생성합니다.")

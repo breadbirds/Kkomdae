@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pizza.kkomdae.dto.request.ForthStageReq;
 import pizza.kkomdae.dto.request.SecondStageReq;
 import pizza.kkomdae.dto.request.ThirdStageReq;
 import pizza.kkomdae.dto.respond.AiPhotoWithUrl;
@@ -20,6 +21,7 @@ import pizza.kkomdae.security.dto.CustomUserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -114,15 +116,29 @@ public class TestResultService {
             throw new RuntimeException("저장된 테스트 없음");
         }
         testResult.saveThirdStage(thirdStageReq);
-        Rent rent = new Rent();
-        rent.setStudent(student);
-        rent.setRentDateTime(thirdStageReq.getLocalDate());
         Device device = deviceRepository.findDeviceBySerialNum(thirdStageReq.getSerialNum());
         if (device == null) {
             throw new RuntimeException("deivce 시리얼 에러");
         }
-        testResult.setDevice(device);
-        rent.setDevice(device);
+        Rent rent;
+        if (testResult.getRelease() == false) { // 대여로직
+            rent = new Rent();
+            rent.setStudent(student);
+            rent.setRentDateTime(thirdStageReq.getLocalDate());
+            testResult.setDevice(device);
+            rent.setDevice(device);
+        } else { // 반납 로직
+            rent = rentRepository.findByDeviceAndStudent(device, student);
+            rent.setReleaseDateTime(testResult.getDate());
+        }
+
         rentRepository.save(rent);
+    }
+
+    @Transactional
+    public void fourthStage(ForthStageReq forthStageReq) {
+        LaptopTestResult result = lapTopTestResultRepository.findById(forthStageReq.getTestId()).orElseThrow(()->new RuntimeException("testId 오류"));
+        result.setDescription(forthStageReq.getDescription());
+        result.setStage(5);
     }
 }

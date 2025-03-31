@@ -14,6 +14,7 @@ import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.properties.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pizza.kkomdae.controller.PdfController;
 import pizza.kkomdae.dto.PdfInfo;
@@ -29,6 +30,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Service
 public class PdfService {
     private final S3Service s3Service;
@@ -42,15 +44,16 @@ public class PdfService {
     public String makeAndUploadPdf(long testId) {
         LaptopTestResult result = lapTopTestResultRepository.findByIdWithStudentAndDeviceAndPhotos(testId);
         String fileName;
-        try{
+        try {
             PdfInfo pdfInfo = new PdfInfo(result);
             ByteArrayOutputStream baso = initPdf(pdfInfo);
-            fileName = s3Service.uploadPdf(baso,result);
+            fileName = s3Service.uploadPdf(baso, result);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         result.setPdfFileName(fileName);
-        result.setStage(5);
+        result.setStage(6);
+        result.getDevice().setRelease(true);
         lapTopTestResultRepository.save(result);
         return fileName;
     }
@@ -89,7 +92,7 @@ public class PdfService {
                 Paragraph("\n"));
 
         // 노트북 구성품 테이블
-        addComponentsTable(document, koreanFont,info);
+        addComponentsTable(document, koreanFont, info);
         document.add(new
 
                 Paragraph("\n"));
@@ -175,21 +178,27 @@ public class PdfService {
         addHeaderCell(table, font, "반납", 1, 1);
 
         // 테이블 내용 - 첫 번째 행
-        addComponentRow(table, font, "노트북", Integer.toString(info.getLaptopCount()), "마우스\n*리시버 포함", Integer.toString(info.getMouseCount()));
+        addComponentRow(table, font, "노트북", Integer.toString(info.getLaptopCount()), "마우스\n*리시버 포함", Integer.toString(info.getMouseCount()), info);
 
         // 테이블 내용 - 두 번째 행
-        addComponentRow(table, font, "전원선", Integer.toString(info.getPowerCableCount()), "가방\n*가방끈 포함", Integer.toString(info.getBagCount()));
+        addComponentRow(table, font, "전원선", Integer.toString(info.getPowerCableCount()), "가방\n*가방끈 포함", Integer.toString(info.getBagCount()), info);
 
         // 테이블 내용 - 세 번째 행
-        addComponentRow(table, font, "어댑터", Integer.toString(info.getAdapterCount()), "마우스패드", Integer.toString(info.getMousePadCount()));
+        addComponentRow(table, font, "어댑터", Integer.toString(info.getAdapterCount()), "마우스패드", Integer.toString(info.getMousePadCount()), info);
 
         // 특이사항 행
-        Cell specialCell = new Cell(1, 8)
+        Cell specialCell = new Cell(1, 1)
                 .add(new Paragraph("특이사항").setFont(font).setFontSize(10))
-                .setTextAlignment(TextAlignment.LEFT)
+                .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                 .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
         table.addCell(specialCell);
+        Cell descriptionCell = new Cell(1, 7)
+                .add(new Paragraph(info.getDescription()).setFont(font).setFontSize(10))
+                .setTextAlignment(TextAlignment.CENTER)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+        table.addCell(descriptionCell);
 
         document.add(table);
     }
@@ -203,70 +212,138 @@ public class PdfService {
         table.addCell(cell);
     }
 
-    private void addComponentRow(Table table, PdfFont font, String item1, String qty1, String item2, String qty2) {
-        // 첫 번째 항목
-        Cell cell1 = new Cell()
-                .add(new Paragraph(item1).setFont(font).setFontSize(10))
-                .setTextAlignment(TextAlignment.CENTER)
-                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
-        table.addCell(cell1);
+    private void addComponentRow(Table table, PdfFont font, String item1, String qty1, String item2, String qty2, PdfInfo info) {
 
-        // 첫 번째 항목 수량
-        Cell cell2 = new Cell()
-                .add(new Paragraph(qty1).setFont(font).setFontSize(10))
-                .setTextAlignment(TextAlignment.CENTER)
-                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
-        table.addCell(cell2);
+        if (info.getRentDate() == null) { // 반납
+            // 첫 번째 항목
+            Cell cell1 = new Cell()
+                    .add(new Paragraph(item1).setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell1);
 
-        // 첫 번째 항목 수령 체크박스
-        Cell cell3 = new Cell()
-                .add(new Paragraph("☐").setFont(font).setFontSize(10))
-                .setTextAlignment(TextAlignment.CENTER)
-                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
-        table.addCell(cell3);
+            // 첫 번째 항목 수량
+            Cell cell2 = new Cell()
+                    .add(new Paragraph(String.valueOf(1)).setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell2);
 
-        // 첫 번째 항목 반납 체크박스
-        Cell cell4 = new Cell()
-                .add(new Paragraph("☐").setFont(font).setFontSize(10))
-                .setTextAlignment(TextAlignment.CENTER)
-                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
-        table.addCell(cell4);
+            // 첫 번째 항목 수령
+            Cell cell3 = new Cell()
+                    .add(new Paragraph("☐").setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell3);
 
-        // 두 번째 항목
-        Cell cell5 = new Cell()
-                .add(new Paragraph(item2).setFont(font).setFontSize(10))
-                .setTextAlignment(TextAlignment.CENTER)
-                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
-        table.addCell(cell5);
+            // 첫 번째 항목 반납
+            Cell cell4 = new Cell()
+                    .add(new Paragraph(qty1).setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell4);
 
-        // 두 번째 항목 수량
-        Cell cell6 = new Cell()
-                .add(new Paragraph(qty2).setFont(font).setFontSize(10))
-                .setTextAlignment(TextAlignment.CENTER)
-                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
-        table.addCell(cell6);
+            // 두 번째 항목
+            Cell cell5 = new Cell()
+                    .add(new Paragraph(item2).setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell5);
 
-        // 두 번째 항목 수령 체크박스
-        Cell cell7 = new Cell()
-                .add(new Paragraph("☐").setFont(font).setFontSize(10))
-                .setTextAlignment(TextAlignment.CENTER)
-                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
-        table.addCell(cell7);
+            // 두 번째 항목 수량
+            Cell cell6 = new Cell()
+                    .add(new Paragraph(String.valueOf(1)).setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell6);
 
-        // 두 번째 항목 반납 체크박스
-        Cell cell8 = new Cell()
-                .add(new Paragraph("☐").setFont(font).setFontSize(10))
-                .setTextAlignment(TextAlignment.CENTER)
-                .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
-        table.addCell(cell8);
+            // 두 번째 항목 수령
+            Cell cell7 = new Cell()
+                    .add(new Paragraph("☐").setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell7);
+
+            // 두 번째 항목 반납
+            Cell cell8 = new Cell()
+                    .add(new Paragraph(qty2).setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell8);
+        } else { // 대여
+            // 첫 번째 항목
+            Cell cell1 = new Cell()
+                    .add(new Paragraph(item1).setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell1);
+
+            // 첫 번째 항목 수량
+            Cell cell2 = new Cell()
+                    .add(new Paragraph(String.valueOf(1)).setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell2);
+
+            // 첫 번째 항목 수령
+            Cell cell3 = new Cell()
+                    .add(new Paragraph(qty1).setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell3);
+
+            // 첫 번째 항목 반납
+            Cell cell4 = new Cell()
+                    .add(new Paragraph("☐").setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell4);
+
+            // 두 번째 항목
+            Cell cell5 = new Cell()
+                    .add(new Paragraph(item2).setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell5);
+
+            // 두 번째 항목 수량
+            Cell cell6 = new Cell()
+                    .add(new Paragraph(String.valueOf(1)).setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell6);
+
+            // 두 번째 항목 수령
+            Cell cell7 = new Cell()
+                    .add(new Paragraph(qty2).setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell7);
+
+            // 두 번째 항목 반납
+            Cell cell8 = new Cell()
+                    .add(new Paragraph("☐").setFont(font).setFontSize(10))
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
+            table.addCell(cell8);
+        }
+
     }
 
     private void addSignatureSection(Document document, PdfFont font, PdfInfo info) {
@@ -283,22 +360,31 @@ public class PdfService {
         signatureTable.setWidth(UnitValue.createPercentValue(100));
 
         String rentDate;
-        if (info.getReturnDate() == null) {
+        if (info.getRentDate() == null) {
             rentDate = "";
-        }else{
+            log.info("rentdate : null");
+        } else {
+            log.info("rentdate : {}", info.getRentDate());
             rentDate = info.getRentDate().toString();
         }
         String returnDate;
         if (info.getReturnDate() == null) {
+            log.info("returndate : null");
             returnDate = "";
-        }else{
+        } else {
+            log.info("returndate : {}", info.getReturnDate());
             returnDate = info.getReturnDate().toString();
         }
         // 첫 번째 행
         addSignatureRow(signatureTable, font, "수 령 일 자 :", rentDate, "반 납 일 자 :", returnDate);
 
         // 두 번째 행
-        addSignatureRow(signatureTable, font, "수 령 서 명 :", info.getName(), "반 납 서 명 :", "");
+        if (rentDate.isBlank()) {
+            addSignatureRow(signatureTable, font, "수 령 서 명 :", "", "반 납 서 명 :", info.getName());
+        } else {
+            addSignatureRow(signatureTable, font, "수 령 서 명 :", info.getName(), "반 납 서 명 :", "");
+        }
+
 
         // 세 번째 행
         addSignatureRow(signatureTable, font, "시 리 얼 번 호 :", info.getSerial(), "성 명 :", info.getName());
@@ -355,7 +441,6 @@ public class PdfService {
         document.add(new Paragraph("\n"));
 
 
-
         // 첫 번째 페이지: 전면부와 후면부 사진
         addPhotoItem(document, font, "[전면부 사진]", s3Service.generatePresignedUrl(photos.get(0).getName()));
         addPhotoItem(document, font, "[후면부 사진]", s3Service.generatePresignedUrl(photos.get(1).getName()));
@@ -366,10 +451,11 @@ public class PdfService {
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
         addPhotoItem(document, font, "[좌측 사진]", s3Service.generatePresignedUrl(photos.get(3).getName()));
-        document.add(new Paragraph("\n"));
-        document.add(new Paragraph("\n"));
+        // 세 번째 페이지 후 페이지 나누기
+        document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
         // 세 번째 페이지: 액정과 키판 사진
         addPhotoItem(document, font, "[액정 사진/카메라 랜즈 포함]", s3Service.generatePresignedUrl(photos.get(4).getName()));
+        document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
         addPhotoItem(document, font, "[키판 사진]", s3Service.generatePresignedUrl(photos.get(5).getName()));
 
@@ -409,14 +495,14 @@ public class PdfService {
 
         // 사진 셀 추가
         Cell photoCell = new Cell()
-                .setHeight(265) // 모든 사진 셀의 높이 동일하게 설정
+                .setHeight(266) // 모든 사진 셀의 높이 동일하게 설정
                 .setBorder(new SolidBorder(ColorConstants.BLACK, 2))
                 .setTextAlignment(TextAlignment.CENTER)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE);
 
         // 이미지 추가
 
-        String imagePath = PdfController.class.getClassLoader().getResource("static/image/test.jpg").getPath();
+
         Image image = new Image(ImageDataFactory.create(new URL(url)));
 
         // 이미지 크기와 정렬 설정
