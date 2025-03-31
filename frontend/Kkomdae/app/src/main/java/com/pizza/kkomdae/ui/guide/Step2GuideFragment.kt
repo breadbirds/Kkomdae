@@ -17,6 +17,10 @@ import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentStep2GuideBinding
 import com.pizza.kkomdae.ui.step2.QrScanFragment
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.widget.Toast
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -71,6 +75,16 @@ class Step2GuideFragment : BaseFragment<FragmentStep2GuideBinding>(
             showQuitBottomSheet()
         }
 
+        // URL 복사 기능
+        binding.urlLink.setOnClickListener {
+            copyUrlToClipboard()
+        }
+
+        // URL 복사 아이콘 클릭 시에도
+        binding.ivUrlCopy.setOnClickListener {
+            copyUrlToClipboard()
+        }
+
         binding.btnNext.setOnClickListener {
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
             transaction.replace(R.id.fl_main, QrScanFragment())
@@ -80,6 +94,18 @@ class Step2GuideFragment : BaseFragment<FragmentStep2GuideBinding>(
 
         showIntroDialog()
     }
+
+
+    private fun copyUrlToClipboard() {
+        val url = binding.tvUrl.text.toString()
+        val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = ClipData.newPlainText("URL", url)
+        clipboardManager.setPrimaryClip(clipData)
+
+        // 사용자에게 복사 완료 알림
+        Toast.makeText(requireContext(), "URL이 복사되었습니다", Toast.LENGTH_SHORT).show()
+    }
+
 
     private fun showIntroDialog() {
         val dialog = Dialog(requireContext())
