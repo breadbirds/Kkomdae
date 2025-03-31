@@ -1,4 +1,4 @@
-package com.pizza.kkomdae.ui.step1
+package com.pizza.kkomdae.ui.step4
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.card.MaterialCardView
 import com.pizza.kkomdae.R
-import com.pizza.kkomdae.presenter.model.Step4AiResult
 import com.pizza.kkomdae.databinding.ItemStep1ResultBinding
+import com.pizza.kkomdae.presenter.model.Step4AiResult
 
 class Step4AiResultAdapter(val list: List<Step4AiResult>, val listen:(Int)->Unit): RecyclerView.Adapter<Step4AiResultAdapter.Step1ResultViewHolder>() {
     private var selectedPosition: Int = 0
@@ -22,12 +22,22 @@ class Step4AiResultAdapter(val list: List<Step4AiResult>, val listen:(Int)->Unit
             if (position == selectedPosition) {
                 binding.root.scaleX = 1.2f  // 가로 크기 증가
                 binding.root.scaleY = 1.2f  // 세로 크기 증가
-                (binding.root as MaterialCardView).setStrokeColor(ContextCompat.getColor(binding.root.context, R.color.blue500))
+                (binding.root as MaterialCardView).setStrokeColor(
+                    ContextCompat.getColor(
+                        binding.root.context,
+                        R.color.blue500
+                    )
+                )
 
             } else {
                 binding.root.scaleX = 1.0f
                 binding.root.scaleY = 1.0f
-                (binding.root as MaterialCardView).setStrokeColor(ContextCompat.getColor(binding.root.context, R.color.gray200))
+                (binding.root as MaterialCardView).setStrokeColor(
+                    ContextCompat.getColor(
+                        binding.root.context,
+                        R.color.gray200
+                    )
+                )
             }
 
 

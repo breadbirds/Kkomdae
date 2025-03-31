@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.pizza.kkomdae.databinding.ActivityMainBinding
 import com.pizza.kkomdae.ui.MainFragment
-import com.pizza.kkomdae.ui.step1.Step4AiResultFragment
+import com.pizza.kkomdae.ui.step4.Step4AiResultFragment
 import android.Manifest
 import android.content.pm.PackageManager
 import android.util.Log

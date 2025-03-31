@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.ui.step3.FinalResultFragment
+import com.pizza.kkomdae.ui.step4.Step4AiResultFragment
 
 class LoadingFragment : Fragment() {
 
@@ -107,7 +108,7 @@ class LoadingFragment : Fragment() {
 
         // 버튼 클릭 리스너 설정
         btn_next.setOnClickListener {
-            val resultFragment = FinalResultFragment()
+            val resultFragment = Step4AiResultFragment()
 
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fl_main, resultFragment)

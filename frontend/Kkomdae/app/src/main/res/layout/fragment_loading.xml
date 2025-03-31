@@ -223,7 +223,8 @@
         android:text="분석 결과 보러가기"
         android:textColor="@color/white"
         style="@style/Title1"
-        android:padding="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         android:backgroundTint="#4285F4"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent" />

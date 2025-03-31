@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.step1.Step4AiResultFragment">
+    tools:context=".ui.step4.Step4AiResultFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_top_bar"
@@ -16,7 +16,7 @@
 
         <include
             android:id="@+id/top_bar"
-            layout="@layout/layout_register_top_bar"/>
+            layout="@layout/layout_top_bar"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
