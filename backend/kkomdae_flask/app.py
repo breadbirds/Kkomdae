@@ -11,6 +11,17 @@ import tempfile
 from loguru import logger
 load_dotenv()
 
+# AI pipeline 라이브러리
+import torch
+from torchvision.models.detection import fasterrcnn_resnet50_fpn
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+import torchvision.transforms as T
+import json
+import cv2
+from ultralytics import YOLO
+import os
+import numpy as np
+
 
 # AWS 관련 설정 로드
 aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
@@ -18,6 +29,19 @@ aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
 region_name = os.getenv('AWS_REGION')
 bucket_name = os.getenv('BUCKET_NAME')
 folder = os.getenv('S3_PREFIX')
+
+# -------------------------------------
+# AI pipeline 전역 변수 설정
+# Faster R CNN
+model_path = "model/faster_damage.pth"                  # 모델 pth 경로
+num_classes = 2                                         # class(damage, background)
+score_threshold = 0.2                                   # threshold
+
+# YOLO
+yolo_model_path = "model/yolo_laptop.pt"
+yolo_threshold = 0.7                                   # threshold
+# -------------------------------------
+
 
 # Flask 애플리케이션 생성
 app = Flask(__name__)
@@ -85,8 +109,24 @@ def analyze():
         return jsonify({"error": "이미지를 열 수 없습니다.", "detail": str(e)}), 400
 
     # --- 이미지 분석 로직 예시 ---
-    new_image = original_image.convert("L")  # 그레이스케일 변환
+    # new_image = original_image.convert("L")  # 그레이스케일 변환
     # 실제로는 OpenCV나 딥러닝 모델 등을 적용 가능
+    # Faster R-CNN
+    model = load_model()
+    image_tensor = load_image(original_image)    
+    faster_results = predict_and_get_result(model, image_tensor)
+
+    # YOLO
+    yolo_model = load_yolo_model()
+    yolo_results = detect_laptop_yolo(yolo_model, original_image)
+
+    # Post-processing (filter)
+    filtered_results = filter_faster_by_yolo(faster_results, yolo_results)
+
+    # 이미지 저장
+    new_image = visualize_filtered(local_download_path, filtered_results) 
+    # <- 이게 맞나..? 난 로컬로만 저장했는ㄷ...
+    # 밑에 또  이미지를 저장하는 로직이 또 있네..?
     # ---------------------------------
 
     # 3) 새로운 이미지 S3 키 만들기
@@ -136,11 +176,105 @@ def analyze():
 
     # 최종 반환
     result = {
-        "damage" : 0, # 적용 결과
+        "damage" : len(filtered_results), # 적용 결과 (✨수정함✨)
         "uploadName" : f"analyzed_{s3_key}",
     }
     logger.debug(f"Response: {result}")
     return jsonify(result)
+
+# ✅ 1. model 불러오기
+def load_model():
+    model = fasterrcnn_resnet50_fpn(weights=None)
+    in_features = model.roi_heads.box_predictor.cls_score.in_features
+    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+    state_dict = torch.load(model_path, map_location=torch.device('cpu'))
+    model.load_state_dict(state_dict)
+    model.eval()
+    print("✅ 모델 로드 완료")
+    return model
+
+# ✅ 2. 이미지 로드 및 전처리
+def load_image(pil_image):
+    image = pil_image.convert("RGB")                # 3채널 RGB 이미지로 변환
+    transform = T.ToTensor()                        # 픽셀값 정규화(float 32)
+    return transform(image).unsqueeze(0)            # tensor 리턴
+
+# ✅ 3. 모델 추론 결과 반환
+def predict_and_get_result(model, image_tensor):
+    with torch.no_grad():
+        output = model(image_tensor)[0]
+
+    result = []
+    for box, score in zip(output['boxes'], output['scores']):
+        if score >= score_threshold:
+            result.append({
+                "bbox": box.tolist(),
+                "score": float(score)
+            })
+    print(f"✅ Faster 결과 추론 완료: {len(result)}개 bbox")
+    return result
+
+# ✅ 4. YOLO 모델 로드
+def load_yolo_model():
+    model = YOLO(yolo_model_path)
+    print("✅ YOLO 모델 로드 완료")
+    return model
+
+# ✅ 5. YOLO 추론 결과 반환
+def detect_laptop_yolo(model, pil_image):
+    img = np.array(pil_image.convert("RGB"))  # Pillow → numpy array
+    img = img[..., ::-1]  # RGB → BGR 변환 (YOLO는 BGR도 지원)
+    results = model.predict(img, conf=yolo_threshold)  # predict() 권장
+    
+    result = []
+    for box in results[0].boxes:
+        cls_id = int(box.cls)
+        label = model.names[cls_id]
+        conf = float(box.conf)
+        xyxy = box.xyxy.cpu().tolist()[0]
+        if label == "ssafy_laptop":
+            result.append({
+                "bbox": xyxy,
+                "label": label,
+                "score": conf
+            })
+    print(f"✅ YOLO 결과 추론 완료: {len(result)}개 bbox")
+    return result
+
+
+# 범위 안에 있는지 없는지 확인하는 함수
+def is_inside(inner_box, outer_box):
+    x1, y1, x2, y2 = inner_box
+    X1, Y1, X2, Y2 = outer_box
+    return (x1 >= X1) and (y1 >= Y1) and (x2 <= X2) and (y2 <= Y2)
+
+# ✅ 6. Faster 결과를 YOLO bbox 내부 결과만 필터링
+def filter_faster_by_yolo(faster_results, yolo_results):
+    if len(yolo_results) == 0:
+        print("⚠ YOLO 결과가 없습니다.")
+        return []
+
+    laptop_box = yolo_results[0]['bbox']
+    filtered = [det for det in faster_results if is_inside(det['bbox'], laptop_box)]
+    print(f"✨ 필터링된 bbox 개수: {len(filtered)}")
+    return filtered
+
+# ✅ 7. bbox 이미지로 저장
+def visualize_filtered(image_path, filtered_results):
+    image = cv2.imread(image_path)
+    for det in filtered_results:
+        box = det['bbox']
+        score = det['score']
+        x1, y1, x2, y2 = map(int, box)
+        cv2.rectangle(image, (x1, y1), (x2, y2), (255, 0, 0), 2)
+        cv2.putText(image, f"damage {score:.2f}", (x1, y1 - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
+        
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # OpenCV BGR → RGB 변환
+    pil_image = Image.fromarray(image_rgb)              # numpy array → Pillow 이미지로 변환
+    print(f"✅ 필터링된 bbox 이미지 변환 완료")
+
+    return pil_image  # 로컬 저장 안 함
 
 # Flask 앱 실행
 if __name__ == '__main__':
