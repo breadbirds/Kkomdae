@@ -143,11 +143,6 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
             mainActivity.next()
         }
 
-        // 촬영하기 버튼
-        binding.btnSkip.setOnClickListener {
-            NavigateStep2Guide()
-        }
-
         showIntroDialog()
 
     }
@@ -196,23 +191,6 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
 
         bottomSheetDialog.setContentView(bottomSheetView)
         bottomSheetDialog.show()
-    }
-
-    private fun NavigateStep2Guide() {
-        // 메인 액티비티의 프래그먼트 매니저를 통해 화면 전환
-        val transaction = mainActivity.supportFragmentManager.beginTransaction()
-
-        // Step2GuideFragment로 전환
-        val step2Fragment = Step2GuideFragment.newInstance("", "")
-
-        // 현재 프래그먼트를 Step2GuideFragment로 교체
-        transaction.replace(R.id.fl_main, step2Fragment)
-
-        // 백 스택에 추가 (뒤로가기 버튼으로 돌아올 수 있도록)
-        transaction.addToBackStack(null)
-
-        // 변경사항 적용
-        transaction.commit()
     }
 
     companion object {
