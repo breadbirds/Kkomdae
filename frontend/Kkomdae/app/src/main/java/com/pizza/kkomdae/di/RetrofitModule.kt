@@ -2,6 +2,7 @@ package com.pizza.kkomdae.di
 
 import android.content.Context
 import android.util.Log
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.pizza.kkomdae.BuildConfig
 import com.pizza.kkomdae.util.AddAuthInterceptor
@@ -74,8 +75,14 @@ object RetrofitModule {
     ) : Retrofit {
         return Retrofit.Builder()
             .baseUrl(SERVER_URL)
-            .addConverterFactory(gsonConverterFactory)
+//            .addConverterFactory(gsonConverterFactory)
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .client(client.build())
             .build()
     }
+
+    val gson : Gson = GsonBuilder()
+        .setLenient()
+        .setPrettyPrinting()  // JSON을 보기 좋게 출력
+        .create()
 }

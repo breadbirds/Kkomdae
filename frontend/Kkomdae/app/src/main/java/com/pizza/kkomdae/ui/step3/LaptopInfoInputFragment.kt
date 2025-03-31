@@ -17,12 +17,15 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentBackShotGuideBinding
 import com.pizza.kkomdae.databinding.FragmentLaptopInfoInputBinding
+import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
+import com.pizza.kkomdae.presenter.viewmodel.Step3ViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -37,6 +40,9 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+
+    private val viewModel : Step3ViewModel by activityViewModels()
+
     private var laptopCount=1
     private var powerCount=1
     private var adapterCount=1
@@ -56,6 +62,8 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
         binding.topBar.pbStep.progress=100
         binding.topBar.tvTitle.text = "Step3"
 
@@ -71,8 +79,9 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             checkNext()
         }
 
-
-
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val currentDate = sdf.format(Date())
+        viewModel.setLocalDate(currentDate)
 
         // 날짜 설정
         settingDate()
@@ -98,13 +107,35 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         // 마우스패드 개수 설정
         settingPadCount()
 
+
+
         binding.btnConfirm.setOnClickListener {
+            inputData()
+
+//            viewModel.postThirdStage()
+
+
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
             transaction.replace(R.id.fl_main, FinalResultFragment())
             transaction.addToBackStack(null)
             transaction.commit()
         }
 
+    }
+
+
+    private fun inputData(){
+        viewModel.apply {
+            setModelCode(binding.atvModelName.text.toString())
+            setSerialNum(binding.etSerial.text.toString())
+            setBarcodeNum(binding.etBarcode.text.toString())
+            setLaptop(binding.tvLaptopCount.text.toString().toInt())
+            setPowerCable(binding.tvPowerCount.text.toString().toInt())
+            setAdapter(binding.tvAdapterCount.text.toString().toInt())
+            setMouse(binding.tvMouseCount.text.toString().toInt())
+            setBag(binding.tvBagCount.text.toString().toInt())
+            setMousePad(binding.tvPadCount.text.toString().toInt())
+        }
     }
 
     private fun checkNext() {
@@ -343,9 +374,11 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             // 날짜 선택 리스너
             datePicker.addOnPositiveButtonClickListener { selection ->
                 val sdf = SimpleDateFormat("yyyy년 MM월 dd일", Locale.getDefault())
+                val targetFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                 val selectedDate = sdf.format(Date(selection))
+                val targetDate = targetFormat.format(Date(selection))
                 binding.tvDate.text = selectedDate
-
+                viewModel.setLocalDate(targetDate)
             }
 
             // 다이얼로그 표시

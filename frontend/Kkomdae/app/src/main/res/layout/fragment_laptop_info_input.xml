@@ -251,7 +251,6 @@
                     <TextView
                         android:id="@+id/tv_laptop_count"
                         style="@style/Title1"
-
                         android:layout_height="wrap_content"
                         android:text="1"
                         android:layout_width="40dp"
