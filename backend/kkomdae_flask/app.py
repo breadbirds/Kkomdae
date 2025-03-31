@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv              # 환경 변수 로딩
 import boto3                                # AWS S3 연동을 위한 boto3 라이브러리 (최신 버전)
 from io import BytesIO
-from PIL import Image
+from PIL import Image, ImageDraw
 import tempfile
 from loguru import logger
 load_dotenv()
@@ -16,8 +16,6 @@ import torch
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 import torchvision.transforms as T
-import json
-import cv2
 from ultralytics import YOLO
 import os
 import numpy as np
@@ -259,22 +257,22 @@ def filter_faster_by_yolo(faster_results, yolo_results):
     print(f"✨ 필터링된 bbox 개수: {len(filtered)}")
     return filtered
 
-# ✅ 7. bbox 이미지로 저장
+# ✅ 7. bbox 이미지로 저장 (cv2 없이 PIL로만)
 def visualize_filtered(image_path, filtered_results):
-    image = cv2.imread(image_path)
+    image = Image.open(image_path).convert("RGB")
+    draw = ImageDraw.Draw(image)
+
     for det in filtered_results:
         box = det['bbox']
         score = det['score']
         x1, y1, x2, y2 = map(int, box)
-        cv2.rectangle(image, (x1, y1), (x2, y2), (255, 0, 0), 2)
-        cv2.putText(image, f"damage {score:.2f}", (x1, y1 - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
-        
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # OpenCV BGR → RGB 변환
-    pil_image = Image.fromarray(image_rgb)              # numpy array → Pillow 이미지로 변환
-    print(f"✅ 필터링된 bbox 이미지 변환 완료")
+        draw.rectangle([(x1, y1), (x2, y2)], outline=(255, 0, 0), width=2)
+        draw.text((x1, y1 - 10), f"damage {score:.2f}", fill=(255, 0, 0))
 
-    return pil_image  # 로컬 저장 안 함
+    print(f"✅ 필터링된 bbox 이미지 변환 완료 (PIL 버전)")
+
+    return image
+
 
 # Flask 앱 실행
 if __name__ == '__main__':
