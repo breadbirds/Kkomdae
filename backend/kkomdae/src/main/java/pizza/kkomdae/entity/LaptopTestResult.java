@@ -39,6 +39,7 @@ public class LaptopTestResult {
     private Integer mousePad;
     private Integer stage = 1;
     private Integer picStage = 0;
+    private String description;
 
 
     @OneToMany(mappedBy = "laptopTestResult")
@@ -48,6 +49,7 @@ public class LaptopTestResult {
     // Todo ai 결과를 어떻게 저장할 지 고민
 
     public LaptopTestResult(Student student) {
+        this.release = false;
         this.student = student;
     }
 
