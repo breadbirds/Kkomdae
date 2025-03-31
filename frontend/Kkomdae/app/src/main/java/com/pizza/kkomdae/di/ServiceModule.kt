@@ -3,6 +3,7 @@ package com.pizza.kkomdae.di
 import com.pizza.kkomdae.data.source.remote.InspectService
 import com.pizza.kkomdae.data.source.remote.LoginService
 import com.pizza.kkomdae.data.source.remote.Step1Service
+import com.pizza.kkomdae.data.source.remote.Step2Service
 import com.pizza.kkomdae.data.source.remote.UserService
 import dagger.Module
 import dagger.Provides
@@ -31,4 +32,8 @@ object ServiceModule {
     @Singleton
     @Provides
     fun providesPhotoService(retrofit: Retrofit) : Step1Service = retrofit.create(Step1Service::class.java)
+
+    @Singleton
+    @Provides
+    fun providesStep2Service(retrofit: Retrofit) : Step2Service = retrofit.create(Step2Service::class.java)
 }

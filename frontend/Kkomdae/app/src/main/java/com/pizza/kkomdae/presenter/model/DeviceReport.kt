@@ -5,7 +5,7 @@ data class DeviceReport(
     val usb: UsbStatus,
     val camera: ComponentStatus,
     val charger: ComponentStatus,
-    val battery_report: String
+    val battery_report: BatteryReport
 )
 data class KeyboardStatus(
     val status: String,
@@ -19,4 +19,10 @@ data class UsbStatus(
 
 data class ComponentStatus(
     val status: String
+)
+
+
+data class BatteryReport (
+    val status: String,
+    val reportName: String
 )
