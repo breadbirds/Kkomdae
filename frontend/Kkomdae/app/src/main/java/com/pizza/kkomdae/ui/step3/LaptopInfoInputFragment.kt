@@ -66,7 +66,7 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         showIntroDialog()
 
         binding.etSerial.doOnTextChanged { text, start, before, count ->
-           // 유효성 검사
+            // 유효성 검사
             checkNext()
         }
 
