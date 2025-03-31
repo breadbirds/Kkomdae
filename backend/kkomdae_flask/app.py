@@ -109,8 +109,24 @@ def analyze():
         return jsonify({"error": "이미지를 열 수 없습니다.", "detail": str(e)}), 400
 
     # --- 이미지 분석 로직 예시 ---
-    new_image = original_image.convert("L")  # 그레이스케일 변환
+    # new_image = original_image.convert("L")  # 그레이스케일 변환
     # 실제로는 OpenCV나 딥러닝 모델 등을 적용 가능
+    # Faster R-CNN
+    model = load_model()
+    image_tensor = load_image(original_image)    
+    faster_results = predict_and_get_result(model, image_tensor)
+
+    # YOLO
+    yolo_model = load_yolo_model()
+    yolo_results = detect_laptop_yolo(yolo_model, original_image)
+
+    # Post-processing (filter)
+    filtered_results = filter_faster_by_yolo(faster_results, yolo_results)
+
+    # 이미지 저장
+    new_image = visualize_filtered(local_download_path, filtered_results) 
+    # <- 이게 맞나..? 난 로컬로만 저장했는ㄷ...
+    # 밑에 또  이미지를 저장하는 로직이 또 있네..?
     # ---------------------------------
 
     # 3) 새로운 이미지 S3 키 만들기
