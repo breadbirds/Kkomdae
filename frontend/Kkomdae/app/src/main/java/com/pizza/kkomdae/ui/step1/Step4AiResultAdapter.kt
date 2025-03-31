@@ -7,10 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.card.MaterialCardView
 import com.pizza.kkomdae.R
-import com.pizza.kkomdae.presenter.model.Step1Result
+import com.pizza.kkomdae.presenter.model.Step4AiResult
 import com.pizza.kkomdae.databinding.ItemStep1ResultBinding
 
-class Step1ResultAdapter(val list: List<Step1Result>, val listen:(Int)->Unit): RecyclerView.Adapter<Step1ResultAdapter.Step1ResultViewHolder>() {
+class Step4AiResultAdapter(val list: List<Step4AiResult>, val listen:(Int)->Unit): RecyclerView.Adapter<Step4AiResultAdapter.Step1ResultViewHolder>() {
     private var selectedPosition: Int = 0
 
     inner class Step1ResultViewHolder(val binding: ItemStep1ResultBinding) : RecyclerView.ViewHolder(binding.root){

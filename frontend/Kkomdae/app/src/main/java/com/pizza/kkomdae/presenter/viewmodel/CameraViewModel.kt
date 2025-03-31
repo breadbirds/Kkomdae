@@ -151,9 +151,7 @@ class CameraViewModel @Inject constructor(
                     testResponse?.let {
 
                         _postResult.postValue(it)
-
                     }
-
 
                 }.onFailure { exception ->
                     // 로그인 정보 불러오기 실패
@@ -162,7 +160,6 @@ class CameraViewModel @Inject constructor(
 
             }
         }
-
 
     }
 

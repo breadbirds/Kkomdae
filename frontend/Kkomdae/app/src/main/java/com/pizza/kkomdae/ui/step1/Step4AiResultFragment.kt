@@ -4,21 +4,18 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.pizza.kkomdae.AppData
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
-import com.pizza.kkomdae.presenter.model.Step1Result
-import com.pizza.kkomdae.databinding.FragmentStep1ResultBinding
-import com.pizza.kkomdae.presenter.viewmodel.CameraViewModel
+import com.pizza.kkomdae.presenter.model.Step4AiResult
 import com.pizza.kkomdae.ui.guide.Step2GuideFragment
 import android.content.Context
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import com.pizza.kkomdae.MainActivity
+import com.pizza.kkomdae.databinding.FragmentStep4AiResultBinding
 import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 
 // TODO: Rename parameter arguments, choose names that match
@@ -29,12 +26,12 @@ private const val TAG = "Step1ResultFragment"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [Step1ResultFragment.newInstance] factory method to
+ * Use the [Step4AiResultFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class Step1ResultFragment : BaseFragment<FragmentStep1ResultBinding>(
-    FragmentStep1ResultBinding::bind,
-    R.layout.fragment_step1_result
+class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
+    FragmentStep4AiResultBinding::bind,
+    R.layout.fragment_step4_ai_result
 ) {
     private lateinit var mainActivity: MainActivity
     private val viewModel : MainViewModel by activityViewModels()
@@ -61,7 +58,7 @@ class Step1ResultFragment : BaseFragment<FragmentStep1ResultBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.getPhoto(1)
+
 
         binding.topBar.tvTitle.text = "STEP 1"
         binding.topBar.pbStep.progress=100/3
@@ -84,15 +81,15 @@ class Step1ResultFragment : BaseFragment<FragmentStep1ResultBinding>(
             .into(binding.ivImage)
 
         val data = listOf(
-            Step1Result(R.drawable.ic_front_laptop, "전면부"),
-            Step1Result(R.drawable.ic_guide_back, "후면부"),
-            Step1Result(R.drawable.ic_camera_left, "좌측"),
-            Step1Result(R.drawable.ic_camera_right, "우측"),
-            Step1Result(R.drawable.ic_guide_screen, "화면"),
-            Step1Result(R.drawable.ic_guide_keypad, "키판"),
+            Step4AiResult(R.drawable.ic_front_laptop, "전면부"),
+            Step4AiResult(R.drawable.ic_guide_back, "후면부"),
+            Step4AiResult(R.drawable.ic_camera_left, "좌측"),
+            Step4AiResult(R.drawable.ic_camera_right, "우측"),
+            Step4AiResult(R.drawable.ic_guide_screen, "화면"),
+            Step4AiResult(R.drawable.ic_guide_keypad, "키판"),
         )
 
-        binding.rvPosition.adapter = Step1ResultAdapter(data, listen = {
+        binding.rvPosition.adapter = Step4AiResultAdapter(data, listen = {
             changeImage(it)
         })
         binding.rvPosition.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -109,10 +106,7 @@ class Step1ResultFragment : BaseFragment<FragmentStep1ResultBinding>(
             showQuitBottomSheet()
         }
 
-        viewModel.resultImage.observe(viewLifecycleOwner){
-            imageList = it
-            changeImage(0)
-        }
+
 
     }
 
@@ -175,7 +169,7 @@ class Step1ResultFragment : BaseFragment<FragmentStep1ResultBinding>(
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            Step1ResultFragment().apply {
+            Step4AiResultFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

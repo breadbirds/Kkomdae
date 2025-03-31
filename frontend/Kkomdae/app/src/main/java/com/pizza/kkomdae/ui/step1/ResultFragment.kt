@@ -39,8 +39,6 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
     private val viewModel: CameraViewModel by activityViewModels()
 
 
-
-
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -87,10 +85,12 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
         binding.btnBack?.setOnClickListener {
             cameraActivity.changeFragment(viewModel.step.value?:0)
         }
+
+        // 체크 버튼
         binding.btnCheck?.setOnClickListener {
             viewModel.postPhoto()
-//            cameraActivity.changeFragment((viewModel.step.value?:-1)+1)
         }
+
         // X 버튼 눌렀을 때
         binding.btnCancel?.setOnClickListener {
             showStopCameraDialog()
@@ -153,13 +153,10 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
             }
     }
 
-
     override fun onResume() {
         super.onResume()
         cameraActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     }
-
-
 
 
 }
