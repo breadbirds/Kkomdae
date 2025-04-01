@@ -52,7 +52,11 @@ public class PhotoService {
         int updateStage = photoreq.getPhotoType();
         // 저장된 사진 단계 확인
         int savedStage = test.getPicStage();
-        // 업로드된 사진의 단계가 높드면 단계를 업데이트
+        // 업로드된 사진의 스테이지가 6일 때 (마지막 사진일 때)
+        if (updateStage == 6) {
+            test.setStage(2);
+        }
+        // 업로드된 사진의 단계가 높으면 단계를 업데이트
         if (savedStage < updateStage) {
             test.setPicStage(photoreq.getPhotoType());
         }
