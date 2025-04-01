@@ -11,10 +11,12 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
 import android.widget.TextView
+import androidx.fragment.app.activityViewModels
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentFinalResultBinding
 import com.pizza.kkomdae.databinding.FragmentOathBinding
+import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.ui.SubmitCompleteFragment
 import com.pizza.kkomdae.ui.guide.AllStepOnboardingFragment
 
@@ -35,6 +37,7 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private val viewModel : FinalViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +57,17 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
         // 제출하기 클릭 이벤트
         binding.btnSubmit.setOnClickListener {
             showSubmitDialog()
+        }
+
+        viewModel.pdfName.observe(viewLifecycleOwner){
+
+            // 제출완료 화면으로 전환
+            val submitCompleteFragment = SubmitCompleteFragment.newInstance("", "")
+
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fl_main, submitCompleteFragment)
+                .addToBackStack(null)
+                .commit()
         }
 
     }
@@ -82,13 +96,10 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
             // 다이얼로그 닫기
             dialog.dismiss()
 
-            // 제출완료 화면으로 전환
-            val submitCompleteFragment = SubmitCompleteFragment.newInstance("", "")
+            // api호출
+            viewModel.postPdf()
 
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fl_main, submitCompleteFragment)
-                .addToBackStack(null)
-                .commit()
+
         }
 
         dialog.show()

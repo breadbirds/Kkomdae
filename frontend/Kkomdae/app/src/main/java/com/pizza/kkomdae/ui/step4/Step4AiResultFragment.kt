@@ -60,6 +60,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         // api 호출
         viewModel.getAiPhoto(5)
 
+
+
         binding.ivImage.setOnClickListener {
             val bundle = Bundle()
             bundle.putInt("param1", step)  // 이미지 URL을 전달
