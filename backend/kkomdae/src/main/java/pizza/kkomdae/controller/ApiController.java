@@ -1,7 +1,6 @@
 package pizza.kkomdae.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pizza.kkomdae.dto.request.PhotoReq;
 import pizza.kkomdae.dto.request.SecondStageReq;
+import pizza.kkomdae.dto.request.TestResultReq;
 import pizza.kkomdae.dto.request.ThirdStageReq;
 import pizza.kkomdae.dto.respond.*;
 import pizza.kkomdae.entity.Photo;
@@ -17,7 +17,8 @@ import pizza.kkomdae.s3.S3Service;
 import pizza.kkomdae.security.dto.CustomUserDetails;
 import pizza.kkomdae.service.*;
 
-
+import javax.crypto.MacSpi;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,7 +35,6 @@ public class ApiController {
     private final S3Service s3Service;
     private final FlaskService flaskService;
     private final PdfService pdfService;
-
 
     @GetMapping("/user-info")
     @Operation(summary = "첫페이지에서 유저의 정보를 조회하는 api", description = "")
@@ -71,7 +71,6 @@ public class ApiController {
             return new ApiResponse(true, "사진 업로드 및 저장 성공");
         }
     }
-
 
     @GetMapping("photo")
     @Operation(summary = "테스트 id로 테스트의 사진을 얻는 api", description = "List<String>으로 반환")
@@ -118,5 +117,44 @@ public class ApiController {
     @PostMapping("/pdf/{testId}")
     public String makePdf(@PathVariable long testId) {
         return pdfService.makeAndUploadPdf(testId);
+    }
+
+    @Operation(summary = "랜덤 키 생성", description = "노트북과 앱 연결을 위한 키 생성")
+    @PostMapping("/random-key/{testId}")
+    public ApiResponse randomKey(@PathVariable long testId) {
+        String randomKey = testResultService.randomKey(testId);
+        Map<String, String> result = new HashMap<>();
+        result.put("randomKey", randomKey);
+
+        return new ApiResponse(true, "랜덤 키 생성", result);
+    }
+
+    @GetMapping("/verify-key")
+    @Operation(summary = "랜덤 키 검증", description = "생성된 랜덤 키의 유효성을 검증")
+    public ApiResponse verifyKey(@RequestParam String key) {
+        boolean isValid = testResultService.verifyRandomKey(key);
+        Map<String, String> result = new HashMap<>();
+        result.put("isValid", isValid + "");
+        return new ApiResponse(isValid, isValid ? "유효한 키입니다" : "유효하지 않은 키입니다",result);
+    }
+
+    @PostMapping("/test-result")
+    @Operation(
+            summary = "테스트 결과 저장",
+            description = "각 테스트(키보드, 카메라 등)의 결과를 저장합니다."
+    )
+    public ApiResponse updateTestResult(@RequestBody TestResultReq testResultReq) {
+        try {
+            testResultService.updateTestResult(testResultReq);
+            return new ApiResponse(
+                    true,
+                    "테스트 결과가 성공적으로 저장되었습니다."
+            );
+        } catch (RuntimeException e) {
+            return new ApiResponse(
+                    false,
+                    e.getMessage()
+            );
+        }
     }
 }

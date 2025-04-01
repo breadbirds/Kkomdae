@@ -7,6 +7,7 @@ import pizza.kkomdae.entity.LaptopTestResult;
 import pizza.kkomdae.entity.Student;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface LapTopTestResultRepository extends JpaRepository<LaptopTestResult,Long>, CustomLapTopTestResultRepository {
@@ -16,4 +17,7 @@ public interface LapTopTestResultRepository extends JpaRepository<LaptopTestResu
     LaptopTestResult findByStudentAndLaptopTestResultId(Student student, long laptopTestResultId);
 
     LaptopTestResult findByStudentAndStageIsLessThanAndDeviceIsNull(Student student, int stepIsLessThan);
+
+    Optional<LaptopTestResult> findByRandomKey(String randomKey);
+
 }
