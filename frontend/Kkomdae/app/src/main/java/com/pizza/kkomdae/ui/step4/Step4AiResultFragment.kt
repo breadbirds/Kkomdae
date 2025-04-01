@@ -1,6 +1,7 @@
 package com.pizza.kkomdae.ui.step4
 
 import android.content.Context
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -17,6 +18,7 @@ import com.pizza.kkomdae.presenter.model.Step4AiResult
 import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.ui.step1.ImageDetailFragment
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
 import com.pizza.kkomdae.ui.guide.Step2GuideFragment
 import com.pizza.kkomdae.ui.step3.FinalResultFragment
 
@@ -74,11 +76,29 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         val data = listOf(
             Step4AiResult(R.drawable.ic_front_laptop, "전면부"),
             Step4AiResult(R.drawable.ic_guide_back, "후면부"),
-            Step4AiResult(R.drawable.ic_camera_left, "좌측"),
-            Step4AiResult(R.drawable.ic_camera_right, "우측"),
-            Step4AiResult(R.drawable.ic_guide_screen, "화면"),
-            Step4AiResult(R.drawable.ic_guide_keypad, "키판"),
+            Step4AiResult(R.drawable.ic_camera_left, "좌측면"),
+            Step4AiResult(R.drawable.ic_camera_right, "우측면"),
+            Step4AiResult(R.drawable.ic_guide_screen, "모니터"),
+            Step4AiResult(R.drawable.ic_guide_keypad, "키보드"),
         )
+
+        class HorizontalSpaceItemDecoration(private val horizontalSpace: Int) : RecyclerView.ItemDecoration() {
+            override fun getItemOffsets(
+                outRect: Rect,
+                view: View,
+                parent: RecyclerView,
+                state: RecyclerView.State
+            ) {
+                outRect.right = horizontalSpace
+                outRect.left = horizontalSpace
+            }
+        }
+
+        // 간격 추가
+        binding.rvPosition.addItemDecoration(HorizontalSpaceItemDecoration(
+            resources.getDimensionPixelSize(R.dimen.recyclerview_item_horizontal_spacing) // 값은 dimens.xml에 정의
+        ))
+
 
         binding.rvPosition.adapter = Step4AiResultAdapter(data, listen = {
             changeImage(it)

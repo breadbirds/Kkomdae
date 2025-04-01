@@ -19,29 +19,26 @@ class Step4AiResultAdapter(val list: List<Step4AiResult>, val listen:(Int)->Unit
                 .load(list[position].image)
                 .into(binding.ivPosition)
 
+            // 선택된 아이템 처리
             if (position == selectedPosition) {
-                binding.root.scaleX = 1.2f  // 가로 크기 증가
-                binding.root.scaleY = 1.2f  // 세로 크기 증가
-                (binding.root as MaterialCardView).setStrokeColor(
-                    ContextCompat.getColor(
-                        binding.root.context,
-                        R.color.blue500
-                    )
+                // 선택된 아이템은 파란색 테두리와 파란색 텍스트
+                (binding.root as MaterialCardView).strokeColor =
+                    ContextCompat.getColor(binding.root.context, R.color.blue500)
+                binding.tvPosition.setTextColor(
+                    ContextCompat.getColor(binding.root.context, R.color.blue500)
                 )
-
             } else {
-                binding.root.scaleX = 1.0f
-                binding.root.scaleY = 1.0f
-                (binding.root as MaterialCardView).setStrokeColor(
-                    ContextCompat.getColor(
-                        binding.root.context,
-                        R.color.gray200
-                    )
+                // 선택되지 않은 아이템은 회색 테두리와 회색 텍스트
+                (binding.root as MaterialCardView).strokeColor =
+                    ContextCompat.getColor(binding.root.context, R.color.gray200)
+                binding.tvPosition.setTextColor(
+                    ContextCompat.getColor(binding.root.context, R.color.gray500)
                 )
             }
 
 
             binding.tvPosition.text= list[position].name
+
             binding.root.setOnClickListener {
                 listen(position)
                 val previousPosition = selectedPosition
