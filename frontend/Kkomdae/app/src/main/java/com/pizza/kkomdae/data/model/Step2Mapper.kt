@@ -1,13 +1,9 @@
 package com.pizza.kkomdae.data.model
 
-import com.pizza.kkomdae.data.model.dto.GetPhotoResponseDto
-import com.pizza.kkomdae.data.model.dto.PhotoResponseDto
 import com.pizza.kkomdae.data.model.dto.PostSecondStageRequestDto
-import com.pizza.kkomdae.data.model.dto.PostSecondStageResponseDto
-import com.pizza.kkomdae.domain.model.GetPhotoResponse
-import com.pizza.kkomdae.domain.model.PhotoResponse
+import com.pizza.kkomdae.data.model.dto.PostResponseDto
 import com.pizza.kkomdae.domain.model.PostSecondStageRequest
-import com.pizza.kkomdae.domain.model.PostSecondStageResponse
+import com.pizza.kkomdae.domain.model.PostResponse
 
 object Step2Mapper {
     fun toPostSecondStageRequestDto(postSecondStageRequest: PostSecondStageRequest):PostSecondStageRequestDto=
@@ -23,10 +19,10 @@ object Step2Mapper {
             batteryReportUrl = postSecondStageRequest.batteryReportUrl
     )
 
-    fun toPostSecondStageResponse(postSecondStageResponseDto: PostSecondStageResponseDto)= PostSecondStageResponse(
-        success= postSecondStageResponseDto.success,
-        message = postSecondStageResponseDto.message,
-        status = postSecondStageResponseDto.status,
+    fun toPostStageResponse(postResponseDto: PostResponseDto)= PostResponse(
+        success= postResponseDto.success,
+        message = postResponseDto.message,
+        status = postResponseDto.status,
 
     )
 

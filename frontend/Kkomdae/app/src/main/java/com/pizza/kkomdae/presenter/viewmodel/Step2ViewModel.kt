@@ -9,10 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pizza.kkomdae.domain.model.PostSecondStageRequest
-import com.pizza.kkomdae.domain.model.PostSecondStageResponse
-import com.pizza.kkomdae.domain.usecase.InspectUseCase
-import com.pizza.kkomdae.domain.usecase.MainUseCase
-import com.pizza.kkomdae.domain.usecase.Step1UseCase
+import com.pizza.kkomdae.domain.model.PostResponse
 import com.pizza.kkomdae.domain.usecase.Step2UseCase
 import com.pizza.kkomdae.presenter.model.BatteryReport
 import com.pizza.kkomdae.presenter.model.ComponentStatus
@@ -52,8 +49,8 @@ class Step2ViewModel@Inject constructor(
     val batteryStatus: LiveData<BatteryReport>
         get() = _batteryStatus
 
-    private var _postResponse = MutableLiveData<PostSecondStageResponse>()
-    val postResponse: LiveData<PostSecondStageResponse>
+    private var _postResponse = MutableLiveData<PostResponse>()
+    val postResponse: LiveData<PostResponse>
         get() = _postResponse
 
 

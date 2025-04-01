@@ -1,8 +1,7 @@
 package com.pizza.kkomdae.domain.usecase
 
-import com.pizza.kkomdae.domain.model.GetPhotoResponse
 import com.pizza.kkomdae.domain.model.PostSecondStageRequest
-import com.pizza.kkomdae.domain.model.PostSecondStageResponse
+import com.pizza.kkomdae.domain.model.PostResponse
 import com.pizza.kkomdae.domain.repository.Step2Repository
 import javax.inject.Inject
 
@@ -12,7 +11,7 @@ class Step2UseCase@Inject constructor(
 
     suspend fun postSecondStage(
         postSecondStageRequest: PostSecondStageRequest
-    ): Result<PostSecondStageResponse> {
+    ): Result<PostResponse> {
         return try {
             val response = step2Repository.postSecondStage(
                 postSecondStageRequest= postSecondStageRequest

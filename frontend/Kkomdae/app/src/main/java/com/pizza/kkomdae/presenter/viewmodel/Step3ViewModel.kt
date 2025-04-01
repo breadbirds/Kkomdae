@@ -3,24 +3,16 @@ package com.pizza.kkomdae.presenter.viewmodel
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pizza.kkomdae.domain.model.PostSecondStageResponse
+import com.pizza.kkomdae.domain.model.PostResponse
 import com.pizza.kkomdae.domain.model.PostThirdStageRequest
-import com.pizza.kkomdae.domain.usecase.Step2UseCase
 import com.pizza.kkomdae.domain.usecase.Step3UseCase
-import com.pizza.kkomdae.presenter.model.KeyboardStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import javax.inject.Inject
 
 private const val TAG = "Step3ViewModel"
@@ -72,8 +64,8 @@ class Step3ViewModel@Inject constructor(
     val mousePad: LiveData<Int>
         get() = _mousePad
 
-    private var _postResponse = MutableLiveData<Boolean>()
-    val postResponse: LiveData<Boolean>
+    private var _postResponse = MutableLiveData<PostResponse>()
+    val postResponse: LiveData<PostResponse>
         get() = _postResponse
 
 
