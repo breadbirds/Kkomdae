@@ -6,4 +6,5 @@ data class GetAiPhotoResponse(
     val success : Boolean,
     val status : String,
     val message : String,
+    val data: AiPhotoData
 )

@@ -58,7 +58,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         super.onViewCreated(view, savedInstanceState)
 
         // api 호출
-        viewModel.getAiPhoto(5)
+        viewModel.getAiPhoto()
 
 
 
@@ -75,9 +75,13 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             transaction.commit()
         }
 
-        Glide.with(binding.ivImage)
-            .load("")
-            .into(binding.ivImage)
+        viewModel.frontUri.observe(viewLifecycleOwner){
+            Glide.with(binding.ivImage)
+                .load(it)
+                .into(binding.ivImage)
+        }
+
+
 
         val data = listOf(
             Step4AiResult(R.drawable.ic_front_laptop, "전면부"),
@@ -158,8 +162,17 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     fun changeImage(it: Int){
         Log.d(TAG, "changeImage: $it")
         step=it
+        val url = when(step){
+            0-> viewModel.frontUri.value
+            1-> viewModel.backUri.value
+            2-> viewModel.leftUri.value
+            3-> viewModel.rightUri.value
+            4-> viewModel.screenUri.value
+            5 -> viewModel.keypadUri.value
+            else -> ""
+        }
         Glide.with(binding.ivImage)
-            .load(imageList?.get(step) ?:"")
+            .load(url)
             .into(binding.ivImage)
     }
 

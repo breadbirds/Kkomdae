@@ -1,11 +1,13 @@
 package com.pizza.kkomdae.data.model
 
+import com.pizza.kkomdae.data.model.dto.AiPhotoDataDto
+import com.pizza.kkomdae.data.model.dto.FourthStageRequestDto
 import com.pizza.kkomdae.data.model.dto.GetAiPhotoResponseDto
 import com.pizza.kkomdae.data.model.dto.GetTotalResultResponseDto
-import com.pizza.kkomdae.data.model.dto.LoginResponseDto
+import com.pizza.kkomdae.domain.model.AiPhotoData
+import com.pizza.kkomdae.domain.model.FourthStageRequest
 import com.pizza.kkomdae.domain.model.GetAiPhotoResponse
 import com.pizza.kkomdae.domain.model.GetTotalResultResponse
-import com.pizza.kkomdae.domain.model.LoginResponse
 
 object FinalMapper {
 
@@ -13,6 +15,28 @@ object FinalMapper {
         success = getAiPhotoResponseDto.success,
         status = getAiPhotoResponseDto.status,
         message= getAiPhotoResponseDto.message,
+        data = toApiPhotoData(getAiPhotoResponseDto.data),
+
+    )
+
+    fun toFourthStageRequestDto(fourthStageRequest: FourthStageRequest)= FourthStageRequestDto(
+        testId =  fourthStageRequest.testId,
+        description = fourthStageRequest.description
+    )
+
+    fun toApiPhotoData(apiPhotoDataDto: AiPhotoDataDto)= AiPhotoData(
+        Picture1_ai_url=apiPhotoDataDto.photo1_ai_url,
+        Picture1_ai_name = apiPhotoDataDto.photo1_ai_name,
+        Picture2_ai_url=apiPhotoDataDto.photo2_ai_url,
+        Picture2_ai_name = apiPhotoDataDto.photo2_ai_name,
+        Picture3_ai_url=apiPhotoDataDto.photo3_ai_url,
+        Picture3_ai_name = apiPhotoDataDto.photo3_ai_name,
+        Picture4_ai_url=apiPhotoDataDto.photo4_ai_url,
+        Picture4_ai_name = apiPhotoDataDto.photo4_ai_name,
+        Picture5_ai_url=apiPhotoDataDto.photo5_ai_url,
+        Picture5_ai_name = apiPhotoDataDto.photo5_ai_name,
+        Picture6_ai_url=apiPhotoDataDto.photo6_ai_url,
+        Picture6_ai_name = apiPhotoDataDto.photo6_ai_name,
     )
 
 
