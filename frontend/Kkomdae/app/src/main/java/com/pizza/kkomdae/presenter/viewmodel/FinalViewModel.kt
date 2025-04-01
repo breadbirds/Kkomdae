@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.pizza.kkomdae.domain.model.FourthStageRequest
 import com.pizza.kkomdae.domain.model.GetTotalResultResponse
 import com.pizza.kkomdae.domain.model.LoginResponse
+import com.pizza.kkomdae.domain.model.PostResponse
 import com.pizza.kkomdae.domain.usecase.FinalUseCase
 import com.pizza.kkomdae.domain.usecase.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -58,6 +59,10 @@ class FinalViewModel @Inject constructor(
     val getFinalResult: LiveData<GetTotalResultResponse>
         get() = _getFinalResult
 
+    private val _postFourth = MutableLiveData<PostResponse>()
+    val postFourth: LiveData<PostResponse>
+        get() = _postFourth
+
     private val sharedPreferences: SharedPreferences =
         application.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
@@ -93,7 +98,7 @@ class FinalViewModel @Inject constructor(
             val result = finalUseCase.postFourthStage(data)
             Log.d(TAG, "postFourthStage: $result")
             result.onSuccess {
-
+                _postFourth.postValue(it)
             }
         }
 

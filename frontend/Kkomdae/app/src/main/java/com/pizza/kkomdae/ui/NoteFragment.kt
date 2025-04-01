@@ -5,10 +5,12 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentNoteBinding
+import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.ui.step3.FinalResultFragment
 
 
@@ -20,6 +22,7 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
     private var param1: String? = null
     private var param2: String? = null
     private var isTextEntered = false   // 텍스트 입력 여부를 추적하는 변수
+    private val viewModel : FinalViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +57,8 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
 
         // 저장하기 버튼 클릭 이벤트
         binding.btnSave.setOnClickListener {
-            navigateToFinalResult()
+            viewModel.postFourthStage(binding.etNoteDetail.text.toString())
+
         }
 
         // 뒤로가기 버튼
@@ -65,6 +69,13 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
         // X 버튼
         binding.topBar.cancelButtonContainer.setOnClickListener {
             showQuitBottomSheet()
+        }
+
+        // 통신 결과 감시
+        viewModel.postFourth.observe(viewLifecycleOwner){
+            if(it.success && it.status=="OK"){
+                navigateToFinalResult()
+            }
         }
 
 
