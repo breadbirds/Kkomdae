@@ -98,6 +98,13 @@ public class TestResultService {
                 .collect(Collectors.toList());
     }
 
+    public AiPhotoWithUrl getAiPhoto(long testId, int type) {
+        LaptopTestResult laptopResult = lapTopTestResultRepository.getReferenceById(testId);
+        Photo photo = photoRepository.getPhotoByLaptopTestResultAndType(laptopResult, type);
+        String presignedUrl = s3Service.generatePresignedUrl(photo.getAiName());
+        return new AiPhotoWithUrl(photo, presignedUrl);
+    }
+
     @Transactional
     public void secondStage(CustomUserDetails userDetails, SecondStageReq secondStageReq) {
         Student student = studentRepository.getReferenceById(userDetails.getUserId());
