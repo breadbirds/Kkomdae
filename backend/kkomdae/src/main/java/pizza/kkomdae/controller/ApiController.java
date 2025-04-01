@@ -54,7 +54,7 @@ public class ApiController {
 
 
     @PostMapping(value = "/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "사진 업로드", description = "사진을 업로드하고 분석 및 저장 / type에 -1 (음수) 전송 시 전체 스텝을 2로 변경")
+    @Operation(summary = "사진 업로드", description = "사진을 업로드하고 분석 및 저장 / type에 6(마지막 사진) 또는 -1 (음수) 전송 시 전체 Stage를 2로 변경")
     public ApiResponse uploadPhoto(
             @RequestParam("photoType") int photoType,
             @RequestParam("testId") long testId,
