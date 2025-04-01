@@ -746,7 +746,7 @@
             android:id="@+id/tv_step4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="비고"
+            android:text="기타 특이사항"
             style="@style/Title1"
             app:layout_constraintStart_toEndOf="@id/fl_step4"
             app:layout_constraintTop_toTopOf="@id/fl_step4"
@@ -773,25 +773,7 @@
                 android:layout_height="wrap_content"
                 android:padding="20dp">
 
-                <!-- 비고 제목 -->
-                <TextView
-                    android:id="@+id/tv_note_title"
-                    style="@style/Title3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="기타 참고사항"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
 
-                <View
-                    android:id="@+id/line_note"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="4dp"
-                    android:background="@color/gray200"
-                    app:layout_constraintTop_toBottomOf="@id/tv_note_title" />
-
-                <!-- 전면부 -->
                 <TextView
                     android:id="@+id/tv_front_title"
                     style="@style/Title4"
@@ -799,8 +781,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:text="전면부"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/line_note" />
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <TextView
                     android:id="@+id/tv_front_note1"
@@ -824,7 +805,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_front_note1" />
 
-                <!-- 후면부 -->
                 <TextView
                     android:id="@+id/tv_back_title"
                     style="@style/Title4"
