@@ -19,6 +19,7 @@ import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.ui.step1.ImageDetailFragment
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.ui.guide.Step2GuideFragment
 import com.pizza.kkomdae.ui.step3.FinalResultFragment
 
@@ -32,7 +33,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     R.layout.fragment_step4_ai_result
 ) {
     private lateinit var mainActivity: MainActivity
-    private val viewModel : MainViewModel by activityViewModels()
+    private val viewModel : FinalViewModel by activityViewModels()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -55,6 +56,9 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // api 호출
+        viewModel.getAiPhoto(5)
 
         binding.ivImage.setOnClickListener {
             val bundle = Bundle()
