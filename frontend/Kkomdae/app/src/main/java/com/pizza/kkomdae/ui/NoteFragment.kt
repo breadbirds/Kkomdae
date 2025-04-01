@@ -50,7 +50,7 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
     }
 
     private fun navigateToFinalResult() {
-        // 다음 화면으로 이동 (원하는 Fragment로 변경 가능)
+        // 다음 화면으로 이동
         val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fl_main, FinalResultFragment())
         transaction.addToBackStack(null)
@@ -78,11 +78,11 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
             val transaction = mainActivity.supportFragmentManager.beginTransaction()
             transaction.replace(R.id.fl_main, com.pizza.kkomdae.ui.MainFragment())
             transaction.commit()
-
-            // 바텀시트표시
-            bottomSheetDialog.setContentView(bottomSheetView)
-            bottomSheetDialog.show()
         }
+
+        // 바텀시트 표시
+        bottomSheetDialog.setContentView(bottomSheetView)
+        bottomSheetDialog.show()
     }
 
     companion object {
