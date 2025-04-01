@@ -20,8 +20,7 @@ import com.pizza.kkomdae.ui.step1.ImageDetailFragment
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
-import com.pizza.kkomdae.ui.guide.Step2GuideFragment
-import com.pizza.kkomdae.ui.step3.FinalResultFragment
+import com.pizza.kkomdae.ui.NoteFragment
 
 /**
  * A simple [Fragment] subclass.
@@ -115,7 +114,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         // 다음 버튼
         binding.btnConfirm.setOnClickListener {
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.fl_main, FinalResultFragment ())
+            transaction.replace(R.id.fl_main, NoteFragment ())
             transaction.addToBackStack(null)
             transaction.commit()
         }

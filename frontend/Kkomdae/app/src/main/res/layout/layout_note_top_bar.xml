@@ -25,18 +25,26 @@
             android:clickable="false"/>
     </FrameLayout>
 
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="타이틀"
-        app:layout_constraintStart_toStartOf="parent"
+    <FrameLayout
+        android:id="@+id/cancel_button_container"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:textSize="20dp"
-        android:textColor="@color/gray800"
-        android:fontFamily="@font/pretendard_semi_bold"
-        android:lineSpacingMultiplier="1.4"/>
+        android:layout_marginEnd="4dp">
+
+        <ImageView
+            android:id="@+id/btn_cancel"
+            android:layout_width="20dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_cancel_dark"
+            android:layout_gravity="center"
+            app:tint="@color/gray700"
+            android:clickable="false"/>
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
