@@ -107,7 +107,7 @@ class MainViewModel@Inject constructor(
                 // 로그인 성공 시 실제 데이터 처리
                 userInfoResponse?.let {
                     if(it.onGoingTestId!=0){
-                        saveTestId(5)
+                        saveTestId(it.onGoingTestId.toLong())
                     }
 
                     _picStage.postValue(it.picStage)
@@ -116,7 +116,7 @@ class MainViewModel@Inject constructor(
 
                     val data = UserInfoResponse(
                         onGoingTestId = it.onGoingTestId,
-                        stage = 4,
+                        stage = it.stage,
                         picStage = it.picStage,
                         name = it.name,
                         userRentTestRes = it.userRentTestRes.map {
