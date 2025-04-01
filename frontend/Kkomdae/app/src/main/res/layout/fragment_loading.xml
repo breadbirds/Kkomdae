@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="#FCFCFC"
     android:padding="36dp"
     tools:context=".ui.LoadingFragment">
 
@@ -13,8 +13,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="사진을 준비하고 있어요"
-        android:textColor="@color/gray800"
-        style="@style/Display2"
+        android:textColor="@color/gray700"
+        style="@style/Display3"
         android:layout_marginTop="32dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -24,9 +24,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="점검을 시작할게요!"
-        android:textColor="@color/gray600"
-        style="@style/Title1"
-        android:layout_marginTop="12dp"
+        android:textColor="@color/gray700"
+        style="@style/Display3"
+        android:layout_marginTop="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
@@ -35,10 +35,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_rounded_progress"
-        android:padding="16dp"
+        android:padding="12dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintTop_toBottomOf="@id/tv_subtitle">>
 
         <ImageView
@@ -53,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="점검 진행중... "
-            style="@style/Label1"
+            style="@style/Body2"
             android:textColor="@color/gray600" />
 
         <TextView
@@ -71,17 +71,16 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="2dp"
             android:text=" (3분 소요 예상)"
-            style="@style/Label4"
-            android:textColor="@color/gray600" />
+            style="@style/Caption1"
+            android:textColor="@color/gray300" />
     </LinearLayout>
 
-    <!-- 캐릭터 이미지 -->
     <ImageView
         android:id="@+id/iv_character"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:src="@drawable/ic_loading1"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="42dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_progress_container" />
@@ -92,8 +91,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="16dp"
-        android:layout_marginTop="32dp"
+        android:padding="18dp"
+        android:layout_marginTop="46dp"
         app:layout_constraintTop_toBottomOf="@id/iv_character">
 
         <FrameLayout
@@ -119,7 +118,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="노트북 사진 데이터 처리"
-            style="@style/Body1"
+            style="@style/Title3"
             android:textColor="@color/gray600"
             android:layout_marginStart="12dp" />
     </LinearLayout>
@@ -138,7 +137,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="16dp"
+        android:padding="18dp"
         app:layout_constraintTop_toBottomOf="@id/container1">
 
         <FrameLayout
@@ -164,7 +163,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="노트북 외관 분석 확인"
-            style="@style/Body1"
+            style="@style/Title3"
             android:textColor="@color/gray600"
             android:layout_marginStart="12dp" />
     </LinearLayout>
@@ -182,10 +181,9 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="16dp"
+        android:padding="18dp"
         app:layout_constraintTop_toBottomOf="@id/container2">
 
-        <!-- 로딩/체크 이미지 -->
         <FrameLayout
             android:layout_width="24dp"
             android:layout_height="24dp">
@@ -210,7 +208,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="손상 여부 확인"
-            style="@style/Body1"
+            style="@style/Title3"
             android:textColor="@color/gray600"
             android:layout_marginStart="12dp" />
     </LinearLayout>

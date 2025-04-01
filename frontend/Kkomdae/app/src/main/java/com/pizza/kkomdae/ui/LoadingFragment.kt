@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.ui.step3.FinalResultFragment
 import com.pizza.kkomdae.ui.step4.Step4AiResultFragment
@@ -216,18 +217,28 @@ class LoadingFragment : Fragment() {
         tv_subtitle.text = stageSubtitles[currentStage]
 
         // 단계에 따라 캐릭터 이미지 변경
+        // 단계에 따라 GIF 이미지 로드
         when (currentStage) {
-            0 -> iv_character.setImageResource(R.drawable.ic_loading1)
-            1 -> iv_character.setImageResource(R.drawable.ic_loading2)
-            2 -> iv_character.setImageResource(R.drawable.ic_loading3)
+            0 -> Glide.with(this)
+                .asGif()
+                .load(R.raw.loading1)
+                .into(iv_character)
+            1 -> Glide.with(this)
+                .asGif()
+                .load(R.raw.loading2)
+                .into(iv_character)
+            2 -> Glide.with(this)
+                .asGif()
+                .load(R.raw.loading3)
+                .into(iv_character)
             3 -> iv_character.setImageResource(R.drawable.ic_loading_final)
         }
 
         // 로그
-        println("Stage updated to: $currentStage with image: ${when(currentStage) {
-            0 -> "ic_loading1"
-            1 -> "ic_loading2"
-            2 -> "ic_loading3"
+        println("Stage updated to: $currentStage with GIF image: ${when(currentStage) {
+            0 -> "loading1"
+            1 -> "loading2"
+            2 -> "loading3"
             3 -> "ic_loading_final"
             else -> "unknown"
         }}")
@@ -249,7 +260,7 @@ class LoadingFragment : Fragment() {
         // 버튼 활성화 (약간 지연시켜 표시)
         handler.postDelayed({
             btn_next.visibility = View.VISIBLE
-        }, 500)
+        }, 300)
     }
 
     override fun onDestroy() {
