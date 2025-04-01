@@ -87,7 +87,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
         // 다음 버튼
-        binding.button.setOnClickListener {
+        binding.btnConfirm.setOnClickListener {
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
             transaction.replace(R.id.fl_main, FinalResultFragment ())
             transaction.addToBackStack(null)
@@ -95,7 +95,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         }
 
         // X 클릭 이벤트 설정
-        binding.topBar.backButtonContainer.setOnClickListener {
+        binding.btnClose.setOnClickListener {
             showQuitBottomSheet()
         }
 
