@@ -71,7 +71,7 @@
                 android:padding="18dp"
                 android:textColor="@color/gray700"
                 android:textColorHint="@color/gray300"
-                style="@style/Caption1" />
+                style="@style/Body2" />
         </androidx.cardview.widget.CardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
