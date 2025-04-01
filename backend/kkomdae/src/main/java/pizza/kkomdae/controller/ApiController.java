@@ -19,8 +19,7 @@ import pizza.kkomdae.security.dto.CustomUserDetails;
 import pizza.kkomdae.service.*;
 
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -73,25 +72,65 @@ public class ApiController {
         }
     }
 
+    @PostMapping(value = "/re-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "사진 재 업로드", description = "사진을 재 업로드하고 분석 및 저장 / 동기방식")
+    public ApiResponse uploadRePhoto(
+            @RequestParam("photoType") int photoType,
+            @RequestParam("testId") long testId,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
+
+            PhotoReq photoReq = new PhotoReq();
+            photoReq.setPhotoType(photoType);
+            photoReq.setTestId(testId);
+            Photo photo = photoService.uploadPhotoSync(photoReq, image);
+            photoService.analyzeRePhoto(photo.getPhotoId());
+            return new ApiResponse(true, "사진 업로드 및 저장 성공");
+
+    }
+
 
     @GetMapping("photo")
-    @Operation(summary = "테스트 id로 테스트의 사진을 얻는 api", description = "List<String>으로 반환")
+    @Operation(summary = "테스트 id로 테스트의 사진을 얻는 api", description = "List<Map<String,String>>으로 반환")
     public ApiResponse getPhoto(@RequestParam long testId) {
+        // 1) photoList 가져오기
         List<PhotoWithUrl> photoList = testResultService.getPhotos(testId);
-
-        Map<String, String> photoMap = photoList.stream()
-                .collect(Collectors.toMap(PhotoWithUrl::getName, PhotoWithUrl::getUrl));
-
-        return new ApiResponse(true, "사진 url 반환 완료", photoMap);
+        // 2) 정렬
+        photoList.sort(
+                Comparator.comparingInt(PhotoWithUrl::getType)
+        );
+        // 3) 반환 리스트 생성
+        List<Map<String, String>> resultList = new ArrayList<>();
+        // 4) 각 사진마다 매핑
+        for (PhotoWithUrl photo : photoList) {
+            int type = photo.getType();
+            Map<String, String> map = new HashMap<>();
+            map.put("picture" + type +"_name", photo.getName());
+            map.put("picture" + type +"_url", photo.getUrl());
+            resultList.add(map);
+        }
+        return new ApiResponse(true, "사진 url 반환 완료", resultList);
     }
 
     @GetMapping("ai-photo")
     @Operation(summary = "테스트 아이디로 ai로 분석된 사진을 얻는 api", description = "List<String>으로 반환")
     public ApiResponse getAiPhoto(@RequestParam long testId) {
+        // 1) 사진 조회 결과 가져오기
         List<AiPhotoWithUrl> photoList = testResultService.getAiPhotos(testId);
-        Map<String, String> photoMap = photoList.stream()
-                .collect(Collectors.toMap(AiPhotoWithUrl::getAiName, AiPhotoWithUrl::getUrl));
-        return new ApiResponse(true, "분석 사진 url 반환 완료", photoMap);
+        // 2) 정렬하기
+        photoList.sort(
+                Comparator.comparingInt(AiPhotoWithUrl::getType)
+        );
+        // 3) 반환 리스트 생성
+        List<Map<String, String>> resultList = new ArrayList<>();
+        // 4) 각 사진 매핑
+        for (AiPhotoWithUrl photo : photoList) {
+            int type = photo.getType();
+            Map<String, String> map = new HashMap<>();
+            map.put("Picture" + type +"_ai_name", photo.getAiName());
+            map.put("Picture" + type +"_ai_url", photo.getUrl());
+            resultList.add(map);
+        }
+        return new ApiResponse(true, "분석 사진 url 반환 완료", resultList);
     }
 
     @Operation(summary = "파일 이름으로 URL 반환", description = "파일 이름으로 url을 돌려받기")
