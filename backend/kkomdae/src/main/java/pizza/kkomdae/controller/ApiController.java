@@ -84,8 +84,16 @@ public class ApiController {
             photoReq.setTestId(testId);
             Photo photo = photoService.uploadPhotoSync(photoReq, image);
             photoService.analyzeRePhoto(photo.getPhotoId());
-            return new ApiResponse(true, "사진 업로드 및 저장 성공");
 
+            List<Map<String, String>> result = new ArrayList<>();
+
+            AiPhotoWithUrl photo1 = testResultService.getAiPhoto(testId, photoType);
+            Map<String, String> map = new HashMap<>();
+            map.put("photo_name", photo1.getAiName());
+            map.put("photo_url", photo1.getUrl());
+            result.add(map);
+
+            return new ApiResponse(true, "사진 업로드 및 저장 성공", result);
     }
 
 
@@ -98,16 +106,15 @@ public class ApiController {
         photoList.sort(
                 Comparator.comparingInt(PhotoWithUrl::getType)
         );
-        // 3) 반환 리스트 생성
-        List<Map<String, String>> resultList = new ArrayList<>();
+        // 3) 반환 맵 생성
+        Map<String, String> resultList = new HashMap<>();
         // 4) 각 사진마다 매핑
         for (PhotoWithUrl photo : photoList) {
             int type = photo.getType();
-            Map<String, String> map = new HashMap<>();
-            map.put("picture" + type +"_name", photo.getName());
-            map.put("picture" + type +"_url", photo.getUrl());
-            resultList.add(map);
+            resultList.put("photo" + type +"_name", photo.getName());
+            resultList.put("photo" + type +"_url", photo.getUrl());
         }
+
         return new ApiResponse(true, "사진 url 반환 완료", resultList);
     }
 
@@ -121,14 +128,12 @@ public class ApiController {
                 Comparator.comparingInt(AiPhotoWithUrl::getType)
         );
         // 3) 반환 리스트 생성
-        List<Map<String, String>> resultList = new ArrayList<>();
+        Map<String, String> resultList = new HashMap<>();
         // 4) 각 사진 매핑
         for (AiPhotoWithUrl photo : photoList) {
             int type = photo.getType();
-            Map<String, String> map = new HashMap<>();
-            map.put("Picture" + type +"_ai_name", photo.getAiName());
-            map.put("Picture" + type +"_ai_url", photo.getUrl());
-            resultList.add(map);
+            resultList.put("photo" + type +"_ai_name", photo.getAiName());
+            resultList.put("photo" + type +"_ai_url", photo.getUrl());
         }
         return new ApiResponse(true, "분석 사진 url 반환 완료", resultList);
     }

@@ -121,5 +121,6 @@ public class PhotoService {
         photo.setDamage(response.getDamage());
 
         photoRepository.save(photo);
+
     }
 }
