@@ -1,5 +1,8 @@
 package com.pizza.kkomdae.presenter.viewmodel
 
+import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,17 +18,25 @@ import javax.inject.Inject
 private const val TAG = "FinalViewModel"
 @HiltViewModel
 class FinalViewModel @Inject constructor(
+    application: Application,
     private val finalUseCase: FinalUseCase
 ) : ViewModel() {
 
-    private val _loginResult = MutableLiveData<Result<LoginResponse>>()
-    val loginResult: LiveData<Result<LoginResponse>>
-        get() = _loginResult
+    private val _pdfName = MutableLiveData<String>()
+    val pdfName: LiveData<String>
+        get() = _pdfName
 
-    fun postPdf(testId: Long){
+    private val sharedPreferences: SharedPreferences =
+        application.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+    fun postPdf(){
+        val testId = sharedPreferences.getLong("test_id",0)
         viewModelScope.launch {
             val result = finalUseCase.postPdf(testId)
-            Log.d(TAG, "login: $result")
+            Log.d(TAG, "postPdf: $result")
+            result.onSuccess {
+                _pdfName.postValue(it.message)
+            }
         }
     }
 
