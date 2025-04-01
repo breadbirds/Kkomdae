@@ -29,6 +29,7 @@ import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.presenter.model.DeviceReport
 import com.pizza.kkomdae.databinding.FragmentQrScanBinding
+import com.pizza.kkomdae.presenter.viewmodel.Step2ViewModel
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"

@@ -54,7 +54,7 @@ public class ApiController {
 
 
     @PostMapping(value = "/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "사진 업로드", description = "사진을 업로드하고 분석 및 저장 / type에 -1 (음수) 전송 시 전체 스텝을 2로 변경")
+    @Operation(summary = "사진 업로드", description = "사진을 업로드하고 분석 및 저장 / type에 6(마지막 사진) 또는 -1 (음수) 전송 시 전체 Stage를 2로 변경")
     public ApiResponse uploadPhoto(
             @RequestParam("photoType") int photoType,
             @RequestParam("testId") long testId,
@@ -105,20 +105,23 @@ public class ApiController {
 
     @Operation(summary = "qr 정보 입력", description = "2단계 qr 정보 입력 및 단계 저장")
     @PostMapping("/secondStage")
-    public void secondStage(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody SecondStageReq secondStageReq) {
+    public ApiResponse secondStage(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody SecondStageReq secondStageReq) {
         testResultService.secondStage(userDetails, secondStageReq);
+        return new ApiResponse(true,"qr 정보 입력 성공");
     }
 
     @Operation(summary = "기기 정보 입력", description = "기기 모델명, 시리얼 넘버 등의 정보를 받는 api")
     @PostMapping("/thirdStage")
-    public void thirdStage(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody ThirdStageReq thirdStageReq) {
+    public ApiResponse thirdStage(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody ThirdStageReq thirdStageReq) {
         testResultService.thirdStage(userDetails, thirdStageReq);
+        return new ApiResponse(true, "기기 정보 입력 성공");
     }
 
     @Operation(summary = "비고 입력",description = "기타 적고 싶은 사항을 적는 곳")
     @PostMapping("/fourthStage")
-    public void fourthStage(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody ForthStageReq forthStageReq) {
+    public ApiResponse fourthStage(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody ForthStageReq forthStageReq) {
         testResultService.fourthStage(forthStageReq);
+        return new ApiResponse(true, "비고 입력 성공");
     }
 
     @Operation(summary = "pdf 생성", description = "testId로 절차를 종료하고 pdf를 생성합니다.")
@@ -126,4 +129,12 @@ public class ApiController {
     public String makePdf(@PathVariable long testId) {
         return pdfService.makeAndUploadPdf(testId);
     }
+
+    @Operation(summary = "테스트 최종 결과", description = "테스트 최종 결과를 반환")
+    @GetMapping("/laptopTotalResult")
+    public LaptopTotalResultRes laptopTotalResult(@RequestParam long testId ) {
+        return testResultService.laptopTotalResult(testId);
+    }
+
+
 }
