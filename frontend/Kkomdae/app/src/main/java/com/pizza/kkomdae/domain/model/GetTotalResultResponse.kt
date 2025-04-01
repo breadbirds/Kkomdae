@@ -16,6 +16,6 @@ data class GetTotalResultResponse(
     val bagCount:Int,
     val adapterCount: Int,
     val mousepadCount:Int,
-    val description : String,
+    val description : String?,
     val imageNames : List<String>
 )

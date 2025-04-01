@@ -2,6 +2,7 @@ package com.pizza.kkomdae.domain.usecase
 
 import com.pizza.kkomdae.domain.model.FourthStageRequest
 import com.pizza.kkomdae.domain.model.GetAiPhotoResponse
+import com.pizza.kkomdae.domain.model.GetTotalResultResponse
 import com.pizza.kkomdae.domain.model.LoginResponse
 import com.pizza.kkomdae.domain.model.PostResponse
 import com.pizza.kkomdae.domain.repository.FinalRepository
@@ -32,6 +33,15 @@ class FinalUseCase@Inject constructor(
     suspend fun postFourthStage(fourthStageRequest: FourthStageRequest): Result<PostResponse>{
         return try {
             val response = finalRepository.postFourthStage(fourthStageRequest)
+            Result.success(response)  // ✅ 성공 시 Result.success 반환
+        } catch (e: Exception) {
+            Result.failure(e)  // ✅ 실패 시 Result.failure 반환
+        }
+    }
+
+    suspend fun getLaptopTotalResult(testId: Long): Result<GetTotalResultResponse>{
+        return try {
+            val response = finalRepository.getLaptopTotalResult(testId)
             Result.success(response)  // ✅ 성공 시 Result.success 반환
         } catch (e: Exception) {
             Result.failure(e)  // ✅ 실패 시 Result.failure 반환

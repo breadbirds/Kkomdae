@@ -50,9 +50,56 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         binding.topBar.tvTitle.text = "제출 내용 확인"
 
         showIntroDialog()
+
+        val adapter = FinalResultAdapter(requireContext())
+
+        viewModel.getLaptopTotalResult()
+
+
+        viewModel.getFinalResult.observe(viewLifecycleOwner){
+            binding.apply {
+                if(!it.keyboardStatus){ // 키보드
+                    ivKeyboard.setImageResource(R.drawable.ic_fail)
+                }
+
+                if(!it.useStatus){ // usb
+                    ivUsb.setImageResource(R.drawable.ic_fail)
+                }
+
+                if(!it.cameraStatus){ // 카메라
+                    ivCamera.setImageResource(R.drawable.ic_fail)
+                }
+                if(!it.batteryStatus){ // 배터리 성능
+                    ivBattery.setImageResource(R.drawable.ic_fail)
+                }
+                if(!it.chargerStatus){ // 충전기
+                    ivCharger.setImageResource(R.drawable.ic_fail)
+                }
+
+                tvInputModelName.text=it.modelCode
+                tvInputSerial.text=it.serialNum
+                tvInputBarcode.text=it.barcodeNum
+                tvInputDate.text=it.date
+
+                tvInputLaptopCount.text = it.laptopCount.toString()
+                tvInputMouseCount.text = it.mouseCount.toString()
+                tvInputAdapterCount.text= it.adapterCount.toString()
+                tvInputPowerCount.text=it.powerCableCount.toString()
+                tvInputBagCount.text = it.bagCount.toString()
+                tvInputPadCount.text = it.mousepadCount.toString()
+
+                tvFrontTitle.text = it.description
+
+                adapter.submitList(it.imageNames)
+            }
+        }
+
+
+        binding.viewPager.adapter =adapter
 
         // 제출하기 클릭 이벤트
         binding.btnSubmit.setOnClickListener {
