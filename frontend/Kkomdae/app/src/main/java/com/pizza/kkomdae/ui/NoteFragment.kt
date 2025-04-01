@@ -1,7 +1,10 @@
 package com.pizza.kkomdae.ui
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
@@ -16,6 +19,7 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private var isTextEntered = false   // 텍스트 입력 여부를 추적하는 변수
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +31,21 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // 텍스트 입력 감지를 위한 TextWatcher 설정
+        binding.etNoteDetail.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // 텍스트 입력 여부에 따라 버튼 상태 업데이트
+                isTextEntered = !s.isNullOrEmpty()
+                updateSaveButtonState()
+            }
+        })
 
         // 건너뛰기 버튼 클릭 이벤트
         binding.btnSkip.setOnClickListener {
@@ -47,10 +66,25 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
         binding.topBar.cancelButtonContainer.setOnClickListener {
             showQuitBottomSheet()
         }
+
+
+        // 초기 버튼 상태 설정
+        updateSaveButtonState()
+
     }
 
+    // 저장하기 버튼 상태 업데이트
+    private fun updateSaveButtonState() {
+        if (isTextEntered) {
+            binding.btnSave.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue500))
+        } else {
+            binding.btnSave.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue200))
+        }
+    }
+
+    // 다음 화면으로 이동
     private fun navigateToFinalResult() {
-        // 다음 화면으로 이동
+
         val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fl_main, FinalResultFragment())
         transaction.addToBackStack(null)
