@@ -70,13 +70,13 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = SubmissionAdapter()
 
+        val adapter = SubmissionAdapter()
         binding.rvSubmission.adapter =adapter
         binding.rvSubmission.layoutManager = LinearLayoutManager(mainActivity)
 
 
-        adapter.submitList(viewModel.userInfoResult.value?.userRentTestRes)
+
 
         binding.btnLogout.setOnClickListener {
             mainActivity.logout()
@@ -86,6 +86,7 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
         viewModel.userInfoResult.observe(viewLifecycleOwner){
             step=it.stage
             binding.tvWelcomeMessage.text="${it.name}님 안녕하세요!"
+            adapter.submitList(it.userRentTestRes)
         }
 
         // 노트북 카드뷰 클릭 이벤트
