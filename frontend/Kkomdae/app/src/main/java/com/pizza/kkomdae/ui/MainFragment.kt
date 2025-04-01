@@ -22,6 +22,7 @@ import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.ui.guide.Step1GuideFragment
 import com.pizza.kkomdae.ui.guide.Step2GuideFragment
 import com.pizza.kkomdae.ui.step3.LaptopInfoInputFragment
+import com.pizza.kkomdae.ui.step4.Step4AiResultFragment
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -110,6 +111,13 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
                     transaction.addToBackStack(null)
                     transaction.commit()
                 }
+                4->{
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.fl_main, LoadingFragment())
+                    transaction.addToBackStack(null)
+                    transaction.commit()
+                }
+
 
             }
 
