@@ -4,11 +4,13 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,7 +23,9 @@ import com.pizza.kkomdae.presenter.viewmodel.LoginViewModel
 import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.ui.guide.Step1GuideFragment
 import com.pizza.kkomdae.ui.guide.Step2GuideFragment
+import com.pizza.kkomdae.ui.step3.FinalResultFragment
 import com.pizza.kkomdae.ui.step3.LaptopInfoInputFragment
+import com.pizza.kkomdae.ui.step4.Step4AiResultFragment
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -63,15 +67,16 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val adapter = SubmissionAdapter()
 
+        val adapter = SubmissionAdapter()
         binding.rvSubmission.adapter =adapter
         binding.rvSubmission.layoutManager = LinearLayoutManager(mainActivity)
 
 
-        adapter.submitList(viewModel.userInfoResult.value?.userRentTestRes)
+
 
         binding.btnLogout.setOnClickListener {
             mainActivity.logout()
@@ -81,6 +86,7 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
         viewModel.userInfoResult.observe(viewLifecycleOwner){
             step=it.stage
             binding.tvWelcomeMessage.text="${it.name}님 안녕하세요!"
+            adapter.submitList(it.userRentTestRes)
         }
 
         // 노트북 카드뷰 클릭 이벤트
@@ -110,6 +116,19 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
                     transaction.addToBackStack(null)
                     transaction.commit()
                 }
+                4->{
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.fl_main, LoadingFragment())
+                    transaction.addToBackStack(null)
+                    transaction.commit()
+                }
+                5->{
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.fl_main, FinalResultFragment())
+                    transaction.addToBackStack(null)
+                    transaction.commit()
+                }
+
 
             }
 

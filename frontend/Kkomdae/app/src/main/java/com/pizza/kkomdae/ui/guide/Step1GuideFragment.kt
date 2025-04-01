@@ -134,11 +134,12 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
 
         binding.layoutStep.flStep1
 
-        // X 클릭 이벤트 설정
+        // X 버튼
         binding.topBar.backButtonContainer.setOnClickListener {
             showQuitBottomSheet()
         }
 
+        // 촬영하기 버튼
         binding.btnNext.setOnClickListener {
             mainActivity.next()
         }
@@ -165,9 +166,6 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
         dialog.show()
     }
 
-    /**
-     * X 버튼 클릭 시 나타나는 등록 취소 확인 바텀시트를 표시
-     */
     private fun showQuitBottomSheet() {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         val bottomSheetView = layoutInflater.inflate(R.layout.layout_bottom_sheet, null)

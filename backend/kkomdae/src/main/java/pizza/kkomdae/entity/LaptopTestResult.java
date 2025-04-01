@@ -48,7 +48,8 @@ public class LaptopTestResult {
     private Integer stage = 1;
     private Integer picStage = 0;
     private String randomKey;
-
+    private String description;
+    
     @OneToMany(mappedBy = "laptopTestResult")
     private List<Photo> photos;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,6 +57,7 @@ public class LaptopTestResult {
     // Todo ai 결과를 어떻게 저장할 지 고민
 
     public LaptopTestResult(Student student) {
+        this.release = false;
         this.student = student;
     }
 

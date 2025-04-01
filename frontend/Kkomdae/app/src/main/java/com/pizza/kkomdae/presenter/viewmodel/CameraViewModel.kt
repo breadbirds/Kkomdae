@@ -114,8 +114,8 @@ class CameraViewModel @Inject constructor(
 
     fun postPhoto(){
         var uri = frontUri.value
-        val testId = 2L
-//        val testId = sharedPreferences.getLong("test_id",0)
+//        val testId = 2L
+        val testId = sharedPreferences.getLong("test_id",0)
         Log.d("Post", "postPhoto: ${step.value}")
         when(step.value){
             1->{
@@ -151,9 +151,7 @@ class CameraViewModel @Inject constructor(
                     testResponse?.let {
 
                         _postResult.postValue(it)
-
                     }
-
 
                 }.onFailure { exception ->
                     // 로그인 정보 불러오기 실패
@@ -162,7 +160,6 @@ class CameraViewModel @Inject constructor(
 
             }
         }
-
 
     }
 

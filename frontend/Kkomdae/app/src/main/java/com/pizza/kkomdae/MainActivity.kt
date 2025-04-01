@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.pizza.kkomdae.databinding.ActivityMainBinding
 import com.pizza.kkomdae.ui.MainFragment
-import com.pizza.kkomdae.ui.step1.Step1ResultFragment
+import com.pizza.kkomdae.ui.step4.Step4AiResultFragment
 import android.Manifest
 import android.content.pm.PackageManager
 import android.util.Log
@@ -17,7 +17,7 @@ import com.pizza.kkomdae.data.source.local.SecureTokenManager
 import com.pizza.kkomdae.data.source.local.TokenManager
 import com.pizza.kkomdae.databinding.LayoutLogoutDialogBinding
 import android.view.WindowManager
-import com.pizza.kkomdae.ui.guide.Step1GuideFragment
+import com.pizza.kkomdae.ui.guide.Step2GuideFragment
 import dagger.hilt.android.AndroidEntryPoint
 private const val TAG = "MainActivity"
 
@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity() {
             if(photoUri==1){
                 val transaction = supportFragmentManager.beginTransaction()
                 supportFragmentManager.popBackStack()
-                transaction.replace(R.id.fl_main, Step1ResultFragment())
+                transaction.replace(R.id.fl_main, Step2GuideFragment())
                     .addToBackStack("")
                 transaction.commit()
                 checkCameraPermission()
