@@ -14,5 +14,7 @@ public interface PhotoRepository extends JpaRepository<Photo,Long> {
 
     Photo findByLaptopTestResultAndPhotoId(LaptopTestResult laptopTestResult, long photoId);
 
+    Photo getPhotoByLaptopTestResultAndType(LaptopTestResult laptopTestResult, int type);
+
     Optional<Photo> findByLaptopTestResultAndType(LaptopTestResult test, int type);
 }

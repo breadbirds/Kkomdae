@@ -6,6 +6,7 @@ import com.pizza.kkomdae.data.model.LoginMapper
 import com.pizza.kkomdae.data.model.Step2Mapper
 import com.pizza.kkomdae.data.source.remote.FinalService
 import com.pizza.kkomdae.data.source.remote.LoginService
+import com.pizza.kkomdae.domain.model.FourthStageRequest
 import com.pizza.kkomdae.domain.model.GetAiPhotoResponse
 import com.pizza.kkomdae.domain.model.PostResponse
 import com.pizza.kkomdae.domain.repository.FinalRepository
@@ -29,4 +30,14 @@ class FinalRepositoryImpl@Inject constructor(
             throw e
         }
     }
+
+    override suspend fun postFourthStage(fourthStageRequest: FourthStageRequest): PostResponse {
+        return try {
+            Step2Mapper.toPostStageResponse(finalService.postFourthStage(FinalMapper.toFourthStageRequestDto(fourthStageRequest)))
+        }catch (e: Exception){
+            throw e
+        }
+    }
+
+
 }
