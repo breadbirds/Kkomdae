@@ -40,7 +40,9 @@ class FinalViewModel @Inject constructor(
         }
     }
 
-    fun getAiPhoto(testId:Long){
+
+    fun getAiPhoto(){
+        val testId = sharedPreferences.getLong("test_id",0)
         viewModelScope.launch {
             val result = finalUseCase.getAiPhoto(testId)
             Log.d(TAG, "getAiPhoto: $result")
