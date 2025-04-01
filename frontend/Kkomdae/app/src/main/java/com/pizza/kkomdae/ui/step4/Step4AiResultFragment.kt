@@ -58,7 +58,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         super.onViewCreated(view, savedInstanceState)
 
         // api 호출
-        viewModel.getAiPhoto(5)
+        viewModel.getAiPhoto()
 
 
 
