@@ -129,4 +129,12 @@ public class ApiController {
     public String makePdf(@PathVariable long testId) {
         return pdfService.makeAndUploadPdf(testId);
     }
+
+    @Operation(summary = "테스트 최종 결과", description = "테스트 최종 결과를 반환")
+    @GetMapping("/laptopTotalResult")
+    public LaptopTotalResultRes laptopTotalResult(@RequestParam long testId ) {
+        return testResultService.laptopTotalResult(testId);
+    }
+
+
 }

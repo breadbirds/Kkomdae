@@ -9,6 +9,7 @@ import pizza.kkomdae.dto.request.SecondStageReq;
 import pizza.kkomdae.dto.request.ThirdStageReq;
 import pizza.kkomdae.dto.respond.AiPhotoWithUrl;
 import pizza.kkomdae.dto.respond.LaptopTestResultWithStudent;
+import pizza.kkomdae.dto.respond.LaptopTotalResultRes;
 import pizza.kkomdae.dto.respond.PhotoWithUrl;
 import pizza.kkomdae.entity.*;
 import pizza.kkomdae.repository.PhotoRepository;
@@ -140,5 +141,11 @@ public class TestResultService {
         LaptopTestResult result = lapTopTestResultRepository.findById(forthStageReq.getTestId()).orElseThrow(()->new RuntimeException("testId 오류"));
         result.setDescription(forthStageReq.getDescription());
         result.setStage(5);
+    }
+
+    public LaptopTotalResultRes laptopTotalResult(long testId) {
+        LaptopTestResult result = lapTopTestResultRepository.findByIdWithStudentAndDeviceAndPhotos(testId);
+        LaptopTotalResultRes res = new LaptopTotalResultRes(result);
+        return res;
     }
 }
