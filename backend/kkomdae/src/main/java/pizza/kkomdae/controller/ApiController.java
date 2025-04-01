@@ -126,8 +126,8 @@ public class ApiController {
 
     @Operation(summary = "pdf 생성", description = "testId로 절차를 종료하고 pdf를 생성합니다.")
     @PostMapping("/pdf/{testId}")
-    public String makePdf(@PathVariable long testId) {
-        return pdfService.makeAndUploadPdf(testId);
+    public ApiResponse makePdf(@PathVariable long testId) {
+        return new ApiResponse(true, pdfService.makeAndUploadPdf(testId));
     }
 
     @Operation(summary = "테스트 최종 결과", description = "테스트 최종 결과를 반환")
