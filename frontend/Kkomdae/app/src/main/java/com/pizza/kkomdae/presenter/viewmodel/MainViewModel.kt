@@ -107,7 +107,7 @@ class MainViewModel@Inject constructor(
                 // 로그인 성공 시 실제 데이터 처리
                 userInfoResponse?.let {
                     if(it.onGoingTestId!=0){
-                        saveTestId(testId.value?:0L)
+                        saveTestId(it.onGoingTestId.toLong())
                     }
 
                     _picStage.postValue(it.picStage)

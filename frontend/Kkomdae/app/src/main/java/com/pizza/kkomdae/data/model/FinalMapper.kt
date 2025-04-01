@@ -1,9 +1,11 @@
 package com.pizza.kkomdae.data.model
 
 import com.pizza.kkomdae.data.model.dto.AiPhotoDataDto
+import com.pizza.kkomdae.data.model.dto.FourthStageRequestDto
 import com.pizza.kkomdae.data.model.dto.GetAiPhotoResponseDto
 import com.pizza.kkomdae.data.model.dto.GetTotalResultResponseDto
 import com.pizza.kkomdae.domain.model.AiPhotoData
+import com.pizza.kkomdae.domain.model.FourthStageRequest
 import com.pizza.kkomdae.domain.model.GetAiPhotoResponse
 import com.pizza.kkomdae.domain.model.GetTotalResultResponse
 
@@ -15,6 +17,11 @@ object FinalMapper {
         message= getAiPhotoResponseDto.message,
         data = toApiPhotoData(getAiPhotoResponseDto.data),
 
+    )
+
+    fun toFourthStageRequestDto(fourthStageRequest: FourthStageRequest)= FourthStageRequestDto(
+        testId =  fourthStageRequest.testId,
+        description = fourthStageRequest.description
     )
 
     fun toApiPhotoData(apiPhotoDataDto: AiPhotoDataDto)= AiPhotoData(

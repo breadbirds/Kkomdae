@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pizza.kkomdae.domain.model.FourthStageRequest
 import com.pizza.kkomdae.domain.model.LoginResponse
 import com.pizza.kkomdae.domain.usecase.FinalUseCase
 import com.pizza.kkomdae.domain.usecase.LoginUseCase
@@ -22,6 +23,7 @@ class FinalViewModel @Inject constructor(
     application: Application,
     private val finalUseCase: FinalUseCase
 ) : ViewModel() {
+
 
     private val _pdfName = MutableLiveData<String>()
     val pdfName: LiveData<String>
@@ -54,8 +56,9 @@ class FinalViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences =
         application.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
+    val testId = sharedPreferences.getLong("test_id",0)
+
     fun postPdf(){
-        val testId = sharedPreferences.getLong("test_id",0)
         viewModelScope.launch {
             val result = finalUseCase.postPdf(testId)
             Log.d(TAG, "postPdf: $result")
@@ -65,9 +68,24 @@ class FinalViewModel @Inject constructor(
         }
     }
 
+    fun postFourthStage(description:String){
+        viewModelScope.launch {
+            val data = FourthStageRequest(
+                testId = testId,
+                description = description
+            )
+            val result = finalUseCase.postFourthStage(data)
+            Log.d(TAG, "postFourthStage: $result")
+            result.onSuccess {
+
+            }
+        }
+
+    }
+
 
     fun getAiPhoto(){
-        val testId = sharedPreferences.getLong("test_id",0)
+
         viewModelScope.launch {
             val result = finalUseCase.getAiPhoto(testId)
             Log.d(TAG, "getAiPhoto: $result")
