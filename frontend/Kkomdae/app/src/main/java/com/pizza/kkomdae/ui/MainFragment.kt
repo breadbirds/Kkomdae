@@ -23,6 +23,7 @@ import com.pizza.kkomdae.presenter.viewmodel.LoginViewModel
 import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.ui.guide.Step1GuideFragment
 import com.pizza.kkomdae.ui.guide.Step2GuideFragment
+import com.pizza.kkomdae.ui.step3.FinalResultFragment
 import com.pizza.kkomdae.ui.step3.LaptopInfoInputFragment
 import com.pizza.kkomdae.ui.step4.Step4AiResultFragment
 
@@ -117,6 +118,12 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
                 4->{
                     val transaction = requireActivity().supportFragmentManager.beginTransaction()
                     transaction.replace(R.id.fl_main, LoadingFragment())
+                    transaction.addToBackStack(null)
+                    transaction.commit()
+                }
+                5->{
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.fl_main, FinalResultFragment())
                     transaction.addToBackStack(null)
                     transaction.commit()
                 }

@@ -2,6 +2,7 @@ package com.pizza.kkomdae.data.source.remote
 
 import com.pizza.kkomdae.data.model.dto.FourthStageRequestDto
 import com.pizza.kkomdae.data.model.dto.GetAiPhotoResponseDto
+import com.pizza.kkomdae.data.model.dto.GetTotalResultResponseDto
 import com.pizza.kkomdae.data.model.dto.PostResponseDto
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -20,4 +21,7 @@ interface FinalService {
 
     @POST("api/fourthStage")
     suspend fun postFourthStage( @Body fourthStageRequest: FourthStageRequestDto): PostResponseDto
+
+    @GET("api/laptopTotalResult")
+    suspend fun getLaptopTotalResult(@Query("testId") testId: Long): GetTotalResultResponseDto
 }

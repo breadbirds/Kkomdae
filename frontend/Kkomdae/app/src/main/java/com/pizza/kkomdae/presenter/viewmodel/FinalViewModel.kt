@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pizza.kkomdae.domain.model.FourthStageRequest
+import com.pizza.kkomdae.domain.model.GetTotalResultResponse
 import com.pizza.kkomdae.domain.model.LoginResponse
 import com.pizza.kkomdae.domain.usecase.FinalUseCase
 import com.pizza.kkomdae.domain.usecase.LoginUseCase
@@ -53,6 +54,10 @@ class FinalViewModel @Inject constructor(
     val keypadUri: LiveData<String?>
         get() = _keypadUri
 
+    private val _getFinalResult = MutableLiveData<GetTotalResultResponse>()
+    val getFinalResult: LiveData<GetTotalResultResponse>
+        get() = _getFinalResult
+
     private val sharedPreferences: SharedPreferences =
         application.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
@@ -68,6 +73,17 @@ class FinalViewModel @Inject constructor(
         }
     }
 
+    fun getLaptopTotalResult(){
+        viewModelScope.launch {
+            val result = finalUseCase.getLaptopTotalResult(testId)
+            Log.d(TAG, "getLaptopTotalResult: $result")
+            result.onSuccess {
+                _getFinalResult.postValue(it)
+            }
+        }
+    }
+
+    // 비고 입력
     fun postFourthStage(description:String){
         viewModelScope.launch {
             val data = FourthStageRequest(
