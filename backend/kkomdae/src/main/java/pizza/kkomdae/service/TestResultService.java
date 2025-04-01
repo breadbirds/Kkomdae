@@ -58,7 +58,7 @@ public class TestResultService {
     @Transactional
     public long initTest(long userId, String serialNum) {
         Student student = studentRepository.getReferenceById(userId);
-        LaptopTestResult laptopTestResult = lapTopTestResultRepository.findByStudentAndStageIsLessThan(student, 5);
+        LaptopTestResult laptopTestResult = lapTopTestResultRepository.findByStudentAndStageIsLessThan(student, 6);
         if (laptopTestResult == null) {
             laptopTestResult = new LaptopTestResult(student);
             if (serialNum != null) {
