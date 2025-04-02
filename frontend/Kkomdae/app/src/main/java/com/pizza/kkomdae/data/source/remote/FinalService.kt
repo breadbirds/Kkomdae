@@ -4,6 +4,7 @@ import com.pizza.kkomdae.data.model.dto.FourthStageRequestDto
 import com.pizza.kkomdae.data.model.dto.GetAiPhotoResponseDto
 import com.pizza.kkomdae.data.model.dto.GetPdUrlResponseDto
 import com.pizza.kkomdae.data.model.dto.GetTotalResultResponseDto
+import com.pizza.kkomdae.data.model.dto.PostRePhotoResponseDto
 import com.pizza.kkomdae.data.model.dto.PostResponseDto
 import com.pizza.kkomdae.domain.model.GetPdfUrlResponse
 import okhttp3.MultipartBody
@@ -39,7 +40,7 @@ interface FinalService {
         @Query("photoType") photoType: Int,
         @Query("testId") testId: Long,
         @Part file: MultipartBody.Part,
-        ): PostResponseDto
+        ): PostRePhotoResponseDto
 
 
 }

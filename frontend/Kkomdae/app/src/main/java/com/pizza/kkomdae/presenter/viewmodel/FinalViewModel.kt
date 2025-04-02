@@ -17,6 +17,7 @@ import androidx.lifecycle.viewModelScope
 import com.pizza.kkomdae.domain.model.FourthStageRequest
 import com.pizza.kkomdae.domain.model.GetTotalResultResponse
 import com.pizza.kkomdae.domain.model.LoginResponse
+import com.pizza.kkomdae.domain.model.PostRePhotoResponse
 import com.pizza.kkomdae.domain.model.PostResponse
 import com.pizza.kkomdae.domain.usecase.FinalUseCase
 
@@ -88,11 +89,61 @@ class FinalViewModel @Inject constructor(
     val reCameraStage: LiveData<Int>
         get() = _reCameraStage
 
-    private val _reCameraUri = MutableLiveData<Uri>()
-    val reCameraUri: LiveData<Uri>
+    private val _reCameraUri = MutableLiveData<Uri?>()
+    val reCameraUri: LiveData<Uri?>
         get() = _reCameraUri
 
+    // 전면부 재촬영 결과
+    private val _rePhoto1 = MutableLiveData<PostRePhotoResponse?>()
+    val rePhoto1: LiveData<PostRePhotoResponse?>
+        get() = _rePhoto1
+
+    // 후면부 재촬영 결과
+    private val _rePhoto2 = MutableLiveData<PostRePhotoResponse?>()
+    val rePhoto2: LiveData<PostRePhotoResponse?>
+        get() = _rePhoto2
+
+    // 좌측면 재촬영 결과
+    private val _rePhoto3 = MutableLiveData<PostRePhotoResponse?>()
+    val rePhoto3: LiveData<PostRePhotoResponse?>
+        get() = _rePhoto3
+
+    // 우측면 재촬영 결과
+    private val _rePhoto4 = MutableLiveData<PostRePhotoResponse?>()
+    val rePhoto4: LiveData<PostRePhotoResponse?>
+        get() = _rePhoto4
+
+    // 모니터 재촬영 결과
+    private val _rePhoto5 = MutableLiveData<PostRePhotoResponse?>()
+    val rePhoto5: LiveData<PostRePhotoResponse?>
+        get() = _rePhoto5
+
+    // 키보드 재촬영 결과
+    private val _rePhoto6 = MutableLiveData<PostRePhotoResponse?>()
+    val rePhoto6: LiveData<PostRePhotoResponse?>
+        get() = _rePhoto6
+
     val testId = sharedPreferences.getLong("test_id",0)
+
+    fun clearRePhoto1(){
+        _rePhoto1.postValue(null)
+    }
+    fun clearRePhoto2(){
+        _rePhoto2.postValue(null)
+    }
+    fun clearRePhoto3(){
+        _rePhoto3.postValue(null)
+    }
+    fun clearRePhoto4(){
+        _rePhoto4.postValue(null)
+    }
+    fun clearRePhoto5(){
+        _rePhoto5.postValue(null)
+    }
+    fun clearRePhoto6(){
+        _rePhoto6.postValue(null)
+    }
+
 
     fun setReCameraUri(uri:Uri){
         _reCameraUri.postValue(uri)
@@ -105,17 +156,66 @@ class FinalViewModel @Inject constructor(
     fun postRePhoto(){
         val stage = reCameraStage.value?:1
 
+        val loadingUrl = ""
+        when(stage){
+            1->{
+
+                _frontUri.postValue(loadingUrl)
+            }
+            2->{
+
+                _backUri.postValue(loadingUrl)
+            }
+            3->{
+
+                _leftUri.postValue(loadingUrl)
+            }
+            4->{
+
+                _rightUri.postValue(loadingUrl)
+            }
+            5->{
+
+                _screenUri.postValue(loadingUrl)
+            }
+            6->{
+                _keypadUri.postValue(loadingUrl)
+            }
+        }
+
 
         viewModelScope.launch {
             reCameraUri.value?.let {
                 val file = uriToImagePart(it)
+                _reCameraUri.postValue(null)
                 try {
                     finalUseCase.postRePhoto(testId = testId, photoType = reCameraStage.value?:1, file = file).collect { response ->
                         Log.d(TAG, "postRePhoto: $response")
 
                         when(stage){
                             1->{
-
+                                _rePhoto1.postValue(response)
+                                _frontUri.postValue(response.data.photo_ai_url)
+                            }
+                            2->{
+                                _rePhoto2.postValue(response)
+                                _backUri.postValue(response.data.photo_ai_url)
+                            }
+                            3->{
+                                _rePhoto3.postValue(response)
+                                _leftUri.postValue(response.data.photo_ai_url)
+                            }
+                            4->{
+                                _rePhoto4.postValue(response)
+                                _rightUri.postValue(response.data.photo_ai_url)
+                            }
+                            5->{
+                                _rePhoto5.postValue(response)
+                                _screenUri.postValue(response.data.photo_ai_url)
+                            }
+                            6->{
+                                _rePhoto6.postValue(response)
+                                _keypadUri.postValue(response.data.photo_ai_url)
                             }
                         }
                     }
