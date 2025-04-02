@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,23 +14,33 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.activityViewModels
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.pizza.kkomdae.MainActivity
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentBackShotGuideBinding
 import com.pizza.kkomdae.databinding.FragmentLaptopInfoInputBinding
+import com.pizza.kkomdae.presenter.viewmodel.Step2ViewModel
+import com.pizza.kkomdae.presenter.viewmodel.Step3ViewModel
+import com.pizza.kkomdae.ui.LoadingFragment
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Date
 import java.util.Locale
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
-
+@RequiresApi(Build.VERSION_CODES.O)
 class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
     FragmentLaptopInfoInputBinding::bind,
     R.layout.fragment_laptop_info_input
@@ -43,6 +54,11 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
     private var mouseCount=1
     private var bagCount=1
     private var padCount=1
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val now = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant())
+
+    private var date = dateFormat.format(now)
+    private val viewModel: Step3ViewModel by activityViewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +78,7 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         showIntroDialog()
 
         binding.etSerial.doOnTextChanged { text, start, before, count ->
-           // 유효성 검사
+            // 유효성 검사
             checkNext()
         }
 
@@ -70,9 +86,6 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             // 유효성 검사
             checkNext()
         }
-
-
-
 
         // 날짜 설정
         settingDate()
@@ -98,34 +111,102 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         // 마우스패드 개수 설정
         settingPadCount()
 
-        binding.btnConfirm.setOnClickListener {
-            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.fl_main, FinalResultFragment())
-            transaction.addToBackStack(null)
-            transaction.commit()
+        // post 통신 결과
+        viewModel.postResponse.observe(viewLifecycleOwner){
+            if(it.success && it.status=="OK"){ // 통신 성공
+                showEndDialog()
+            }else{ // todo 통신 실패시
+
+            }
         }
 
+        // X 클릭 이벤트 설정
+        binding.topBar.backButtonContainer.setOnClickListener {
+            showQuitBottomSheet()
+        }
+
+        // 완료 버튼
+        binding.btnConfirm.setOnClickListener {
+            val serialValid = binding.etSerial.text.toString().isNotEmpty()
+            val barcodeValid = binding.etBarcode.text.toString().isNotEmpty()
+            val modelValid = binding.atvModelName.text.toString().isNotEmpty()
+            val dateValid = binding.tvDate.text.toString() != "날짜 선택"
+
+            if (serialValid && barcodeValid && modelValid && dateValid) {
+                // 모든 필수 정보가 입력됨 - 다이얼로그 표시
+                inputData()
+                showConfirmDialog()
+            } else {
+                // 어떤 필드가 누락되었는지 사용자에게 알려줍니다
+                val missingFields = mutableListOf<String>()
+                if (!serialValid) missingFields.add("시리얼 번호")
+                if (!barcodeValid) missingFields.add("바코드 번호")
+                if (!modelValid) missingFields.add("모델명")
+                if (!dateValid) missingFields.add("수령일자")
+
+                val message = "노트북 정보를 모두 입력해주세요."
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
-    private fun checkNext() {
-        if (binding.etSerial.text.toString() != "" && binding.etBarcode.text.toString() != "") {
-            binding.btnConfirm.backgroundTintList = ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.blue500
-                )
-            )
-            binding.btnConfirm.isClickable = true
-        } else {
 
-            binding.btnConfirm.isClickable = false
-            binding.btnConfirm.backgroundTintList = ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.blue200
-                )
-            )
+
+    private fun inputData(){
+        viewModel.apply {
+            setModelCode(binding.atvModelName.text.toString())
+            setSerialNum(binding.etSerial.text.toString())
+            setBarcodeNum(binding.etBarcode.text.toString())
+            setLocalDate(date)
+            setLaptop(laptopCount)
+            setPowerCable(powerCount)
+            setAdapter(adapterCount)
+            setMouse(mouseCount)
+            setBag(bagCount)
+            setMousePad(padCount)
+
         }
+    }
+
+    private fun showQuitBottomSheet() {
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        val bottomSheetView = layoutInflater.inflate(R.layout.layout_bottom_sheet, null)
+
+        // 계속하기 버튼 클릭 시 바텀시트 닫기
+        val btnContinue = bottomSheetView.findViewById<View>(R.id.btn_continue)
+        btnContinue.setOnClickListener {
+            bottomSheetDialog.dismiss()
+        }
+
+        // 그만두기 버튼 클릭 시 메인 화면으로 이동
+        val btnQuit = bottomSheetView.findViewById<View>(R.id.btn_quit)
+        btnQuit.setOnClickListener {
+            bottomSheetDialog.dismiss()
+            // 메인 화면으로 이동
+            val mainActivity = requireActivity() as MainActivity
+            mainActivity.supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        }
+
+        bottomSheetDialog.setContentView(bottomSheetView)
+        bottomSheetDialog.show()
+    }
+
+
+    private fun checkNext() {
+        val serialValid = binding.etSerial.text.toString().isNotEmpty()
+        val barcodeValid = binding.etBarcode.text.toString().isNotEmpty()
+        val modelValid = binding.atvModelName.text.toString().isNotEmpty()
+        val dateValid = binding.tvDate.text.toString() != "날짜 선택"
+
+        val allValid = serialValid && barcodeValid && modelValid && dateValid
+
+        binding.btnConfirm.backgroundTintList = ColorStateList.valueOf(
+            ContextCompat.getColor(
+                requireContext(),
+                if (allValid) R.color.blue500 else R.color.blue200
+            )
+        )
+        binding.btnConfirm.isClickable = allValid
     }
 
     // 마우스패드 개수 설정
@@ -336,7 +417,7 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
     private fun settingDate() {
         binding.btnDate.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("날짜 선택") // 상단 제목
+                .setTitleText("날짜 선택")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds()) // 기본 선택 날짜 (오늘)
                 .build()
 
@@ -345,6 +426,8 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
                 val sdf = SimpleDateFormat("yyyy년 MM월 dd일", Locale.getDefault())
                 val selectedDate = sdf.format(Date(selection))
                 binding.tvDate.text = selectedDate
+                date = dateFormat.format(Date(selection))
+                checkNext()
 
             }
 
@@ -364,6 +447,10 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         val adapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, items)
         binding.atvModelName.setAdapter(adapter)
+
+        binding.atvModelName.setOnItemClickListener { _, _, _, _ ->
+            checkNext()
+        }
     }
 
     // 시작 다이얼로그
@@ -384,6 +471,68 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
 
         dialog.show()
     }
+
+    // 완료 다이얼로그
+    private fun showConfirmDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.layout_dialog_step3_confirm)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        // 닫기 버튼 클릭 리스너
+        val cancelButton = dialog.findViewById<View>(R.id.btn_cancel)
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        // 입력 완료하기 버튼 클릭 리스너
+        val confirmButton = dialog.findViewById<View>(R.id.btn_confirm)
+        confirmButton.setOnClickListener {
+            viewModel.postThirdStage()
+            dialog.dismiss()
+
+        }
+
+        dialog.show()
+    }
+
+    // 종료 다이얼로그
+    private fun showEndDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.layout_dialog_step_end)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        // "분석하러 가기" 버튼에 클릭 리스너 추가
+        val confirmButton = dialog.findViewById<Button>(R.id.btn_confirm)
+        confirmButton.setOnClickListener {
+            dialog.dismiss() // 다이얼로그 닫기
+
+            // AiResultFragment로 전환
+//            val transaction = requireActivity().supportFragmentManager.beginTransaction()
+//            transaction.replace(R.id.fl_main, AiResultFragment())
+//            transaction.addToBackStack(null) // 뒤로 가기 버튼으로 이전 화면으로 돌아갈 수 있도록 설정
+//            transaction.commit()
+
+            // LoadingFragment 전환
+            val transaction = requireActivity().supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.fl_main, LoadingFragment())
+            transaction.addToBackStack(null) // 뒤로 가기 버튼으로 이전 화면으로 돌아갈 수 있도록 설정
+            transaction.commit()
+        }
+
+        dialog.show()
+    }
+
+
 
     companion object {
         /**

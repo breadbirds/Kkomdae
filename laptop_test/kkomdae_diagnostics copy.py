@@ -60,22 +60,6 @@ user32.SetWindowLongPtrW.argtypes = [wintypes.HWND, wintypes.INT, LONG_PTR]
 user32.CallWindowProcW.restype = LRESULT
 user32.CallWindowProcW.argtypes = [LONG_PTR, wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
 
-class GUID(ctypes.Structure):
-    _fields_ = [
-        ("Data1", wintypes.DWORD),
-        ("Data2", wintypes.WORD),
-        ("Data3", wintypes.WORD),
-        ("Data4", wintypes.BYTE * 8)
-    ]
-
-class DEV_BROADCAST_DEVICEINTERFACE(ctypes.Structure):
-    _fields_ = [
-        ("dbcc_size", wintypes.DWORD),
-        ("dbcc_devicetype", wintypes.DWORD),
-        ("dbcc_reserved", wintypes.DWORD),
-        ("dbcc_classguid", GUID),
-        ("dbcc_name", wintypes.WCHAR * 1)
-    ]
 
 # Raw Input 관련 구조체 정의
 class RAWINPUTDEVICE(ctypes.Structure):
@@ -1245,7 +1229,6 @@ class TestApp(ttkb.Window):
                 'powershell.exe -WindowStyle Hidden -NonInteractive -Command "'
                 '$OutputEncoding = [System.Text.UTF8Encoding]::new(); '
                 'Get-PnpDevice -Class USB -PresentOnly:$true '
-                '| Where-Object { $_.FriendlyName -like \'*Composite Device*\' -or $_.Name -like \'*Composite Device*\' } '
                 '| Select-Object InstanceId, FriendlyName, Name '
                 '| ConvertTo-Json'
                 '"'

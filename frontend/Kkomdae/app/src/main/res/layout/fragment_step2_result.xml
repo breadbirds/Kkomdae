@@ -13,45 +13,52 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tv_guide_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="자가진단 결과"
-        style="@style/Display1"
-        android:textColor="@color/gray700"
-        android:layout_marginTop="40dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/top_bar" />
-
-    <TextView
-        android:id="@+id/tv_guide_subtitle"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="노트북 항목별로 상세한 진단 결과를 확인해보세요!"
-        android:textAlignment="center"
-        style="@style/Body1"
-        android:textColor="@color/gray300"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_height="0dp"
+        android:paddingTop="32dp"
+        android:paddingBottom="32dp"
+        android:paddingStart="36dp"
+        android:paddingEnd="36dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_guide_title" />
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintBottom_toTopOf="@id/btn_next">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="자가진단 결과"
+            style="@style/Display2"
+            android:textColor="@color/gray700"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <TextView
+            app:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/tv_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="노트북 항목별로 상세한 진단 결과를 확인해보세요."
+            app:layout_constraintTop_toBottomOf="@id/tv_title"
+            style="@style/Label1"
+            android:textColor="@color/gray700"
+            android:layout_marginTop="10dp"/>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_diagnostic_results"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="10dp"
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_guide_subtitle">
+        app:layout_constraintTop_toBottomOf="@id/tv_subtitle">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -64,8 +71,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="30dp"
-                android:paddingEnd="30dp"
+                android:paddingStart="28dp"
+                android:paddingEnd="28dp"
                 android:paddingTop="30dp"
                 android:paddingBottom="20dp">
 
@@ -94,7 +101,7 @@
                     android:paddingBottom="4dp"
                     android:text="통과"
                     android:textColor="#485B78"
-                    style="@style/Title2" />
+                    style="@style/Title3" />
             </LinearLayout>
 
 
@@ -104,8 +111,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="30dp"
-                android:paddingEnd="30dp"
+                android:paddingStart="28dp"
+                android:paddingEnd="28dp"
                 android:paddingTop="20dp"
                 android:paddingBottom="20dp">
 
@@ -134,7 +141,7 @@
                     android:paddingBottom="4dp"
                     android:text="통과"
                     android:textColor="#485B78"
-                    style="@style/Title2" />
+                    style="@style/Title3" />
             </LinearLayout>
 
 
@@ -144,8 +151,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="30dp"
-                android:paddingEnd="30dp"
+                android:paddingStart="28dp"
+                android:paddingEnd="28dp"
                 android:paddingTop="20dp"
                 android:paddingBottom="20dp">
 
@@ -174,7 +181,7 @@
                     android:paddingBottom="4dp"
                     android:text="통과"
                     android:textColor="#485B78"
-                    style="@style/Title2" />
+                    style="@style/Title3" />
             </LinearLayout>
 
 
@@ -184,8 +191,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="30dp"
-                android:paddingEnd="30dp"
+                android:paddingStart="28dp"
+                android:paddingEnd="28dp"
                 android:paddingTop="20dp"
                 android:paddingBottom="20dp">
 
@@ -214,7 +221,7 @@
                     android:paddingBottom="4dp"
                     android:text="실패"
                     android:textColor="#E4614F"
-                    style="@style/Title2"/>
+                    style="@style/Title3"/>
             </LinearLayout>
 
             <!-- 배터리 성능 -->
@@ -223,8 +230,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingStart="30dp"
-                android:paddingEnd="30dp"
+                android:paddingStart="28dp"
+                android:paddingEnd="28dp"
                 android:paddingTop="20dp"
                 android:paddingBottom="30dp">
 
@@ -253,22 +260,37 @@
                     android:paddingBottom="4dp"
                     android:text="통과"
                     android:textColor="#485B78"
-                    style="@style/Title2" />
+                    style="@style/Title3" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+        <TextView
+            android:id="@+id/tvDetailedInfoGuide"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="* 자세한 진단 결과는 노트북에 설치된 자가진단 프로그램을 통해 확인하실 수 있습니다."
+            style="@style/Caption1"
+            android:textColor="@color/gray300"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintTop_toBottomOf="@id/card_diagnostic_results"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <Button
         android:id="@+id/btn_next"
         android:layout_width="0dp"
-        android:layout_height="56dp"
+        android:layout_height="60dp"
         android:backgroundTint="@color/blue500"
         android:textColor="@color/white"
-        android:text="저장 후 다음 단계"
+        android:text="저장 후 다음단계"
         android:layout_margin="24dp"
         style="@style/Title1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>

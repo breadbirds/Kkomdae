@@ -2,6 +2,7 @@ package com.pizza.kkomdae.ui.step2
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.fragment.app.FragmentManager
@@ -11,6 +12,7 @@ import com.pizza.kkomdae.MainActivity
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentStep2ResultBinding
+import com.pizza.kkomdae.presenter.viewmodel.Step2ViewModel
 import com.pizza.kkomdae.ui.step3.LaptopInfoInputFragment
 
 // TODO: Rename parameter arguments, choose names that match
@@ -90,7 +92,7 @@ class Step2ResultFragment : BaseFragment<FragmentStep2ResultBinding>(
         }
 
         // 배터리
-        if(viewModel.batteryStatus.value == "pass"){
+        if(viewModel.batteryStatus.value?.status == "pass"){
             binding.tvBattery.text="통과"
             binding.tvBattery.setBackgroundResource(R.drawable.bg_rounded_blue_light)
             binding.tvBattery.setTextColor(Color.parseColor("#485B78"))
@@ -101,10 +103,18 @@ class Step2ResultFragment : BaseFragment<FragmentStep2ResultBinding>(
         }
 
         binding.btnNext.setOnClickListener {
-            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.fl_main, LaptopInfoInputFragment())
-            transaction.addToBackStack(null)
-            transaction.commit()
+            viewModel.postSecondStage()
+
+        }
+
+        viewModel.postResponse.observe(viewLifecycleOwner){
+//            Log.d("Post", "onViewCreated: ${it.statusCode}")
+            if(it.success){
+                val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                transaction.replace(R.id.fl_main, LaptopInfoInputFragment())
+                transaction.addToBackStack(null)
+                transaction.commit()
+            }
         }
 
         // X 클릭 이벤트 설정

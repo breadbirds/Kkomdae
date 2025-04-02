@@ -63,9 +63,6 @@ class MainActivity : AppCompatActivity() {
     private var lastCapturedBox: BBox? = null // crop을 위해 best box를 저장하는 변수
     private var isCapturing = false // 중복 캡처 방지
 
-
-
-
     // 이전 프레임과 비교를 위한 상태
     private var lastBox: BBox? = null
     private var stableFrameCount = 0

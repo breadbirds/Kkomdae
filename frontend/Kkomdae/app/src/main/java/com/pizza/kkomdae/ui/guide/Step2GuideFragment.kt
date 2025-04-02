@@ -17,7 +17,10 @@ import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentStep2GuideBinding
 import com.pizza.kkomdae.ui.step2.QrScanFragment
-import com.pizza.kkomdae.ui.step2.Step2ResultFragment
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.widget.Toast
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -50,20 +53,36 @@ class Step2GuideFragment : BaseFragment<FragmentStep2GuideBinding>(
         binding.topBar.tvTitle.text = "Step 2"
         binding.topBar.pbStep.progress=200/3
 
-        // Lottie 애니메이션 설정
-        binding.animationArrow.setAnimation(R.raw.step2_right_arrow)
-        binding.animationArrow.playAnimation()
-        binding.animationArrow.loop(true)
-        binding.animationArrow.apply {
-            setAnimation(R.raw.step2_right_arrow)
-            speed = 0.8f  // 속도 조정 (1.0이 기본)
-            repeatCount = LottieDrawable.INFINITE  // 무한 반복
+        // dot 로딩
+        binding.animationDot.apply {
+            setAnimation(R.raw.dot_loading)
+            repeatCount = LottieDrawable.INFINITE
+            speed = 0.5f
             playAnimation()
         }
+
+        // 배경 원형 애니메이션
+        binding.animationBg.apply {
+            setAnimation(R.raw.laptop_connection)
+            repeatCount = LottieDrawable.INFINITE
+            speed = 0.5f  // 속도 조절 (1.0f가 기본 속도, 0.5f는 절반 속도, 2.0f는 두 배 속도)
+            playAnimation()
+        }
+
 
         // X 클릭 이벤트 설정
         binding.topBar.backButtonContainer.setOnClickListener {
             showQuitBottomSheet()
+        }
+
+        // URL 복사 기능
+        binding.urlLink.setOnClickListener {
+            copyUrlToClipboard()
+        }
+
+        // URL 복사 아이콘 클릭 시에도
+        binding.ivUrlCopy.setOnClickListener {
+            copyUrlToClipboard()
         }
 
         binding.btnNext.setOnClickListener {
@@ -75,6 +94,18 @@ class Step2GuideFragment : BaseFragment<FragmentStep2GuideBinding>(
 
         showIntroDialog()
     }
+
+
+    private fun copyUrlToClipboard() {
+        val url = binding.tvUrl.text.toString()
+        val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = ClipData.newPlainText("URL", url)
+        clipboardManager.setPrimaryClip(clipData)
+
+        // 사용자에게 복사 완료 알림
+        Toast.makeText(requireContext(), "URL이 복사되었습니다", Toast.LENGTH_SHORT).show()
+    }
+
 
     private fun showIntroDialog() {
         val dialog = Dialog(requireContext())

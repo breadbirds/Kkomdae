@@ -37,6 +37,10 @@ class SubmissionAdapter: ListAdapter<UserRentTestResponse, SubmissionAdapter.Sub
                 binding.btnUp.isVisible=false
                 binding.btnDown.isVisible=true
             }
+
+            binding.tvModelNumber.text= getItem(position).modelCode
+            binding.tvInputDate.text = getItem(position).dateTime
+
         }
     }
 
