@@ -1,6 +1,7 @@
 package com.pizza.kkomdae.ui.step4
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +13,8 @@ import com.pizza.kkomdae.presenter.model.Step4AiResult
 
 class Step4AiResultAdapter(val list: List<Step4AiResult>, val listen:(Int)->Unit): RecyclerView.Adapter<Step4AiResultAdapter.Step1ResultViewHolder>() {
     private var selectedPosition: Int = 0
+
+    private val showPositions = mutableSetOf<Int>() // ✅ 숨긴 아이템을 저장하는 Set
 
     inner class Step1ResultViewHolder(val binding: ItemStep1ResultBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(position: Int){
@@ -34,6 +37,13 @@ class Step4AiResultAdapter(val list: List<Step4AiResult>, val listen:(Int)->Unit
                 binding.tvPosition.setTextColor(
                     ContextCompat.getColor(binding.root.context, R.color.gray500)
                 )
+            }
+
+            // ✅ 특정 인덱스의 `TextView` 숨기기 / 보이기
+            if (showPositions.contains(position)) {
+                binding.clLoading.visibility = View.VISIBLE  // 👀 텍스트 숨김
+            } else {
+                binding.clLoading.visibility = View.GONE  // 👀 텍스트 보이기
             }
 
 
@@ -70,5 +80,21 @@ class Step4AiResultAdapter(val list: List<Step4AiResult>, val listen:(Int)->Unit
     override fun onBindViewHolder(holder: Step1ResultViewHolder, position: Int) {
 
         holder.bind(position)
+    }
+
+    // ✅ 특정 인덱스의 `TextView`를 숨기는 함수 (다시 보이게 하지 않음)
+    fun showTextAt(index: Int) {
+        if (!showPositions.contains(index)) { // 이미 숨긴 경우 다시 숨기지 않음
+            showPositions.add(index)
+            notifyItemChanged(index) // 해당 아이템만 업데이트
+        }
+    }
+
+    // ✅ 특정 인덱스의 `TextView`를 다시 보이게 하는 함수 (VISIBLE)
+    fun hideTextAt(index: Int) {
+        if (showPositions.contains(index)) { // 숨겨진 경우에만 다시 보이게 함
+            showPositions.remove(index)
+            notifyItemChanged(index) // 해당 아이템만 업데이트
+        }
     }
 }
