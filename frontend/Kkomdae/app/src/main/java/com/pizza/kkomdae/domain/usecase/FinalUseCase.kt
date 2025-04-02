@@ -2,6 +2,7 @@ package com.pizza.kkomdae.domain.usecase
 
 import com.pizza.kkomdae.domain.model.FourthStageRequest
 import com.pizza.kkomdae.domain.model.GetAiPhotoResponse
+import com.pizza.kkomdae.domain.model.GetPdfUrlResponse
 import com.pizza.kkomdae.domain.model.GetTotalResultResponse
 import com.pizza.kkomdae.domain.model.LoginResponse
 import com.pizza.kkomdae.domain.model.PostResponse
@@ -24,6 +25,15 @@ class FinalUseCase@Inject constructor(
     suspend fun getAiPhoto(testId: Long): Result<GetAiPhotoResponse>{
         return try {
             val response = finalRepository.getAiPhoto(testId)
+            Result.success(response)  // ✅ 성공 시 Result.success 반환
+        } catch (e: Exception) {
+            Result.failure(e)  // ✅ 실패 시 Result.failure 반환
+        }
+    }
+
+    suspend fun getPdfUrl(name:String): Result<GetPdfUrlResponse>{
+        return try {
+            val response = finalRepository.getPdfUrl(name)
             Result.success(response)  // ✅ 성공 시 Result.success 반환
         } catch (e: Exception) {
             Result.failure(e)  // ✅ 실패 시 Result.failure 반환

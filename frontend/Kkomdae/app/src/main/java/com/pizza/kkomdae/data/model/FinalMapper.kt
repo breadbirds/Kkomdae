@@ -3,11 +3,13 @@ package com.pizza.kkomdae.data.model
 import com.pizza.kkomdae.data.model.dto.AiPhotoDataDto
 import com.pizza.kkomdae.data.model.dto.FourthStageRequestDto
 import com.pizza.kkomdae.data.model.dto.GetAiPhotoResponseDto
+import com.pizza.kkomdae.data.model.dto.GetPdUrlResponseDto
 import com.pizza.kkomdae.data.model.dto.GetTotalResultResponseDto
 import com.pizza.kkomdae.domain.model.AiPhotoData
 import com.pizza.kkomdae.domain.model.FourthStageRequest
 import com.pizza.kkomdae.domain.model.GetAiPhotoResponse
 import com.pizza.kkomdae.domain.model.GetTotalResultResponse
+import com.pizza.kkomdae.domain.model.GetPdfUrlResponse
 
 object FinalMapper {
 
@@ -22,6 +24,10 @@ object FinalMapper {
     fun toFourthStageRequestDto(fourthStageRequest: FourthStageRequest)= FourthStageRequestDto(
         testId =  fourthStageRequest.testId,
         description = fourthStageRequest.description
+    )
+
+    fun toGetPdfUrlDto(getPdUrlResponseDto: GetPdUrlResponseDto)= GetPdfUrlResponse(
+        url =  getPdUrlResponseDto.url,
     )
 
     fun toApiPhotoData(apiPhotoDataDto: AiPhotoDataDto)= AiPhotoData(
@@ -57,6 +63,6 @@ object FinalMapper {
         adapterCount = getTotalResultResponseDto.adapterCount,
         mousepadCount = getTotalResultResponseDto.mousepadCount,
         description = getTotalResultResponseDto.description,
-        imageNames = getTotalResultResponseDto.imageNames
+        imageUrls = getTotalResultResponseDto.imageUrls
     )
 }

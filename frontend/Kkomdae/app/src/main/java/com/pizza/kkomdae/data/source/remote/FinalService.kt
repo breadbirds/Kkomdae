@@ -2,8 +2,10 @@ package com.pizza.kkomdae.data.source.remote
 
 import com.pizza.kkomdae.data.model.dto.FourthStageRequestDto
 import com.pizza.kkomdae.data.model.dto.GetAiPhotoResponseDto
+import com.pizza.kkomdae.data.model.dto.GetPdUrlResponseDto
 import com.pizza.kkomdae.data.model.dto.GetTotalResultResponseDto
 import com.pizza.kkomdae.data.model.dto.PostResponseDto
+import com.pizza.kkomdae.domain.model.GetPdfUrlResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -24,4 +26,9 @@ interface FinalService {
 
     @GET("api/laptopTotalResult")
     suspend fun getLaptopTotalResult(@Query("testId") testId: Long): GetTotalResultResponseDto
+
+    @GET("api/test-file/{file-name}")
+    suspend fun getPdfUrl(@Path("file-name") name: String): GetPdUrlResponseDto
+
+
 }

@@ -306,9 +306,9 @@ class TestApp(ttkb.Window):
         """
         try:
             # 테스트환경
-            url = "http://localhost:8080/api/verify-key"
+            # url = "http://localhost:8080/api/verify-key"
             # 운영환경
-            # url = "https://j12d101.p.ssafy.io/api/verify-key"
+            url = "https://j12d101.p.ssafy.io/api/verify-key"
 
             response = requests.get(url, params={"key": key})
             # 서버 응답 확인
@@ -533,21 +533,22 @@ class TestApp(ttkb.Window):
         """
         테스트 상태를 업데이트합니다.
         """
-        if new_status in ["테스트 완료", "생성 완료"]:
-            if test_name == "배터리":
-                self.detail = self.report
-                print(self.detail)
-            self.send_test_result(test_name, True, self.detail)
-        elif new_status == "오류 발생":
-            if test_name == "USB":
-                self.detail = [port for port, connected in self.usb_ports.items() if not connected]
-            elif test_name == "키보드":
-                self.detail = sorted(self.failed_keys)
-            else:
-                self.detail = None
-            print(self.detail)
-            self.send_test_result(test_name, False, self.detail)
+        # 서버 전송
+        if new_status in ["테스트 완료", "생성 완료", "오류 발생"]:
+            self.detail = None
+            test_result = False
+            if new_status in ["테스트 완료", "생성 완료"]:
+                test_result = True
+                if test_name == "배터리":
+                    self.detail = self.report
+            elif new_status == "오류 발생":
+                if test_name == "USB":
+                    self.detail = [port for port, connected in self.usb_ports.items() if not connected]
+                elif test_name == "키보드":
+                    self.detail = sorted(self.failed_keys)
+            self.send_test_result(test_name, test_result, self.detail)
 
+        # 테스트 결과 이미지 변경
         if test_name in ["키보드", "카메라", "충전", "배터리"]:
             status_label = self.test_status_labels[test_name]
             new_img = self.status_images[new_status]
@@ -1404,11 +1405,13 @@ class TestApp(ttkb.Window):
         self.cap = None
         self.camera_update_after_id = None
         self.window_name = None
+        self.photo_flag = True
 
     def open_camera_test(self) -> None:
         """
         카메라(웹캠) 테스트 창을 열어 프레임을 표시합니다.
         """
+        # 카메라 flage 설정
         # 이미 카메라 테스트가 실행 중인지 확인
         if getattr(self, "camera_test_running", False) or getattr(self, "cap", None) is not None:
             messagebox.showinfo("정보", "카메라 테스트가 이미 실행 중입니다.")
@@ -1433,7 +1436,7 @@ class TestApp(ttkb.Window):
 
         except Exception as e:
             messagebox.showerror("카메라 오류", f"카메라를 열 수 없습니다: {str(e)}")
-            self.update_status("카메라", "오류 발생")
+            self.photo_flag = False
             self.close_camera_test()
 
     def update_camera_frame(self) -> None:
@@ -1456,13 +1459,11 @@ class TestApp(ttkb.Window):
             key = cv2.waitKey(1) & 0xFF
             if key == 27:  # ESC
                 self.close_camera_test()
-                self.mark_test_complete("카메라")
                 return
 
             # OpenCV 창이 닫혔는지 검사
             if cv2.getWindowProperty(self.window_name, cv2.WND_PROP_VISIBLE) < 1:
                 self.close_camera_test()
-                self.mark_test_complete("카메라")
                 return
 
             # 다음 프레임 업데이트 예약 (카메라가 실행 중일 때만)
@@ -1472,7 +1473,7 @@ class TestApp(ttkb.Window):
 
         except Exception as e:
             messagebox.showerror("카메라 오류", f"예외 발생: {str(e)}")
-            self.update_status("카메라", "오류 발생")
+            self.photo_flag = False
             self.close_camera_test()
 
     def close_camera_test(self) -> None:
@@ -1510,6 +1511,13 @@ class TestApp(ttkb.Window):
 
         # 종료 절차 끝
         self.camera_closing = False
+
+        if self.photo_flag:
+            self.mark_test_complete("카메라")
+        else:
+            self.update_status("카메라", "오류 발생")
+            self.photo_flag = True
+
 
     # -------------------------------
     # 충전 테스트 관련 메서드

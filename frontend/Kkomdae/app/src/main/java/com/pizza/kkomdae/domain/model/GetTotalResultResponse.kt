@@ -17,5 +17,5 @@ data class GetTotalResultResponse(
     val adapterCount: Int,
     val mousepadCount:Int,
     val description : String?,
-    val imageNames : List<String>
+    val imageUrls : List<String>
 )

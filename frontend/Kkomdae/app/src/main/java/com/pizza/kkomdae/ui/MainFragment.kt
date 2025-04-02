@@ -10,7 +10,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +22,7 @@ import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.presenter.model.Submission
 import com.pizza.kkomdae.databinding.FragmentMainBinding
+import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.presenter.viewmodel.LoginViewModel
 import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.ui.guide.Step1GuideFragment
@@ -50,12 +54,17 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
 
     private lateinit var mainActivity: MainActivity
     private val viewModel : MainViewModel by activityViewModels()
+    private val finalViewModel : FinalViewModel by activityViewModels()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mainActivity = context as MainActivity
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.getUserInfo()
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -63,14 +72,20 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
             param2 = it.getString(ARG_PARAM2)
         }
 
-        viewModel.getUserInfo()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = SubmissionAdapter()
+        val adapter = SubmissionAdapter(clickPdf = {
+            Toast.makeText(requireContext(),"pdf 파일이 다운로드 중입니다.",Toast.LENGTH_SHORT).show()
+            finalViewModel.getPdfUrl(it)
+        })
+        // 파일명 -> url 변환 통신 결과
+        finalViewModel.pdfUrl.observe(viewLifecycleOwner){
+            viewModel.downloadPdf(it)
+        }
         binding.rvSubmission.adapter =adapter
         binding.rvSubmission.layoutManager = LinearLayoutManager(mainActivity)
 
