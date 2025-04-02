@@ -221,6 +221,7 @@ def setup_debugging_log():
 # ===============================
 class TestApp(ttkb.Window):
     def __init__(self):
+
         setup_debugging_log()  # 디버깅 로그 설정
         super().__init__(themename="flatly")
         self.title("KkomDae Diagnostics")
@@ -231,9 +232,104 @@ class TestApp(ttkb.Window):
         # 변수 및 상태 초기화
         self._init_variables()
 
+        # random key 
+        self.random_key = None
+
         # UI 구성
         self.create_title_section()
         self.create_test_items()
+
+        self.validate_random_key()
+
+    def validate_random_key(self):
+        """
+        랜덤키 검증을 위한 메서드입니다.
+        """
+        # 랜덤키를 입력받습니다.
+        key_window = ttkb.Toplevel(self)
+        key_window.title("랜덤키 입력")
+        key_window.geometry("500x300")
+        key_window.resizable(False, False)
+
+        # 모달로 설정하여 부모 창과의 상호작용을 막음
+        key_window.grab_set()
+        key_window.transient(self)
+        
+        def on_close():
+            """
+            창을 닫을 때 전체 애플리케이션 종료
+            """
+            if messagebox.askokcancel("종료", "애플리케이션을 종료하시겠습니까?"):
+                key_window.grab_release()  # grab 해제
+                key_window.destroy()
+                self.quit()  # 애플리케이션 종료
+
+        # 키 입력 레이블 및 입력 필드 생성
+        key_label = ttkb.Label(key_window,
+                               text='앱에서 발급받은 키를 입력하세요',
+                               font=("Arial", 12))
+        key_label.pack(pady=10)
+        
+        # 키 입력 필드
+        key_var = ttkb.StringVar()
+        key_entry = ttkb.Entry(key_window, textvariable=key_var, font=("Arial", 12))
+        key_entry.pack(pady=10)
+        
+        def on_submit():
+            """
+            키 입력 후 확인 버튼 클릭 시 호출되는 메서드입니다.
+            """
+            key = key_var.get()
+            vaild = self.check_random_key(key)
+            print(f'입력한 키: {key}')
+            print(f'유효성 검사 결과: {vaild}')
+            if vaild:
+                self.random_key = key
+                key_window.grab_release()  # grab 해제
+                key_window.destroy()
+            else:
+                messagebox.showerror("오류", "유효하지 않은 키입니다.")
+        
+        # 확인 버튼 생성
+        submit_button = ttkb.Button(key_window, 
+                                    text="확인", 
+                                    command=on_submit,
+                                    bootstyle="primary")
+        submit_button.pack(pady=10)
+
+        # ESC 키 등으로 창을 강제로 닫지 못하도록 함
+        key_window.protocol("WM_DELETE_WINDOW", on_close)
+        
+    def check_random_key(self, key: str) -> bool:
+        """
+        서버에 랜덤키 확인 요청
+        """
+        try:
+            # 테스트환경
+            url = "http://localhost:8080/api/verify-key"
+            # 운영환경
+            # url = "https://j12d101.p.ssafy.io/api/verify-key"
+
+            response = requests.get(url, params={"key": key})
+            # 서버 응답 확인
+            if response.status_code == 200:
+                result = response.json().get("data")
+                print(result)
+                TorF = result.get("isValid")
+                print(f'TorF : {TorF}')
+                if TorF == 'true':
+                    print("유효한 키입니다.")
+                    return True
+                else:
+                    print("유효하지 않은 키입니다.")
+                    return False
+            else:
+                logging.error(f"서버 오류: {response.status_code}")
+                return False
+        except requests.RequestException as e:
+            logging.error(f"요청 오류: {e}")
+            return False
+
 
     def _init_variables(self) -> None:
         """
@@ -297,9 +393,6 @@ class TestApp(ttkb.Window):
                 3:self.create_text_image("③ 연결 필요", (120, 30), self.notosans_path, 16, (255, 0, 0), align_left=False)
             },
             "USB테스트 완료":{
-            #     1:self.create_text_image("①", (40, 30), self.notosans_path, 16, (0, 128, 0), align_left=False),
-            #     2:self.create_text_image("②", (40, 30), self.notosans_path, 16, (0, 128, 0), align_left=False),
-            #     3:self.create_text_image("③", (40, 30), self.notosans_path, 16, (0, 128, 0), align_left=False),
                 1:self.create_text_image("① 연결 확인", (120, 30), self.notosans_path, 16, (0, 128, 0), align_left=True),
                 2:self.create_text_image("② 연결 확인", (120, 30), self.notosans_path, 16, (0, 128, 0), align_left=True),
                 3:self.create_text_image("③ 연결 확인", (120, 30), self.notosans_path, 16, (0, 128, 0), align_left=True)
@@ -346,6 +439,7 @@ class TestApp(ttkb.Window):
 
         # 배터리 리포트 파일 경로 초기화
         self.report_path = None
+        self.report = None
 
         # 키보드 테스트 관련 변수
         self.failed_keys = []
@@ -435,16 +529,30 @@ class TestApp(ttkb.Window):
         draw.text((text_x, text_y), key, font=font, fill=text_color, align='center')
         return ImageTk.PhotoImage(img)
 
-
     def update_status(self, test_name, new_status):
         """
         테스트 상태를 업데이트합니다.
         """
-        status_label = self.test_status_labels[test_name]
-        new_img = self.status_images[new_status]
-        status_label.config(image=new_img)
-        status_label.image = new_img  # 이미지 참조 유지
+        if new_status in ["테스트 완료", "생성 완료"]:
+            if test_name == "배터리":
+                self.detail = self.report
+                print(self.detail)
+            self.send_test_result(test_name, True, self.detail)
+        elif new_status == "오류 발생":
+            if test_name == "USB":
+                self.detail = [port for port, connected in self.usb_ports.items() if not connected]
+            elif test_name == "키보드":
+                self.detail = sorted(self.failed_keys)
+            else:
+                self.detail = None
+            print(self.detail)
+            self.send_test_result(test_name, False, self.detail)
 
+        if test_name in ["키보드", "카메라", "충전", "배터리"]:
+            status_label = self.test_status_labels[test_name]
+            new_img = self.status_images[new_status]
+            status_label.config(image=new_img)
+            status_label.image = new_img  # 이미지 참조 유지
 
     def create_title_section(self) -> None:
         """
@@ -484,7 +592,6 @@ class TestApp(ttkb.Window):
         subtitle_label2 = ttkb.Label(text_container, image=self.subtitle_img2, background="#0078D7", anchor="w")
         subtitle_label2.grid(row=2, column=0, sticky="w")
 
-
     def create_test_items(self) -> None:
         """
         각 테스트 항목(키보드, 카메라, USB, 충전, 배터리, QR코드)의 UI를 생성합니다.
@@ -506,7 +613,6 @@ class TestApp(ttkb.Window):
             row = idx // 3  # 0,1,2 -> 0 / 3,4,5 -> 1
             col = idx % 3   # 0,3 -> 0 / 1,4 -> 1 / 2,5 -> 2
             self.create_test_item(test_frame, name, row, col)
-
 
     def create_test_item(self, parent, name: str, row: int, col: int) -> None:
         """
@@ -612,54 +718,24 @@ class TestApp(ttkb.Window):
 
     def get_all_usb_ports(self) -> dict:
         """
-        PowerShell 단계에서도 'USB Composite Device' 이름만 필터링하도록 변경한 예시 코드.
+        시스템의 모든 USB 포트(숨겨진 포트 포함)를 검색하여 초기 상태를 설정합니다.
+        반환값은 예시로 {'port1': 상태, 'port3': 상태} 형태로 출력됩니다.
         """
         usb_ports = {}
         try:
-            # ---------------------------
-            # 1) WMI를 사용하여 USB 장치 정보 가져오기
-            # ---------------------------
-            wmi_obj = win32com.client.GetObject("winmgmts:")
-            pnp_entities = wmi_obj.InstancesOf("Win32_PnPEntity")
-
-            for entity in pnp_entities:
-                if hasattr(entity, 'PNPDeviceID') and entity.PNPDeviceID:
-                    device_path = entity.PNPDeviceID.upper()
-                    
-                    # USB 장치만 처리
-                    if device_path.startswith("USB\\"):
-                        logging.debug(f"디버깅: WMI - 장치 정보: {entity}")
-                        # 포트 번호 추출
-                        match = re.search(r'&0&(\d)$', device_path)
-                        if match:
-                            port_number = int(match.group(1))
-                            if port_number in [1, 2, 3]:
-                                key = f'port{port_number}'
-                                if key not in usb_ports:
-                                    usb_ports[key] = False
-                                    logging.debug(f"디버깅: WMI - 새로운 포트 추가: {key}, 상태: False")
-                        
-                        # DeviceID와 LocationInformation을 로그에 기록
-                        if hasattr(entity, 'DeviceID'):
-                            logging.debug(f"디버깅: WMI - DeviceID: {entity.DeviceID}")
-                        if hasattr(entity, 'LocationInformation'):
-                            logging.debug(f"디버깅: WMI - LocationInformation: {entity.LocationInformation}")
-
-            # ---------------------------
-            # 2) PowerShell(숨겨진 장치 포함)
-            # ---------------------------
             cmd = (
-                'powershell.exe -WindowStyle Hidden -Command "'
-                '$OutputEncoding = [System.Text.UTF8Encoding]::new(); '
-                'Get-PnpDevice -Class USB -PresentOnly:$false '
-                '| Select-Object InstanceId '
-                '| ConvertTo-Json'
-                '"'
-            )
+                    'powershell.exe -WindowStyle Hidden -Command "'
+                    '$OutputEncoding = [System.Text.UTF8Encoding]::new(); '
+                    'Get-PnpDevice -Class USB -PresentOnly:$false | '
+                    'Select-Object InstanceId | '
+                    'ConvertTo-Json'
+                    '"'
+                )
+            # CREATE_NO_WINDOW 플래그 추가하여 콘솔 창 숨기기
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             startupinfo.wShowWindow = subprocess.SW_HIDE
-
+            
             result = subprocess.run(
                 cmd,
                 capture_output=True,
@@ -678,45 +754,60 @@ class TestApp(ttkb.Window):
                     devices = json.loads(result.stdout)
                     logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 JSON 파싱 결과:")
                     logging.debug(f"  - 파싱된 데이터: {devices}")
-                    if devices:
+                    if not devices:
+                        logging.debug("디버깅: 첫 번째 PowerShell 명령어 결과 - USB 장치 없음")
+                    else:
+                        # 단일 장치인 경우 리스트로 변환
                         if isinstance(devices, dict):
                             devices = [devices]
                         
                         for device in devices:
                             logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - 장치 정보 처리 시작: {device}")
-                            instance_id = device.get("InstanceId", "")
-                            friendly_name = device.get("FriendlyName", "")
-                            name_field = device.get("Name", "")
-                            logging.debug(f"디버깅:  → FriendlyName={friendly_name}, Name={name_field}")
-
-                            if instance_id.startswith("USB\\"):
-                                match = re.search(r'&0&(\d)$', instance_id)
-                                if match:
-                                    port_number = int(match.group(1))
-                                    if port_number in [1, 2, 3]:
-                                        key = f'port{port_number}'
-                                        if key not in usb_ports:
-                                            usb_ports[key] = False
-                                            logging.debug(f"  → 새로운 포트: {key} (상태: False)")
-                    else:
-                        logging.debug("디버깅: 첫 번째 PowerShell 명령어 결과 - USB 장치 없음(Composite 없음)")
+                            if 'InstanceId' in device:
+                                instance_id = device['InstanceId']
+                                logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - InstanceId: {instance_id}")
+                                # USB 장치인지 확인 (앞부분이 "USB\\"여야 함)
+                                if instance_id.startswith("USB\\"):
+                                    logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - USB 장치 확인: {instance_id}")
+                                    # 정규 표현식으로 "&0&숫자" 패턴을 추출 (숫자는 한 자리 이상)
+                                    match = re.search(r'&0&(\d)$', instance_id)
+                                    if match:
+                                        port_number = int(match.group(1))
+                                        logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - 포트 번호 추출: {port_number}")
+                                        # 여기서 원하는 포트 번호만 처리 (예: 1, 2, 3번)
+                                        if port_number in [1, 2, 3]:
+                                            key = f'port{port_number}'
+                                            logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - 유효한 포트 번호: {key}")
+                                            # 첫번째 명령어에서는 기본 상태 False
+                                            if key not in usb_ports:
+                                                usb_ports[key] = False
+                                                logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - 새로운 포트 추가: {key}, 상태: False")
+                                                logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - 현재 포트 상태: {usb_ports}")
+                                                logging.debug(f'디버깅: 첫 번째 PowerShell 명령어 - divece: {device}')
+                                        else:
+                                            logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - 처리하지 않는 포트 번호: {port_number}")
+                                    else:
+                                        logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - 포트 번호 패턴 불일치: {instance_id}")
+                                else:
+                                    logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - USB 장치가 아님: {instance_id}")
+                            else:
+                                logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - InstanceId 키 없음: {device}")
                 except json.JSONDecodeError as e:
-                    logging.debug(f"JSON 파싱 오류: {e}")
+                    logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - JSON 파싱 오류: {e}")
+                    return usb_ports
             else:
-                logging.debug(f"PowerShell 오류 발생: {result.stderr}")
+                logging.debug(f"디버깅: 첫 번째 PowerShell 명령어 - 오류 발생")
             
-            # ---------------------------
-            # 3) PowerShell(연결된 장치만)
-            # ---------------------------
+            # 연결된 USB 장치 상태 확인
             cmd_connected = (
                 'powershell.exe -WindowStyle Hidden -NonInteractive -Command "'
                 '$OutputEncoding = [System.Text.UTF8Encoding]::new(); '
-                'Get-PnpDevice -Class USB -PresentOnly:$true '
-                '| Where-Object { $_.FriendlyName -like \'*Composite Device*\' -or $_.Name -like \'*Composite Device*\' } '
-                '| Select-Object InstanceId, FriendlyName, Name '
-                '| ConvertTo-Json'
+                'Get-PnpDevice -Class USB -PresentOnly:$true | '
+                'Select-Object InstanceId | '
+                'ConvertTo-Json'
                 '"'
             )
+            
             result_connected = subprocess.run(
                 cmd_connected,
                 capture_output=True,
@@ -730,41 +821,52 @@ class TestApp(ttkb.Window):
             logging.debug(f"  - 반환 코드: {result_connected.returncode}")
             logging.debug(f"  - 표준 출력: {result_connected.stdout}")
             logging.debug(f"  - 표준 에러: {result_connected.stderr}")
-
+            
             if result_connected.returncode == 0:
                 try:
                     connected_devices = json.loads(result_connected.stdout)
-                    logging.debug(f"디버깅: 두 번째 PowerShell 명령어 JSON 파싱 결과: {connected_devices}")
-
-                    if connected_devices:
-                        if isinstance(connected_devices, dict):
-                            connected_devices = [connected_devices]
-                        
-                        for device in connected_devices:
-                            instance_id = device.get("InstanceId", "")
-                            friendly_name = device.get("FriendlyName", "")
-                            name_field = device.get("Name", "")
-                            logging.debug(f"디버깅(연결된): InstanceId={instance_id}, FriendlyName={friendly_name}, Name={name_field}")
-
+                    logging.debug(f"디버깅: 두 번째 PowerShell 명령어 JSON 파싱 결과:")
+                    logging.debug(f"  - 파싱된 데이터: {connected_devices}")
+                    if isinstance(connected_devices, dict):
+                        connected_devices = [connected_devices]
+                    
+                    for device in connected_devices:
+                        logging.debug(f"디버깅: 두 번째 PowerShell 명령어 - 장치 정보 처리 시작: {device}")
+                        if 'InstanceId' in device:
+                            instance_id = device['InstanceId']
+                            logging.debug(f"디버깅: 두 번째 PowerShell 명령어 - InstanceId: {instance_id}")
                             if instance_id.startswith("USB\\"):
+                                logging.debug(f"디버깅: 두 번째 PowerShell 명령어 - USB 장치 확인: {instance_id}")
                                 match = re.search(r'&0&(\d)$', instance_id)
                                 if match:
                                     port_number = int(match.group(1))
+                                    logging.debug(f"디버깅: 두 번째 PowerShell 명령어 - 포트 번호 추출: {port_number}")
+                                    # 원하는 포트 번호만 처리
                                     if port_number in [1, 2, 3]:
                                         key = f'port{port_number}'
+                                        logging.debug(f"디버깅: 두 번째 PowerShell 명령어 - 유효한 포트 번호: {key}")
+                                        # 연결된 장치이면 상태를 True로 업데이트
                                         usb_ports[key] = True
-                                        logging.debug(f"  → {key} 상태 True로 업데이트")
-                    else:
-                        logging.debug("디버깅: 두 번째 PowerShell 명령어 결과 - 연결된 Composite 없음")
+                                        logging.debug(f"디버깅: 두 번째 PowerShell 명령어 - 포트 상태 업데이트: {key}, 상태: True")
+                                        logging.debug(f"디버깅: 두 번째 PowerShell 명령어 - 현재 포트 상태: {usb_ports}")
+                                    else:
+                                        logging.debug(f"디버깅: 두 번째 PowerShell 명령어 - 처리하지 않는 포트 번호: {port_number}")
+                                else:
+                                    logging.debug(f"디버깅: 두 번째 PowerShell 명령어 - 포트 번호 패턴 불일치: {instance_id}")
+                            else:
+                                logging.debug(f"디버깅: 두 번째 PowerShell 명령어 - USB 장치가 아님: {instance_id}")
+                        else:
+                            logging.debug(f"디버깅: 두 번째 PowerShell 명령어 - InstanceId 키 없음: {device}")
                 except json.JSONDecodeError as e:
-                    logging.debug(f"두 번째 PowerShell JSON 파싱 오류: {e}")
+                    logging.debug(f"디버깅: 두 번째 PowerShell 명령어 - JSON 파싱 오류: {e}")
+                    pass
                     
         except Exception as e:
-            logging.debug(f"예외 발생: {e}")
-
+            logging.debug(f"디버깅: 예외 발생: {e}")
+            pass
+        
         logging.debug(f"디버깅: 최종 USB 포트 상태: {usb_ports}")
         return usb_ports
-
 
     # -------------------------------
     # 테스트 시작 및 완료 처리 메서드
@@ -806,7 +908,6 @@ class TestApp(ttkb.Window):
             # 모든 테스트가 완료되었는지 확인
             if all(self.test_done.values()):
                 messagebox.showinfo("모든 테스트 완료", "모든 테스트를 완료했습니다.\n수고하셨습니다!")
-
 
     def open_test_window(self, test_name: str, create_window_func) -> ttkb.Toplevel:
         """
@@ -1202,7 +1303,6 @@ class TestApp(ttkb.Window):
                 'powershell.exe -WindowStyle Hidden -NonInteractive -Command "'
                 '$OutputEncoding = [System.Text.UTF8Encoding]::new(); '
                 'Get-PnpDevice -Class USB -PresentOnly:$true '
-                '| Where-Object { $_.FriendlyName -like \'*Composite Device*\' -or $_.Name -like \'*Composite Device*\' } '
                 '| Select-Object InstanceId, FriendlyName, Name '
                 '| ConvertTo-Json'
                 '"'
@@ -1265,12 +1365,12 @@ class TestApp(ttkb.Window):
                 messagebox.showinfo("USB Test", "모든 USB 포트 테스트 완료!")
             else:
                 # 일부 포트가 연결되지 않은 경우, 사용자에게 안내
+                self.update_status("USB", "오류 발생")
                 messagebox.showinfo("USB Test", "USB 연결 상태를 확인해주세요.")
 
         except Exception as e:
             messagebox.showerror("USB Error", f"USB 포트 확인 중 오류 발생:\n{e}")
-
-            
+     
     def update_usb_port_display(self) -> None:
         """
         self.usb_ports 딕셔너리(예: {"port1": True, "port3": False})를 기반으로
@@ -1356,11 +1456,13 @@ class TestApp(ttkb.Window):
             key = cv2.waitKey(1) & 0xFF
             if key == 27:  # ESC
                 self.close_camera_test()
+                self.mark_test_complete("카메라")
                 return
 
             # OpenCV 창이 닫혔는지 검사
             if cv2.getWindowProperty(self.window_name, cv2.WND_PROP_VISIBLE) < 1:
                 self.close_camera_test()
+                self.mark_test_complete("카메라")
                 return
 
             # 다음 프레임 업데이트 예약 (카메라가 실행 중일 때만)
@@ -1370,6 +1472,7 @@ class TestApp(ttkb.Window):
 
         except Exception as e:
             messagebox.showerror("카메라 오류", f"예외 발생: {str(e)}")
+            self.update_status("카메라", "오류 발생")
             self.close_camera_test()
 
     def close_camera_test(self) -> None:
@@ -1404,8 +1507,6 @@ class TestApp(ttkb.Window):
             cv2.destroyWindow(self.window_name)
         except Exception as ex_destroy:
             cv2.destroyAllWindows()
-
-        self.mark_test_complete("카메라")
 
         # 종료 절차 끝
         self.camera_closing = False
@@ -1474,6 +1575,7 @@ class TestApp(ttkb.Window):
             # 배터리 리포트 파일명 생성
             new_report_name = f"battery_report_{computer_name}_{now}.html"
             new_report_path = os.path.join(downloads_path, new_report_name)
+            self.report = [new_report_name]
 
             # 리포트 생성
             temp_report_path = os.path.join(downloads_path, "battery_report.html")
@@ -1507,7 +1609,6 @@ class TestApp(ttkb.Window):
         """
         messagebox.showinfo("배터리 리포트", f"배터리 리포트가 생성되었습니다.\n파일 경로:\n{self.report_path}")
         self.battery_report_button.config(bootstyle="info")
-        self.update_status("배터리", "생성 완료")
         self.mark_test_complete("배터리")
         # Django 서버 업로드는 백그라운드에서 진행
         threading.Thread(target=self.upload_battery_report, args=(self.report_path,)).start()
@@ -1557,7 +1658,51 @@ class TestApp(ttkb.Window):
             messagebox.showwarning("리포트 없음", "아직 배터리 리포트가 생성되지 않았습니다.\n먼저 '배터리 리포트 생성' 버튼을 눌러주세요.")
             self.update_status("배터리", "생성 전")
 
+    # -------------------------------
+    # 서버로 테스트 결과 전송 관련 메서드
+    # -------------------------------
+    def send_test_result(self, test_type: str, success: bool, detail: str = None) -> bool:
+        """
+        테스트 결과를 서버에 전송합니다.
+        Args:
+            test_type: 테스트 유형 ("키보드", "카메라", "USB", "충전", "배터리")
+            success: 테스트 성공 여부
+            fail_detail: 실패 시 상세 정보
+        Returns:
+            bool: 전송 성공 여부
+        """
+            
+        try:
+            # url = "http://localhost:8080/api/test-result"  # 테스트 서버 URL
+            url = "https://j12d101.p.ssafy.io/api/test-result"  # 운영 서버 URL
+            if test_type == '배터리':
+                data = {
+                    "randomKey": self.random_key,  # 클래스 변수로 저장된 랜덤키
+                    "testType": test_type,
+                    "success": success,
+                    "detail": detail,
+                }
+                response = requests.post(url, json=data)
+            else:
+                data = {
+                    "randomKey": self.random_key,  # 클래스 변수로 저장된 랜덤키
+                    "testType": test_type,
+                    "success": success,
+                    "detail": detail if not success else None
+                }
+                response = requests.post(url, json=data)
 
+            if response.status_code == 200:
+                messagebox.showinfo("테스트 결과 전송", f"{test_type} 테스트 결과가 서버에 전송되었습니다.")
+                return True
+            else:
+                messagebox.showerror("테스트 결과 전송 오류", f"서버 응답 오류: {response.status_code}")
+                return False
+                
+        except requests.RequestException as e:
+            messagebox.showerror("테스트 결과 전송 오류", f"서버와의 통신 오류: {e}")
+            return False
+        
     # -------------------------------
     # QR 코드 생성 관련 메서드
     # -------------------------------
@@ -1609,7 +1754,7 @@ class TestApp(ttkb.Window):
             except Exception as e:
                 messagebox.showerror("QR 코드 생성 오류", f"QR 코드 생성 중 오류 발생:\n{e}")
         else:
-            messagebox.showerror("QR 코드 생성 오류", f"테스트를 진행하지 않아 QR코드를 생성할 수 없습니다. \n 남은 테스트 목록록{self.test_list}")
+            messagebox.showerror("QR 코드 생성 오류", f"테스트를 진행하지 않아 QR코드를 생성할 수 없습니다. \n 남은 테스트 목록{self.test_list}")
             self.update_status("QR코드", "오류 발생")
 
 # ===============================

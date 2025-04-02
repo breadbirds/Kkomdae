@@ -38,7 +38,9 @@ public class WebSecurityConfig {
                                 "/api/swagger-ui/**",     // Swagger UI 경로
                                 "/api/swagger-ui.html"    // Swagger HTML
                                 ,"/css/**"
-                                ,"/image/**"
+                                ,"/image/**",
+                                "/api/verify-key",
+                                "/api/test-result"
                         ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyRequest().authenticated()

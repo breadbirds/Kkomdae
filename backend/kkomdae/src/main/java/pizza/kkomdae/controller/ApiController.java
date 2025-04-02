@@ -10,15 +10,15 @@ import org.springframework.web.multipart.MultipartFile;
 import pizza.kkomdae.dto.request.ForthStageReq;
 import pizza.kkomdae.dto.request.PhotoReq;
 import pizza.kkomdae.dto.request.SecondStageReq;
+import pizza.kkomdae.dto.request.TestResultReq;
 import pizza.kkomdae.dto.request.ThirdStageReq;
 import pizza.kkomdae.dto.respond.*;
 import pizza.kkomdae.entity.Photo;
 import pizza.kkomdae.s3.S3Service;
 import pizza.kkomdae.security.dto.CustomUserDetails;
 import pizza.kkomdae.service.*;
+import javax.crypto.MacSpi;
 import pizza.kkomdae.ssafyapi.MattermostNotificationService;
-
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,7 +35,6 @@ public class ApiController {
     private final FlaskService flaskService;
     private final PdfService pdfService;
     private final MattermostNotificationService mattermostNotificationService;
-
 
     @GetMapping("/user-info")
     @Operation(summary = "첫페이지에서 유저의 정보를 조회하는 api", description = "")
@@ -86,13 +85,12 @@ public class ApiController {
             Photo photo = photoService.uploadPhotoSync(photoReq, image);
             photoService.analyzeRePhoto(photo.getPhotoId());
 
-            List<Map<String, String>> result = new ArrayList<>();
-
             AiPhotoWithUrl photo1 = testResultService.getAiPhoto(testId, photoType);
-            Map<String, String> map = new HashMap<>();
-            map.put("photo_name", photo1.getAiName());
-            map.put("photo_url", photo1.getUrl());
-            result.add(map);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("photo_ai_name", photo1.getAiName());
+            result.put("photo_ai_url", photo1.getUrl());
+            result.put("photo_ai_damage", photo1.getDamage());
 
             return new ApiResponse(true, "사진 업로드 및 저장 성공", result);
     }
@@ -129,12 +127,13 @@ public class ApiController {
                 Comparator.comparingInt(AiPhotoWithUrl::getType)
         );
         // 3) 반환 리스트 생성
-        Map<String, String> resultList = new HashMap<>();
+        Map<String, Object> resultList = new HashMap<>();
         // 4) 각 사진 매핑
         for (AiPhotoWithUrl photo : photoList) {
             int type = photo.getType();
             resultList.put("photo" + type +"_ai_name", photo.getAiName());
             resultList.put("photo" + type +"_ai_url", photo.getUrl());
+            resultList.put("photo" + type +"_ai_damage", photo.getDamage());
         }
         return new ApiResponse(true, "분석 사진 url 반환 완료", resultList);
     }
@@ -175,12 +174,50 @@ public class ApiController {
         return new ApiResponse(true, pdfService.makeAndUploadPdf(testId));
     }
 
+    @Operation(summary = "랜덤 키 생성", description = "노트북과 앱 연결을 위한 키 생성")
+    @PostMapping("/random-key/{testId}")
+    public ApiResponse randomKey(@PathVariable long testId) {
+        String randomKey = testResultService.randomKey(testId);
+        Map<String, String> result = new HashMap<>();
+        result.put("randomKey", randomKey);
+
+        return new ApiResponse(true, "랜덤 키 생성", result);
+    }
+
+    @GetMapping("/verify-key")
+    @Operation(summary = "랜덤 키 검증", description = "생성된 랜덤 키의 유효성을 검증")
+    public ApiResponse verifyKey(@RequestParam String key) {
+        boolean isValid = testResultService.verifyRandomKey(key);
+        Map<String, String> result = new HashMap<>();
+        result.put("isValid", isValid + "");
+        return new ApiResponse(isValid, isValid ? "유효한 키입니다" : "유효하지 않은 키입니다",result);
+    }
+
+    @PostMapping("/test-result")
+    @Operation(
+            summary = "테스트 결과 저장",
+            description = "각 테스트(키보드, 카메라 등)의 결과를 저장합니다."
+    )
+    public ApiResponse updateTestResult(@RequestBody TestResultReq testResultReq) {
+        try {
+            testResultService.updateTestResult(testResultReq);
+            return new ApiResponse(
+                    true,
+                    "테스트 결과가 성공적으로 저장되었습니다."
+            );
+        } catch (RuntimeException e) {
+            return new ApiResponse(
+                    false,
+                    e.getMessage()
+            );
+        }
+    }
+
     @Operation(summary = "테스트 최종 결과", description = "테스트 최종 결과를 반환")
     @GetMapping("/laptopTotalResult")
     public LaptopTotalResultRes laptopTotalResult(@RequestParam long testId ) {
         return testResultService.laptopTotalResult(testId);
     }
-
     @Operation(summary = "관리자 페이지 알림 테스트용", description = "리스트에 교육생 이름을 넣으면 그룹을 만들어서 알림 발송")
     @PostMapping("/notification")
     public void notification(@RequestBody List<String>names) {
@@ -188,3 +225,4 @@ public class ApiController {
         mattermostNotificationService.sendGroupMessage(names);
     }
 }
+

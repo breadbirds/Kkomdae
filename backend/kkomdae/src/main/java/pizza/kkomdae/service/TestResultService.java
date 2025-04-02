@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pizza.kkomdae.dto.request.ForthStageReq;
 import pizza.kkomdae.dto.request.SecondStageReq;
+import pizza.kkomdae.dto.request.TestResultReq;
 import pizza.kkomdae.dto.request.ThirdStageReq;
 import pizza.kkomdae.dto.respond.AiPhotoWithUrl;
 import pizza.kkomdae.dto.respond.LaptopTestResultWithStudent;
@@ -144,6 +145,65 @@ public class TestResultService {
     }
 
     @Transactional
+    public String randomKey(long testId) {
+        // DB에서 해당 testId의 LaptopTestResult 조회
+        LaptopTestResult testResult = lapTopTestResultRepository.findById(testId)
+            .orElseThrow(() -> new RuntimeException("해당 테스트 결과가 존재하지 않습니다."));
+
+        // 알파벳 소문자 (a-z)
+        char letter = (char) ('a' + Math.random() * 26);
+        // 9000까지 의 랜덤 숫자 생성 후 1000을 더해 4자리 숫자 생성
+        int number = (int) (Math.random() * 9000) + 1000;
+
+        // 랜덤 키 생성
+        String random_key = String.format("%c%d", letter, number);
+
+        // 랜덤 키 저장
+        testResult.setRandomKey(random_key);
+
+        // DB에 저장
+        lapTopTestResultRepository.save(testResult);
+
+        // 랜덤 키를 반환
+        return random_key;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean verifyRandomKey(String key) {
+        // DB에서 랜덤 키가 존재하는지 확인
+        return lapTopTestResultRepository.findByRandomKey(key).isPresent();
+    }
+
+    @Transactional
+    public void updateTestResult(TestResultReq testResultReq) {
+        // 1. 입력값 검증
+        if (testResultReq.getRandomKey() == null || testResultReq.getRandomKey().isEmpty()) {
+            throw new RuntimeException("랜덤키가 필요합니다.");
+        }
+
+        // 2. 테스트 결과 조회
+        LaptopTestResult testResult = lapTopTestResultRepository
+                .findByRandomKey(testResultReq.getRandomKey())
+                .orElseThrow(() -> new RuntimeException("저장된 테스트가 없습니다."));
+
+        // 3. 테스트 결과 업데이트
+        testResult.updateTestResult(
+                testResultReq.getTestType(),
+                testResultReq.isSuccess(),
+                (List) testResultReq.getDetail()
+        );
+
+        // 4. 저장
+        lapTopTestResultRepository.save(testResult);
+
+        // 5. 로깅 추가
+        log.info("테스트 결과 업데이트 완료 - randomKey: {}, testType: {}, success: {}",
+                testResultReq.getRandomKey(),
+                testResultReq.getTestType(),
+                testResultReq.isSuccess()
+        );
+    }
+
     public void fourthStage(ForthStageReq forthStageReq) {
         LaptopTestResult result = lapTopTestResultRepository.findById(forthStageReq.getTestId()).orElseThrow(()->new RuntimeException("testId 오류"));
         result.setDescription(forthStageReq.getDescription());
