@@ -57,6 +57,10 @@ class MainViewModel@Inject constructor(
     val resultImage: LiveData<List<String>>
         get() = _resultImage
 
+
+
+
+
     fun postTest(serialNum: String?){
         viewModelScope.launch {
             val result = inspectUseCase.postTest(serialNum = serialNum)

@@ -59,6 +59,13 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         // api 호출
         viewModel.getAiPhoto()
 
+        // 재촬영 이미지 uri 서버로 보내기
+        viewModel.reCameraUri.observe(viewLifecycleOwner){
+            Log.d(TAG, "onViewCreated: $it")
+            viewModel.postRePhoto()
+        }
+
+
 
 
         binding.ivImage.setOnClickListener {
@@ -127,6 +134,14 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         binding.btnClose.setOnClickListener {
             showQuitBottomSheet()
         }
+
+        // 재촬영
+        binding.btnRetry.setOnClickListener {
+            viewModel.setReCameraStage(step+1)
+            mainActivity.reCamera(step)
+        }
+
+
 
     }
 

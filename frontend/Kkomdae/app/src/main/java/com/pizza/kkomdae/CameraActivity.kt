@@ -18,6 +18,7 @@ import com.pizza.kkomdae.ui.step1.ResultFragment
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.util.Log
 import android.view.ViewGroup
 import android.view.Window
@@ -37,6 +38,9 @@ class CameraActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        val stage = intent.getIntExtra("stage",-1)+1
+        viewModel.setReCameraStage(stage)
+
 
         val type = viewModel.getPhotoStage()
         // ✅ 상태바 제거 (전체 화면 모드)
@@ -50,7 +54,12 @@ class CameraActivity : BaseActivity() {
 
 
         Log.d("Post", "onCreate: $step")
-        changeFragment(step)
+        if (stage!=0){
+            changeFragment(stage)
+        }else{
+            changeFragment(step)
+        }
+
 
 
 
@@ -61,6 +70,14 @@ class CameraActivity : BaseActivity() {
             }
         })
 
+    }
+
+    fun moveToBackReCamera(uri: Uri){
+        val resultIntent = Intent().apply {
+            putExtra("RE_PHOTO_URI", uri.toString())  // ✅ URI 값을 전달
+        }
+        setResult(Activity.RESULT_OK, resultIntent)
+        finish()
     }
 
     fun moveToBack(){
