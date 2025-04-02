@@ -109,6 +109,11 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
             }
         }
 
+        // 재촬영 url
+        viewModel.reCameraUri.observe(viewLifecycleOwner){
+            cameraActivity.moveToBackReCamera(it)
+        }
+
     }
 
     private fun showStopCameraDialog() {
