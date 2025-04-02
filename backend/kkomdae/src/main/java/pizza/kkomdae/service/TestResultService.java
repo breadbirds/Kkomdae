@@ -202,6 +202,7 @@ public class TestResultService {
                 testResultReq.getTestType(),
                 testResultReq.isSuccess()
         );
+    }
 
     public void fourthStage(ForthStageReq forthStageReq) {
         LaptopTestResult result = lapTopTestResultRepository.findById(forthStageReq.getTestId()).orElseThrow(()->new RuntimeException("testId 오류"));
