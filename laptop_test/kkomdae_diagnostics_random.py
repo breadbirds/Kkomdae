@@ -1658,6 +1658,12 @@ class TestApp(ttkb.Window):
             messagebox.showwarning("리포트 없음", "아직 배터리 리포트가 생성되지 않았습니다.\n먼저 '배터리 리포트 생성' 버튼을 눌러주세요.")
             self.update_status("배터리", "생성 전")
 
+    def summary_battery_report(self) -> None:
+        """
+        배터리 리포트를 요약
+        """
+
+        
     # -------------------------------
     # 서버로 테스트 결과 전송 관련 메서드
     # -------------------------------

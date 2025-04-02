@@ -12,4 +12,5 @@ public class TestResultReq {
     private String testType;  // "키보드", "카메라", "USB", "충전", "배터리"
     private boolean success;
     private List detail = null;
+    private String summary = null;
 }

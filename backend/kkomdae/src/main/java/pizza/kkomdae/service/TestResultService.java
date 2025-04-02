@@ -190,7 +190,8 @@ public class TestResultService {
         testResult.updateTestResult(
                 testResultReq.getTestType(),
                 testResultReq.isSuccess(),
-                (List) testResultReq.getDetail()
+                (List) testResultReq.getDetail(),
+                testResultReq.getSummary()
         );
 
         // 4. 저장
