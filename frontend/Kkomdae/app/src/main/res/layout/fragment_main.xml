@@ -168,6 +168,25 @@
                             android:layout_height="match_parent">
 
                             <TextView
+                                android:id="@+id/tv_in_progress"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="진행중"
+                                style="@style/Label4"
+                                android:textColor="#FF0000"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="4dp"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:background="@drawable/status_border_rounded_red"
+                                android:layout_marginTop="12dp"
+                                android:layout_marginEnd="12dp"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"/>
+
+                            <TextView
                                 style="@style/Display2"
                                 android:textColor="@color/gray700"
                                 android:id="@+id/tv_laptop_title"

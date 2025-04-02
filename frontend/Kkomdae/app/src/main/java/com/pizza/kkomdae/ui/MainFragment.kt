@@ -84,6 +84,9 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
             step=it.stage
             binding.tvWelcomeMessage.text="${it.name}님 안녕하세요!"
             adapter.submitList(it.userRentTestRes)
+
+            // 진행중인 과정이 있는지 확인하고 표시
+            updateInProgressIndicator()
         }
 
         // 노트북 카드뷰 클릭 이벤트
@@ -103,6 +106,17 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
         // IoT 카드뷰 클릭 이벤트
         binding.cvIot.setOnClickListener {
             showDevelopingDialog()
+        }
+    }
+
+    private fun updateInProgressIndicator() {
+        val inProgressView = binding.cvLaptop.findViewById<TextView>(R.id.tv_in_progress)
+
+        // step이 0이 아니면 "진행중" 표시
+        if (step > 0) {
+            inProgressView.visibility = View.VISIBLE
+        } else {
+            inProgressView.visibility = View.GONE
         }
     }
 
