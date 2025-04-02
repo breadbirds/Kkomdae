@@ -137,10 +137,15 @@ public class ApiController {
         return testResultService.laptopTotalResult(testId);
     }
 
-    @Operation(summary = "관리자 페이지 알림 테스트용", description = "리스트에 교육생 이름을 넣으면 그룹을 만들어서 알림 발송")
+    @Operation(summary = "관리자 페이지 정보 알림 테스트용", description = "리스트에 교육생 이름을 넣으면 그룹을 만들어서 알림 발송")
     @PostMapping("/notification")
     public void notification(@RequestBody List<String>names) {
-//        mattermostNotificationService.createGroupChannel(names);
-        mattermostNotificationService.sendGroupMessage(names);
+        mattermostNotificationService.sendGroupInfoMessage(names);
+    }
+
+    @Operation(summary = "관리자 페이지 재촉 알림 테스트용", description = "")
+    @PostMapping("/alert")
+    public void alert(@RequestBody List<String> names) {
+        mattermostNotificationService.sendGroupHurryMessage(names);
     }
 }

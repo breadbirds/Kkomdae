@@ -39,14 +39,33 @@ public class MattermostNotificationService {
     private final RestTemplate restTemplate;
 
 
-    public void sendGroupMessage(List<String> nicknames) {
-        String message = "# :kkomdae_stop:  꼼대 서비스를 이용해서 대여 신청을 완료해주세요~!\n" +
-                "\":one: :alert_siren: @s12d101user1님 https://j12d101.p.ssafy.io/ 로 접속해서 PC 검사 프로그램을 다운로드 받아주세요\" ";  // 발송할 메시지 내용
+    public void sendGroupInfoMessage(List<String> nicknames) {
+        String message = "# :alert_siren: [공지] 꼼대 서비스를 이용해 대여/반납 절차 안내\n" +
+                "**지급받은 노트북의 대여/반납을 위해 꼼대를 이용해 노트북 상태를 제출해주세요. **\n" +
+                "**2025년04월11일까지 제출을 완료해주세요. **\n" +
+                "**절차 미이행시 노트북 사용에 제한이 있을 수 있습니다. 꼭 지정된 날짜까지 프로세스를 완료해주세요.**\n" +
+                "## **[꼼대 사용 방법]**\n" +
+                "### :one: 꼼대 `애플리케이션`을 다운받아 노트북을 촬영해주세요.\n" +
+                "### :two: 꼼대 `노트북 검사 프로그램`을 통해 노트북을 검사해주세요.\n" +
+                "### :three: 제출을 완료하고 PDF를 확인해 보세요! \n" +
+                "## ** [ :kkomdae_write:  꼼대 다운 받으러 가기 :kkomdae_go: ]([https://j12d101.p.ssafy.io/](https://j12d101.p.ssafy.io))**";  // 발송할 메시지 내용
 
         putUserToChannel(channelId, nicknames);
         sendMessage(channelId, message);
     }
 
+
+    public void sendGroupHurryMessage(List<String> nicknames) {
+        String message = "빨리 마무리 해주세요\n";
+        message += makeTag(nicknames);
+        putUserToChannel(channelId, nicknames);
+        sendMessage(channelId, message);
+    }
+
+    private String makeTag(List<String> nicknames) {
+        //nicknames로 사실 찾아야댐
+        return "@s12d101user1, @s12d101user2";
+    }
 
     private String createGroupChannel(List<String> userIds) {
 
@@ -61,7 +80,8 @@ public class MattermostNotificationService {
      * @param channelId 채널 ID
      * @param message   전송할 메시지 내용
      */
-    private void sendMessage(String channelId, String message) {
+    private void
+    sendMessage(String channelId, String message) {
 //      URL 생성
 
         String url = baseUrl + "/posts";
@@ -87,9 +107,11 @@ public class MattermostNotificationService {
             ResponseEntity<PutUserRtn> response = restTemplate.exchange(uri,
                     HttpMethod.POST, request,
                     PutUserRtn.class);
+            log.info(response.getBody().getChannel_id());
         } catch (HttpClientErrorException e) {
             // 4xx 오류 시 자동 throw
             String responseBody = e.getResponseBodyAsString(); // 본문 추출
+            log.error(responseBody);
         }
 
 
