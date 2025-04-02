@@ -1,7 +1,6 @@
 package pizza.kkomdae.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -17,6 +16,7 @@ import pizza.kkomdae.entity.Photo;
 import pizza.kkomdae.s3.S3Service;
 import pizza.kkomdae.security.dto.CustomUserDetails;
 import pizza.kkomdae.service.*;
+import pizza.kkomdae.ssafyapi.MattermostNotificationService;
 
 
 import java.util.*;
@@ -34,6 +34,7 @@ public class ApiController {
     private final S3Service s3Service;
     private final FlaskService flaskService;
     private final PdfService pdfService;
+    private final MattermostNotificationService mattermostNotificationService;
 
 
     @GetMapping("/user-info")
@@ -180,5 +181,10 @@ public class ApiController {
         return testResultService.laptopTotalResult(testId);
     }
 
-
+    @Operation(summary = "관리자 페이지 알림 테스트용", description = "리스트에 교육생 이름을 넣으면 그룹을 만들어서 알림 발송")
+    @PostMapping("/notification")
+    public void notification(@RequestBody List<String>names) {
+//        mattermostNotificationService.createGroupChannel(names);
+        mattermostNotificationService.sendGroupMessage(names);
+    }
 }

@@ -1,4 +1,4 @@
-package pizza.kkomdae.ssafyapi.dto;
+package pizza.kkomdae.ssafyapi.dto.rtn;
 
 import lombok.Getter;
 import lombok.Setter;

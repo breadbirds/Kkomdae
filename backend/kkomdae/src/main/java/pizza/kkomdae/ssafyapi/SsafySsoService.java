@@ -21,9 +21,9 @@ import pizza.kkomdae.repository.student.StudentRepository;
 import pizza.kkomdae.security.dto.AuthenticationResponse;
 import pizza.kkomdae.security.etc.JwtProviderForSpringSecurity;
 import pizza.kkomdae.security.dto.RefreshReq;
-import pizza.kkomdae.ssafyapi.dto.SsoAuthToken;
+import pizza.kkomdae.ssafyapi.dto.rtn.SsoAuthToken;
 import pizza.kkomdae.ssafyapi.dto.UserInfo;
-import pizza.kkomdae.ssafyapi.dto.UserRequestForSso;
+import pizza.kkomdae.ssafyapi.dto.rtn.UserRequestForSso;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +32,7 @@ public class SsafySsoService {
 
     private final StudentRepository studentRepository;
     private final JwtProviderForSpringSecurity jwtProvider;
+    private final RestTemplate restTemplate;
     @Value("${sso.redirect.uri}")
     private String redirectUri;
     @Value("${sso.client.id}")
@@ -43,8 +44,7 @@ public class SsafySsoService {
 
     public SsoAuthToken getSsoAuthToken(String code) {
         final HttpEntity<MultiValueMap<String, String>> httpEntity = createTokenRequestEntity(code);
-
-        RestTemplate restTemplate = new RestTemplate();
+;
         try {
             ResponseEntity<SsoAuthToken> response = restTemplate.exchange("https://project.ssafy.com/ssafy/oauth2/token",
                     HttpMethod.POST, httpEntity,
@@ -64,7 +64,6 @@ public class SsafySsoService {
 
     public UserRequestForSso getLoginUserInfo(SsoAuthToken token) {
         final HttpEntity<MultiValueMap<String, String>> httpEntity = createUserInfoRequestEntity(token.getAccess_token());
-        RestTemplate restTemplate = new RestTemplate();
         try {
             ResponseEntity<UserRequestForSso> response = restTemplate.exchange("https://project.ssafy.com/ssafy/resources/userInfo",
                     HttpMethod.GET, httpEntity, UserRequestForSso.class);
@@ -81,7 +80,6 @@ public class SsafySsoService {
     }
 
     public UserInfo getUserInfo(String userId) {
-        RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString("https://project.ssafy.com/ssafy/open-api/v1/users/")
                 .path(userId)
                 .queryParam("apiKey", apiKey);
