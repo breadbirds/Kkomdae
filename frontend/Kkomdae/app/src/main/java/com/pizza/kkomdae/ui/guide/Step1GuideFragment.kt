@@ -154,10 +154,25 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
             }
         }
 
-        if (step == 0) {
-            showIntroDialog()
+        // SharedPreferences에서 다이얼로그 표시 여부 확인
+        val sharedPreferences = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val sessionId = sharedPreferences.getString("current_session_id", null)
+
+        // 현재 세션 ID가 없다면 생성 (앱 시작 시)
+        val currentSessionId = sessionId ?: System.currentTimeMillis().toString().also {
+            sharedPreferences.edit().putString("current_session_id", it).apply()
         }
 
+        // 이 세션에서 다이얼로그를 표시했는지 확인
+        val dialogKey = "shown_step1_dialog_$currentSessionId"
+        val hasShownDialog = sharedPreferences.getBoolean(dialogKey, false)
+
+        // 다이얼로그를 아직 표시하지 않았고, 촬영을 시작하지 않았으면 표시
+        if (!hasShownDialog && step == 0) {
+            showIntroDialog()
+            // 다이얼로그를 표시했음을 저장
+            sharedPreferences.edit().putBoolean(dialogKey, true).apply()
+        }
     }
 
     private fun showIntroDialog() {
@@ -192,11 +207,22 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
         val btnQuit = bottomSheetView.findViewById<View>(R.id.btn_quit)
         btnQuit.setOnClickListener {
             bottomSheetDialog.dismiss()
-            // 메인 화면으로 이동
-            val transaction = mainActivity.supportFragmentManager.beginTransaction()
-            mainActivity.supportFragmentManager.popBackStack()
-            transaction.replace(R.id.fl_main, com.pizza.kkomdae.ui.MainFragment())
-            transaction.commit()
+
+            // UI 스레드에서 약간의 지연 후 화면 전환
+            view?.post {
+                try {
+                    // 메인 화면으로 이동
+                    val transaction = mainActivity.supportFragmentManager.beginTransaction()
+                    transaction.setReorderingAllowed(true)
+                    transaction.replace(R.id.fl_main, com.pizza.kkomdae.ui.MainFragment())
+                    transaction.commit()
+
+                    // 백스택 즉시 비우기
+                    mainActivity.supportFragmentManager.popBackStackImmediate(null, 1)
+                } catch (e: Exception) {
+                    Log.e("Step1GuideFragment", "MainFragment로 이동 중 오류: ${e.message}", e)
+                }
+            }
         }
 
         bottomSheetDialog.setContentView(bottomSheetView)
