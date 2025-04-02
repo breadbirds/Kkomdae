@@ -141,10 +141,22 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
 
         // 촬영하기 버튼
         binding.btnNext.setOnClickListener {
-            mainActivity.next()
+            if (step == 6) {
+                // 완료 버튼 클릭 시 Step2GuideFragment로 이동
+                val transaction = mainActivity.supportFragmentManager.beginTransaction()
+                mainActivity.supportFragmentManager.popBackStack()
+                transaction.replace(R.id.fl_main, Step2GuideFragment())
+                    .addToBackStack("")
+                transaction.commit()
+            } else {
+                // 촬영 단계가 완료되지 않았으면 촬영 계속
+                mainActivity.next()
+            }
         }
 
-        showIntroDialog()
+        if (step == 0) {
+            showIntroDialog()
+        }
 
     }
 
