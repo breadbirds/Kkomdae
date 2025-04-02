@@ -9,6 +9,8 @@ import com.pizza.kkomdae.ui.MainFragment
 import com.pizza.kkomdae.ui.step4.Step4AiResultFragment
 import android.Manifest
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,6 +19,12 @@ import com.pizza.kkomdae.data.source.local.SecureTokenManager
 import com.pizza.kkomdae.data.source.local.TokenManager
 import com.pizza.kkomdae.databinding.LayoutLogoutDialogBinding
 import android.view.WindowManager
+import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
+import androidx.core.net.toUri
+import com.pizza.kkomdae.presenter.viewmodel.CameraViewModel
+import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
+import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.ui.guide.Step2GuideFragment
 import dagger.hilt.android.AndroidEntryPoint
 private const val TAG = "MainActivity"
@@ -25,7 +33,7 @@ private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-
+    private val viewModel : FinalViewModel by viewModels()
 
     private val REQUEST_CAMERA_PERMISSION = 1001
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +46,8 @@ class MainActivity : AppCompatActivity() {
 
         transaction.commit()
         checkCameraPermission()
+
+
 
         val secureTokenManager = SecureTokenManager(this)
         val refreshToken = secureTokenManager.getRefreshToken()
@@ -110,6 +120,12 @@ class MainActivity : AppCompatActivity() {
         cameraResultLauncher.launch(intent)
     }
 
+    fun reCamera(stage: Int){
+        val intent = Intent(this, CameraActivity::class.java)
+            .putExtra("stage",stage)
+        reCameraResultLauncher.launch(intent)
+    }
+
     private fun checkCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED) {
@@ -148,6 +164,21 @@ class MainActivity : AppCompatActivity() {
                 transaction.commit()
                 checkCameraPermission()
             }
+        }
+    }
+
+
+    private val reCameraResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val photoUri= result.data?.getStringExtra("RE_PHOTO_URI")
+            if (photoUri != null) {
+                Log.d(TAG, "recameraaa $photoUri: ")
+
+                viewModel.setReCameraUri(Uri.parse(photoUri))
+            }
+
         }
     }
 
