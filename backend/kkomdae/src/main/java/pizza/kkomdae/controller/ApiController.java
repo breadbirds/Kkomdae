@@ -83,13 +83,12 @@ public class ApiController {
             Photo photo = photoService.uploadPhotoSync(photoReq, image);
             photoService.analyzeRePhoto(photo.getPhotoId());
 
-            List<Map<String, String>> result = new ArrayList<>();
-
             AiPhotoWithUrl photo1 = testResultService.getAiPhoto(testId, photoType);
-            Map<String, String> map = new HashMap<>();
-            map.put("photo_name", photo1.getAiName());
-            map.put("photo_url", photo1.getUrl());
-            result.add(map);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("photo_ai_name", photo1.getAiName());
+            result.put("photo_ai_url", photo1.getUrl());
+            result.put("photo_ai_damage", photo1.getDamage());
 
             return new ApiResponse(true, "사진 업로드 및 저장 성공", result);
     }
@@ -126,12 +125,13 @@ public class ApiController {
                 Comparator.comparingInt(AiPhotoWithUrl::getType)
         );
         // 3) 반환 리스트 생성
-        Map<String, String> resultList = new HashMap<>();
+        Map<String, Object> resultList = new HashMap<>();
         // 4) 각 사진 매핑
         for (AiPhotoWithUrl photo : photoList) {
             int type = photo.getType();
             resultList.put("photo" + type +"_ai_name", photo.getAiName());
             resultList.put("photo" + type +"_ai_url", photo.getUrl());
+            resultList.put("photo" + type +"_ai_damage", photo.getDamage());
         }
         return new ApiResponse(true, "분석 사진 url 반환 완료", resultList);
     }

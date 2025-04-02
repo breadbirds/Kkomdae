@@ -723,35 +723,6 @@ class TestApp(ttkb.Window):
         """
         usb_ports = {}
         try:
-            # WMI를 사용하여 USB 장치 정보 가져오기
-            wmi_obj = win32com.client.GetObject("winmgmts:")
-            pnp_entities = wmi_obj.InstancesOf("Win32_PnPEntity")
-
-            for entity in pnp_entities:
-                # entity.Name이 'USB Composite Device'인 경우에만 처리
-                if hasattr(entity, 'PNPDeviceID') and entity.PNPDeviceID:
-                    device_path = entity.PNPDeviceID.upper()
-                    
-                    # USB 장치만 처리
-                    if device_path.startswith("USB\\"):
-                        logging.debug(f"디버깅: WMI - 장치 정보: {entity}")
-                        # 포트 번호 추출
-                        match = re.search(r'&0&(\d)$', device_path)
-                        if match:
-                            port_number = int(match.group(1))
-                            if port_number in [1, 2, 3]:
-                                key = f'port{port_number}'
-                                if key not in usb_ports:
-                                    usb_ports[key] = False
-                                    logging.debug(f"디버깅: WMI - 새로운 포트 추가: {key}, 상태: False")
-                                
-                        # DeviceID와 LocationInformation 로그에 기록
-                        if hasattr(entity, 'DeviceID'):
-                            logging.debug(f"디버깅: WMI - DeviceID: {entity.DeviceID}")
-                        if hasattr(entity, 'LocationInformation'):
-                            logging.debug(f"디버깅: WMI - LocationInformation: {entity.LocationInformation}")
-
-
             cmd = (
                     'powershell.exe -WindowStyle Hidden -Command "'
                     '$OutputEncoding = [System.Text.UTF8Encoding]::new(); '
@@ -1332,7 +1303,6 @@ class TestApp(ttkb.Window):
                 'powershell.exe -WindowStyle Hidden -NonInteractive -Command "'
                 '$OutputEncoding = [System.Text.UTF8Encoding]::new(); '
                 'Get-PnpDevice -Class USB -PresentOnly:$true '
-                '| Where-Object { $_.FriendlyName -like \'*Composite Device*\' -or $_.Name -like \'*Composite Device*\' } '
                 '| Select-Object InstanceId, FriendlyName, Name '
                 '| ConvertTo-Json'
                 '"'
