@@ -213,6 +213,13 @@ public class TestResultService {
     public LaptopTotalResultRes laptopTotalResult(long testId) {
         LaptopTestResult result = lapTopTestResultRepository.findByIdWithStudentAndDeviceAndPhotos(testId);
         LaptopTotalResultRes res = new LaptopTotalResultRes(result);
+        List<Photo> photos = result.getPhotos();
+        List<String> urls = new ArrayList<>();
+        for (Photo photo : photos) {
+            urls.add(s3Service.generatePresignedUrl(photo.getName()));
+        }
+        res.setImageUrls(urls);
+        
         return res;
     }
 }

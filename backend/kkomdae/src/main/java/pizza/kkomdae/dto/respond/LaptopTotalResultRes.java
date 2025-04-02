@@ -2,6 +2,7 @@ package pizza.kkomdae.dto.respond;
 
 
 import lombok.Getter;
+import lombok.Setter;
 import pizza.kkomdae.entity.Laptop;
 import pizza.kkomdae.entity.LaptopTestResult;
 import pizza.kkomdae.entity.Photo;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 public class LaptopTotalResultRes {
     private boolean keyboardStatus;
     private boolean useStatus;
@@ -28,15 +30,11 @@ public class LaptopTotalResultRes {
     private int adapterCount;
     private int mousepadCount;
     private String description;
-    private List<String>imageNames;
+    private List<String> imageUrls;
 
     public LaptopTotalResultRes(LaptopTestResult result) {
-        List<Photo> photos = result.getPhotos();
         Laptop laptop = (Laptop) result.getDevice();
-        this.imageNames = new ArrayList<>();
-        for (Photo photo : photos) {
-            imageNames.add(photo.getAiName());
-        }
+        this.imageUrls = new ArrayList<>();
         this.keyboardStatus = result.getKeyboardStatus();
         this.useStatus = result.getUsbStatus();
         this.cameraStatus = result.getCameraStatus();

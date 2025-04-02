@@ -18,6 +18,7 @@ import pizza.kkomdae.s3.S3Service;
 import pizza.kkomdae.security.dto.CustomUserDetails;
 import pizza.kkomdae.service.*;
 import javax.crypto.MacSpi;
+import pizza.kkomdae.ssafyapi.MattermostNotificationService;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,7 @@ public class ApiController {
     private final S3Service s3Service;
     private final FlaskService flaskService;
     private final PdfService pdfService;
+    private final MattermostNotificationService mattermostNotificationService;
 
     @GetMapping("/user-info")
     @Operation(summary = "첫페이지에서 유저의 정보를 조회하는 api", description = "")
@@ -216,6 +218,11 @@ public class ApiController {
     public LaptopTotalResultRes laptopTotalResult(@RequestParam long testId ) {
         return testResultService.laptopTotalResult(testId);
     }
-
+    @Operation(summary = "관리자 페이지 알림 테스트용", description = "리스트에 교육생 이름을 넣으면 그룹을 만들어서 알림 발송")
+    @PostMapping("/notification")
+    public void notification(@RequestBody List<String>names) {
+//        mattermostNotificationService.createGroupChannel(names);
+        mattermostNotificationService.sendGroupMessage(names);
+    }
 }
 
