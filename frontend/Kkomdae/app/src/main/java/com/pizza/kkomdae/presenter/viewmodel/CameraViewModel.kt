@@ -104,8 +104,10 @@ class CameraViewModel @Inject constructor(
     // ✅ 사진 저장 메서드
     fun setStep(step: Int) {
         _step.value = step
-        savePhotoStage(step)
+    }
 
+    fun confirmPhoto(step: Int) {
+        savePhotoStage(step)
     }
 
     fun clearResult(){
