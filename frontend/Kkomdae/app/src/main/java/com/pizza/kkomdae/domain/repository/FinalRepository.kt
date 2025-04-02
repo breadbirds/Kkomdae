@@ -2,6 +2,7 @@ package com.pizza.kkomdae.domain.repository
 
 import com.pizza.kkomdae.domain.model.FourthStageRequest
 import com.pizza.kkomdae.domain.model.GetAiPhotoResponse
+import com.pizza.kkomdae.domain.model.GetPdfUrlResponse
 import com.pizza.kkomdae.domain.model.GetTotalResultResponse
 import com.pizza.kkomdae.domain.model.LoginResponse
 import com.pizza.kkomdae.domain.model.PostResponse
@@ -15,4 +16,6 @@ interface FinalRepository {
     suspend fun postFourthStage(fourthStageRequest: FourthStageRequest) : PostResponse
 
     suspend fun getLaptopTotalResult(testId: Long): GetTotalResultResponse
+
+    suspend fun getPdfUrl(name: String): GetPdfUrlResponse
 }
