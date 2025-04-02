@@ -31,6 +31,10 @@ class FinalViewModel @Inject constructor(
     val pdfName: LiveData<String>
         get() = _pdfName
 
+    private val _pdfUrl = MutableLiveData<String>()
+    val pdfUrl: LiveData<String>
+        get() = _pdfUrl
+
     private val _frontUri = MutableLiveData<String?>()
     val frontUri: LiveData<String?>
         get() = _frontUri
@@ -122,6 +126,17 @@ class FinalViewModel @Inject constructor(
 
         }
     }
+
+    fun getPdfUrl(name: String){
+        viewModelScope.launch {
+            val result = finalUseCase.getPdfUrl(name)
+            Log.d(TAG, "getPdfUrl: $result")
+            result.onSuccess {
+                _pdfUrl.postValue(it.url)
+            }
+        }
+    }
+
 
 
 

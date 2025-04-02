@@ -1,11 +1,15 @@
 package com.pizza.kkomdae.presenter.viewmodel
 
 import android.app.Application
+import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
+import android.os.Environment
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,10 +28,11 @@ import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+
 private const val TAG = "MainViewModel"
 @HiltViewModel
 class MainViewModel@Inject constructor(
-    application: Application,
+    private val application: Application,
     private val mainUseCase: MainUseCase,
     private val step1UseCase: Step1UseCase,
     private val inspectUseCase: InspectUseCase
@@ -155,6 +160,19 @@ class MainViewModel@Inject constructor(
     }
     private fun savePhotoStage(step: Int) {
         sharedPreferences.edit().putInt("photoStage", step).apply()
+    }
+
+    fun downloadPdf(pdfUrl: String) {
+        val request = DownloadManager.Request(Uri.parse(pdfUrl))
+            .setTitle("PDF 다운로드")
+            .setDescription("PDF 파일을 다운로드 중입니다")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "downloaded_file.pdf")
+            .setAllowedOverMetered(true)
+            .setAllowedOverRoaming(true)
+
+        val downloadManager = application.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        downloadManager.enqueue(request)
     }
 
 

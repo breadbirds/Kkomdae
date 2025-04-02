@@ -5,11 +5,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.activityViewModels
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentOathBinding
 import com.pizza.kkomdae.databinding.FragmentSubmitCompleteBinding
+import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
+import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -28,6 +32,8 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private val viewModel : MainViewModel by activityViewModels()
+    private val finalViewModel : FinalViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +51,19 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
 
         // 버튼 클릭 이벤트 설정
         setupButtonListeners()
+
+        // pdf 다운로드 버튼
+        binding.btnDownloadPdf.setOnClickListener {
+            finalViewModel.pdfName.value?.let {
+                Toast.makeText(requireContext(),"파일이 다운로드 중입니다",Toast.LENGTH_SHORT).show()
+                finalViewModel.getPdfUrl(it)
+            }
+
+        }
+
+        finalViewModel.pdfUrl.observe(viewLifecycleOwner){
+            viewModel.downloadPdf(it)
+        }
     }
 
     private fun setupAnimation() {

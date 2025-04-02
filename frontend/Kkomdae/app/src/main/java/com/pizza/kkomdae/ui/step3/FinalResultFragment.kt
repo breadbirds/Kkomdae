@@ -94,7 +94,7 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
 
                 tvFrontTitle.text = it.description
 
-                adapter.submitList(it.imageNames)
+                adapter.submitList(it.imageUrls)
             }
         }
 
