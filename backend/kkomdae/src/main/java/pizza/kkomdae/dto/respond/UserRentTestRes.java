@@ -2,6 +2,7 @@ package pizza.kkomdae.dto.respond;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import pizza.kkomdae.entity.Laptop;
 import pizza.kkomdae.entity.LaptopTestResult;
 import pizza.kkomdae.entity.Rent;
 
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 @Getter
 public class UserRentTestRes {
     private final String modelCode;
+    private final String serialNum;
     private final LocalDate dateTime;
     private boolean release;
     private final String rentPdfName;
@@ -20,7 +22,9 @@ public class UserRentTestRes {
     private int picStage = 0;
 
     public UserRentTestRes(Rent rent) {
-        this.modelCode = rent.getDevice().getModelCode();
+        Laptop laptop = (Laptop) rent.getDevice();
+        this.modelCode = laptop.getModelCode();
+        this.serialNum = laptop.getSerialNum();
         this.rentPdfName = rent.getDevice().getLaptopTestResults().get(0).getPdfFileName();
 //        log.info("테스트 번호 {}",rent.getDevice().getLaptopTestResults().get(0).getLaptopTestResultId());
         if (rent.getReleaseDateTime() != null) { // 반납했다면
