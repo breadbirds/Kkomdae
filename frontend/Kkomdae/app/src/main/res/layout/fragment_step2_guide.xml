@@ -23,7 +23,7 @@
         app:layout_constraintTop_toBottomOf="@id/top_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="95dp"
         android:layout_marginStart="120dp" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -65,7 +65,7 @@
             android:id="@+id/layout_device_images"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="60dp"
             app:layout_constraintTop_toBottomOf="@id/tv_subtitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -112,7 +112,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="24dp"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="60dp"
             app:layout_constraintTop_toBottomOf="@id/layout_device_images">
 
             <TextView
@@ -140,7 +140,7 @@
                 android:id="@+id/tv_step1_description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="노트북에서 아래 URL에 접속하여 자가진단 프로그램을 다운받은 후 실행해주세요."
+                android:text="노트북에서 자가진단 프로그램을 실행해주세요."
                 style="@style/Body2"
                 android:textColor="@color/gray300"
                 android:layout_marginTop="8dp"
@@ -148,49 +148,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_step1_title" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_url_info"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/blue50"
-                app:layout_constraintStart_toStartOf="@id/tv_step1_title"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_step1_description">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/url_link"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="12dp">
-
-                    <TextView
-                        android:id="@+id/tv_url"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:text="https://kkomade.com"
-                        android:textColor="@color/blue500"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toStartOf="@id/iv_url_copy"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
-
-                    <ImageView
-                        android:id="@+id/iv_url_copy"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginStart="8dp"
-                        android:src="@drawable/ic_url_copy"
-                        app:layout_constraintBottom_toBottomOf="@id/tv_url"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/tv_url"
-                        app:layout_constraintTop_toTopOf="@id/tv_url" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.cardview.widget.CardView>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View

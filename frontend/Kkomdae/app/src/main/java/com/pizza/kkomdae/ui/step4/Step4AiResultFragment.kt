@@ -56,8 +56,61 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val data = listOf(
+            Step4AiResult(R.drawable.ic_front_laptop, "전면부"),
+            Step4AiResult(R.drawable.ic_guide_back, "후면부"),
+            Step4AiResult(R.drawable.ic_camera_left, "좌측면"),
+            Step4AiResult(R.drawable.ic_camera_right, "우측면"),
+            Step4AiResult(R.drawable.ic_guide_screen, "모니터"),
+            Step4AiResult(R.drawable.ic_guide_keypad, "키보드"),
+        )
+        val adapter =Step4AiResultAdapter(data, listen = {
+            changeImage(it)
+        })
+
         // api 호출
         viewModel.getAiPhoto()
+
+        // 재촬영 이미지 uri 서버로 보내기
+        viewModel.reCameraUri.observe(viewLifecycleOwner){
+            // todo 로딩 화면 추가
+            viewModel.reCameraStage.value?.let {
+                adapter.showTextAt(it-1)
+            }
+
+
+            Log.d(TAG, "onViewCreated: $it")
+            viewModel.postRePhoto()
+        }
+
+        viewModel.rePhoto1.observe(viewLifecycleOwner){
+            adapter.hideTextAt(0)
+            viewModel.clearRePhoto1()
+
+        }
+        viewModel.rePhoto2.observe(viewLifecycleOwner){
+            adapter.hideTextAt(1)
+            viewModel.clearRePhoto2()
+        }
+        viewModel.rePhoto3.observe(viewLifecycleOwner){
+            adapter.hideTextAt(2)
+            viewModel.clearRePhoto3()
+        }
+        viewModel.rePhoto4.observe(viewLifecycleOwner){
+            adapter.hideTextAt(3)
+            viewModel.clearRePhoto4()
+        }
+        viewModel.rePhoto5.observe(viewLifecycleOwner){
+            adapter.hideTextAt(4)
+            viewModel.clearRePhoto5()
+        }
+        viewModel.rePhoto6.observe(viewLifecycleOwner){
+            adapter.hideTextAt(5)
+            viewModel.clearRePhoto6()
+        }
+
+
+
 
 
 
@@ -75,21 +128,23 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         }
 
         viewModel.frontUri.observe(viewLifecycleOwner){
-            Glide.with(binding.ivImage)
-                .load(it)
-                .into(binding.ivImage)
+            if (it==""){
+                Glide.with(this)
+                    .asGif()
+                    //todo 로딩 gif 추가
+                    .load(R.raw.loading1)
+                    .into(binding.ivImage)
+            }else{
+                Glide.with(binding.ivImage)
+                    .load(it)
+                    .into(binding.ivImage)
+            }
+
         }
 
 
 
-        val data = listOf(
-            Step4AiResult(R.drawable.ic_front_laptop, "전면부"),
-            Step4AiResult(R.drawable.ic_guide_back, "후면부"),
-            Step4AiResult(R.drawable.ic_camera_left, "좌측면"),
-            Step4AiResult(R.drawable.ic_camera_right, "우측면"),
-            Step4AiResult(R.drawable.ic_guide_screen, "모니터"),
-            Step4AiResult(R.drawable.ic_guide_keypad, "키보드"),
-        )
+
 
         class HorizontalSpaceItemDecoration(private val horizontalSpace: Int) : RecyclerView.ItemDecoration() {
             override fun getItemOffsets(
@@ -109,11 +164,11 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         ))
 
 
-        binding.rvPosition.adapter = Step4AiResultAdapter(data, listen = {
-            changeImage(it)
-        })
+        binding.rvPosition.adapter = adapter
         binding.rvPosition.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+
 
         // 다음 버튼
         binding.btnConfirm.setOnClickListener {
@@ -127,6 +182,14 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         binding.btnClose.setOnClickListener {
             showQuitBottomSheet()
         }
+
+        // 재촬영
+        binding.btnRetry.setOnClickListener {
+            viewModel.setReCameraStage(step+1)
+            mainActivity.reCamera(step)
+        }
+
+
 
     }
 
@@ -170,9 +233,17 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             5 -> viewModel.keypadUri.value
             else -> ""
         }
-        Glide.with(binding.ivImage)
-            .load(url)
-            .into(binding.ivImage)
+        if(url==""){
+            Glide.with(this)
+                .asGif()
+                .load(R.raw.login_loading)
+                .into(binding.ivImage)
+        }else{
+            Glide.with(binding.ivImage)
+                .load(url)
+                .into(binding.ivImage)
+        }
+
     }
 
     companion object {

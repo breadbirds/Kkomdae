@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -98,9 +99,19 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
 
         viewModel.postResult.observe(viewLifecycleOwner){
             if(it?.success == true){
+                // 서버에 사진 전송 성공시에만 프론트에 단계 저장
+                viewModel.confirmPhoto(viewModel.step.value ?: 0)
+                // 다음 단계로 이동
                 cameraActivity.changeFragment((viewModel.step.value?:-1)+1)
                 viewModel.clearResult()
+            } else if (it != null) {
+                showNetworkErrorDialog()
             }
+        }
+
+        // 재촬영 url
+        viewModel.reCameraUri.observe(viewLifecycleOwner){
+            cameraActivity.moveToBackReCamera(it)
         }
 
     }
@@ -128,6 +139,25 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
             // 다이얼로그 닫기
             dialog.dismiss()
             cameraActivity.moveToBack()
+        }
+
+        dialog.show()
+    }
+
+    private fun showNetworkErrorDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.layout_error_dialog)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val width = (resources.displayMetrics.widthPixels * 0.4).toInt()
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        // 확인 버튼
+        val confirmButton = dialog.findViewById<TextView>(R.id.tv_confirm)
+        confirmButton.setOnClickListener {
+            dialog.dismiss()
         }
 
         dialog.show()

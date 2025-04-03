@@ -8,6 +8,7 @@ import com.pizza.kkomdae.domain.model.LoginResponse
 import com.pizza.kkomdae.domain.model.PostResponse
 import com.pizza.kkomdae.domain.repository.FinalRepository
 import com.pizza.kkomdae.domain.repository.InspectRepository
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 class FinalUseCase@Inject constructor(
@@ -57,4 +58,6 @@ class FinalUseCase@Inject constructor(
             Result.failure(e)  // ✅ 실패 시 Result.failure 반환
         }
     }
+
+    fun postRePhoto(photoType: Int, testId: Long, file: MultipartBody.Part)= finalRepository.postRePhoto(photoType=photoType, testId,file=file)
 }

@@ -10,8 +10,12 @@ import com.pizza.kkomdae.domain.model.FourthStageRequest
 import com.pizza.kkomdae.domain.model.GetAiPhotoResponse
 import com.pizza.kkomdae.domain.model.GetPdfUrlResponse
 import com.pizza.kkomdae.domain.model.GetTotalResultResponse
+import com.pizza.kkomdae.domain.model.PostRePhotoResponse
 import com.pizza.kkomdae.domain.model.PostResponse
 import com.pizza.kkomdae.domain.repository.FinalRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import okhttp3.MultipartBody
 import javax.inject.Inject
 
 class FinalRepositoryImpl@Inject constructor(
@@ -54,6 +58,17 @@ class FinalRepositoryImpl@Inject constructor(
             FinalMapper.toGetPdfUrlDto(finalService.getPdfUrl(name))
         }catch (e: Exception){
             throw e
+        }
+    }
+
+    override fun postRePhoto(photoType: Int, testId: Long, file: MultipartBody.Part,): Flow<PostRePhotoResponse> {
+        return flow {
+            try {
+                val response = FinalMapper.toPostRePhotoResponse(finalService.postRePhoto(photoType,testId,file=file))
+                emit(response)
+            }catch (e:Exception){
+                throw e
+            }
         }
     }
 

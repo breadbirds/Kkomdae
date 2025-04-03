@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -71,8 +72,6 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
             param2 = it.getString(ARG_PARAM2)
         }
 
-
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -91,8 +90,6 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
         binding.rvSubmission.layoutManager = LinearLayoutManager(mainActivity)
 
 
-
-
         binding.btnLogout.setOnClickListener {
             mainActivity.logout()
         }
@@ -102,51 +99,18 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
             step=it.stage
             binding.tvWelcomeMessage.text="${it.name}님 안녕하세요!"
             adapter.submitList(it.userRentTestRes)
+
+            // 진행중인 과정이 있는지 확인하고 표시
+            updateInProgressIndicator()
         }
 
         // 노트북 카드뷰 클릭 이벤트
         binding.cvLaptop.setOnClickListener {
-            when(step){
-                0->{
-                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
-                    transaction.replace(R.id.fl_main, OathFragment())
-                    transaction.addToBackStack(null)
-                    transaction.commit()
-                }
-                1->{
-                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
-                    transaction.replace(R.id.fl_main, Step1GuideFragment())
-                    transaction.addToBackStack(null)
-                    transaction.commit()
-                }
-                2->{
-                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
-                    transaction.replace(R.id.fl_main, Step2GuideFragment())
-                    transaction.addToBackStack(null)
-                    transaction.commit()
-                }
-                3->{
-                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
-                    transaction.replace(R.id.fl_main, LaptopInfoInputFragment())
-                    transaction.addToBackStack(null)
-                    transaction.commit()
-                }
-                4->{
-                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
-                    transaction.replace(R.id.fl_main, LoadingFragment())
-                    transaction.addToBackStack(null)
-                    transaction.commit()
-                }
-                5->{
-                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
-                    transaction.replace(R.id.fl_main, FinalResultFragment())
-                    transaction.addToBackStack(null)
-                    transaction.commit()
-                }
-
-
+            if (step == 0) {
+                navigateToFragment(OathFragment())
+            } else {
+                showContinueDialog()
             }
-
         }
 
         // 모바일 카드뷰 클릭 이벤트
@@ -159,6 +123,61 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
             showDevelopingDialog()
         }
     }
+
+    private fun updateInProgressIndicator() {
+        val inProgressView = binding.cvLaptop.findViewById<TextView>(R.id.tv_in_progress)
+
+        // step이 0이 아니면 "진행중" 표시
+        if (step > 0) {
+            inProgressView.visibility = View.VISIBLE
+        } else {
+            inProgressView.visibility = View.GONE
+        }
+    }
+
+    // 임시저장 다이얼로그 표시
+    private fun showContinueDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.layout_dialog_temp)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        // 닫기 버튼
+        val cancelButton = dialog.findViewById<TextView>(R.id.btn_cancel)
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        // 이어하기 버튼
+        val confirmButton = dialog.findViewById<TextView>(R.id.btn_confirm)
+        confirmButton.setOnClickListener {
+            dialog.dismiss()
+
+            // 현재 step에 맞는 화면으로 이동
+            when(step) {
+                1 -> navigateToFragment(Step1GuideFragment())
+                2 -> navigateToFragment(Step2GuideFragment())
+                3 -> navigateToFragment(LaptopInfoInputFragment())
+                4 -> navigateToFragment(LoadingFragment())
+                5 -> navigateToFragment(FinalResultFragment())
+            }
+        }
+
+        dialog.show()
+    }
+
+    // 프래그먼트 전환을 위한 헬퍼 함수
+    private fun navigateToFragment(fragment: Fragment) {
+        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fl_main, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+    }
+
 
     // 개발 중 다이얼로그
     private fun showDevelopingDialog() {

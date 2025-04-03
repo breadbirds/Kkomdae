@@ -4,11 +4,15 @@ import com.pizza.kkomdae.data.model.dto.FourthStageRequestDto
 import com.pizza.kkomdae.data.model.dto.GetAiPhotoResponseDto
 import com.pizza.kkomdae.data.model.dto.GetPdUrlResponseDto
 import com.pizza.kkomdae.data.model.dto.GetTotalResultResponseDto
+import com.pizza.kkomdae.data.model.dto.PostRePhotoResponseDto
 import com.pizza.kkomdae.data.model.dto.PostResponseDto
 import com.pizza.kkomdae.domain.model.GetPdfUrlResponse
+import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -29,6 +33,14 @@ interface FinalService {
 
     @GET("api/test-file/{file-name}")
     suspend fun getPdfUrl(@Path("file-name") name: String): GetPdUrlResponseDto
+
+    @Multipart
+    @POST("api/re-photo")
+    suspend fun postRePhoto(
+        @Query("photoType") photoType: Int,
+        @Query("testId") testId: Long,
+        @Part file: MultipartBody.Part,
+        ): PostRePhotoResponseDto
 
 
 }
