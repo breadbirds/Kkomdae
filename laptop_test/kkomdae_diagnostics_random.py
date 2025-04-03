@@ -306,9 +306,9 @@ class TestApp(ttkb.Window):
         """
         try:
             # 테스트환경
-            # url = "http://localhost:8080/api/verify-key"
+            url = "http://localhost:8080/api/verify-key"
             # 운영환경
-            url = "https://j12d101.p.ssafy.io/api/verify-key"
+            # url = "https://j12d101.p.ssafy.io/api/verify-key"
 
             response = requests.get(url, params={"key": key})
             # 서버 응답 확인
@@ -1561,7 +1561,7 @@ class TestApp(ttkb.Window):
 
         # 사용자에게 진행 중임을 알리는 메시지 표시
         self.update_status("배터리", "생성 중")
-
+    
     def _generate_battery_report_thread(self) -> None:
         """
         실제로 배터리 리포트를 생성하는 작업을 수행하는 메서드 (별도의 스레드에서 실행)
@@ -1584,7 +1584,7 @@ class TestApp(ttkb.Window):
             # 배터리 리포트 파일명 생성
             new_report_name = f"battery_report_{computer_name}_{now}.html"
             new_report_path = os.path.join(downloads_path, new_report_name)
-            self.report = [new_report_name]
+            self.report = new_report_name
 
             # 리포트 생성
             temp_report_path = os.path.join(downloads_path, "battery_report.html")
@@ -1595,7 +1595,7 @@ class TestApp(ttkb.Window):
                 stderr=subprocess.PIPE,
                 text=True,
                 check=False,  # check=False로 변경
-                encoding='utf-8',  # UTF-8 인코딩으로 변경
+                encoding='cp949',  # UTF-8 인코딩으로 변경
             )
         
             if result.returncode != 0:
@@ -1612,6 +1612,7 @@ class TestApp(ttkb.Window):
         except Exception as e:
             self.after(0, lambda: self._on_battery_report_error(f"오류 발생:\n{e}"))
 
+
     def _on_battery_report_generated(self) -> None:
         """
         배터리 리포트 생성 완료 후 실행되는 콜백 메서드 (메인 스레드에서 실행)
@@ -1619,6 +1620,8 @@ class TestApp(ttkb.Window):
         messagebox.showinfo("배터리 리포트", f"배터리 리포트가 생성되었습니다.\n파일 경로:\n{self.report_path}")
         self.battery_report_button.config(bootstyle="info")
         self.mark_test_complete("배터리")
+        # 리포트 이름을 문자열로 저장
+        self.report = os.path.basename(self.report_path) if self.report_path else None
         # Django 서버 업로드는 백그라운드에서 진행
         threading.Thread(target=self.upload_battery_report, args=(self.report_path,)).start()
 
@@ -1756,31 +1759,35 @@ class TestApp(ttkb.Window):
         Args:
             test_type: 테스트 유형 ("키보드", "카메라", "USB", "충전", "배터리")
             success: 테스트 성공 여부
-            fail_detail: 실패 시 상세 정보
+            detail: 상세 정보 (문자열)
         Returns:
             bool: 전송 성공 여부
         """
-            
         try:
             url = "http://localhost:8080/api/test-result"  # 테스트 서버 URL
             # url = "https://j12d101.p.ssafy.io/api/test-result"  # 운영 서버 URL
+            
             if test_type == '배터리':
                 data = {
-                    "randomKey": self.random_key,  # 클래스 변수로 저장된 랜덤키
+                    "randomKey": self.random_key,
                     "testType": test_type,
                     "success": success,
-                    "detail": detail,
+                    "detail": detail if isinstance(detail, str) else str(detail) if detail else None,
                     "summary": self.summary_battery_report()
                 }
-                response = requests.post(url, json=data)
             else:
+                # USB와 키보드의 경우 리스트를 문자열로 변환
+                if isinstance(detail, list):
+                    detail = ','.join(map(str, detail))
+                    
                 data = {
-                    "randomKey": self.random_key,  # 클래스 변수로 저장된 랜덤키
+                    "randomKey": self.random_key,
                     "testType": test_type,
                     "success": success,
                     "detail": detail if not success else None
                 }
-                response = requests.post(url, json=data)
+                
+            response = requests.post(url, json=data)
 
             if response.status_code == 200:
                 messagebox.showinfo("테스트 결과 전송", f"{test_type} 테스트 결과가 서버에 전송되었습니다.")
