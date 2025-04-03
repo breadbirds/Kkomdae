@@ -116,36 +116,36 @@ def analyze():
         return jsonify({"error": "이미지를 열 수 없습니다.", "detail": str(e)}), 400
 
     # --- 이미지 분석 로직 예시 ---
-    # # Faster R-CNN
-    # model = load_model()
-    # image_tensor = load_image(original_image)    
-    # faster_results = predict_and_get_result(model, image_tensor)
+    # Faster R-CNN
+    model = load_model()
+    image_tensor = load_image(original_image)    
+    faster_results = predict_and_get_result(model, image_tensor)
 
-    # # YOLO
-    # yolo_model = load_yolo_model()
-    # yolo_results = detect_laptop_yolo(yolo_model, original_image)
-
-    # # Post-processing (filter)
-    # filtered_results = filter_faster_by_yolo(faster_results, yolo_results)
-
-    # # 이미지 저장
-    # new_image = visualize_filtered(local_download_path, filtered_results) 
-
-    faster_model = load_faster_model()
+    # YOLO
     yolo_model = load_yolo_model()
+    yolo_results = detect_laptop_yolo(yolo_model, original_image)
 
-    # 1. supervision으로 전체 이미지에서 Faster R-CNN detection
-    faster_detections = run_supervision_slicer(faster_model, original_image)
+    # Post-processing (filter)
+    filtered_results = filter_faster_by_yolo(faster_results, yolo_results)
 
-    # 2. YOLO로 ssafy_laptop bbox 탐지
-    laptop_bboxes = detect_laptop_bbox(yolo_model, original_image)
+    # 이미지 저장
+    new_image = visualize_filtered(local_download_path, filtered_results) 
 
-    # 3. Faster detection 중 laptop bbox 내부 결과만 필터링
-    filtered_detections = filter_by_yolo(faster_detections, laptop_bboxes)
-    # filtered_detections = filter_and_classify(faster_detections, laptop_bboxes, image)
+    # faster_model = load_faster_model()
+    # yolo_model = load_yolo_model()
 
-    # 4. 이미지 시각화만 저장
-    new_image = save_annotated_image(original_image, filtered_detections)
+    # # 1. supervision으로 전체 이미지에서 Faster R-CNN detection
+    # faster_detections = run_supervision_slicer(faster_model, original_image)
+
+    # # 2. YOLO로 ssafy_laptop bbox 탐지
+    # laptop_bboxes = detect_laptop_bbox(yolo_model, original_image)
+
+    # # 3. Faster detection 중 laptop bbox 내부 결과만 필터링
+    # filtered_detections = filter_by_yolo(faster_detections, laptop_bboxes)
+    # # filtered_detections = filter_and_classify(faster_detections, laptop_bboxes, image)
+
+    # # 4. 이미지 시각화만 저장
+    # new_image = save_annotated_image(original_image, filtered_detections)
     # ---------------------------------
 
     # 3) 새로운 이미지 S3 키 만들기
@@ -195,120 +195,214 @@ def analyze():
 
     # 최종 반환
     result = {
-        "damage" : len(filtered_detections), # 적용 결과 (✨수정함✨)
+        "damage" : len(filtered_results), # 적용 결과 (✨수정함✨)
+        # "damage" : len(filtered_detections), # 적용 결과 (✨수정함✨)
         "uploadName" : f"analyzed_{s3_key}",
     }
     logger.debug(f"Response: {result}")
     return jsonify(result)
 
-# ✅ 1, Faster R-CNN 모델 로드
-def load_faster_model():
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=None, num_classes=2)
-    model.load_state_dict(torch.load(faster_model_path, map_location=device))
-    model.to(device)
+# ✅ 1. model 불러오기
+def load_model():
+    model = fasterrcnn_resnet50_fpn(weights=None)
+    in_features = model.roi_heads.box_predictor.cls_score.in_features
+    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+    state_dict = torch.load(faster_model_path, map_location=torch.device('cpu'))
+    model.load_state_dict(state_dict)
     model.eval()
     print("✅ Faster R-CNN 모델 로드 완료")
     return model
 
-# ✅ 2. YOLO 모델 로드
+# ✅ 2. 이미지 로드 및 전처리
+def load_image(pil_image):
+    image = pil_image.convert("RGB")                # 3채널 RGB 이미지로 변환
+    transform = T.ToTensor()                        # 픽셀값 정규화(float 32)
+    return transform(image).unsqueeze(0)            # tensor 리턴
+
+# ✅ 3. 모델 추론 결과 반환
+def predict_and_get_result(model, image_tensor):
+    with torch.no_grad():
+        output = model(image_tensor)[0]
+
+    result = []
+    for box, score in zip(output['boxes'], output['scores']):
+        if score >= score_threshold:
+            result.append({
+                "bbox": box.tolist(),
+                "score": float(score)
+            })
+    print(f"✅ Faster 결과 추론 완료: {len(result)}개 bbox")
+    return result
+
+# ✅ 4. YOLO 모델 로드
 def load_yolo_model():
     model = YOLO(yolo_model_path)
     print("✅ YOLO 모델 로드 완료")
     return model
 
-# ✅ 3. Faster R-CNN 전체 이미지 Slicer
-def run_supervision_slicer(faster_model, pil_image):
-    def callback(pil_slice: Image.Image) -> sv.Detections:
-        pil_image = Image.fromarray(pil_slice)
-        image_tensor = F.to_tensor(pil_image.convert("RGB")).unsqueeze(0).to(device)
-
-
-        with torch.no_grad():
-            output = faster_model(image_tensor)[0]
-
-        boxes = output['boxes']
-        scores = output['scores']
-        labels = output['labels']
-
-        keep = scores > faster_threshold
-
-        boxes = boxes[keep].cpu().numpy()
-        scores = scores[keep].cpu().numpy()
-        labels = labels[keep].cpu().numpy()
-
-        return sv.Detections(
-            xyxy=boxes,
-            confidence=scores,
-            class_id=labels
-        )
-
-    slicer = sv.InferenceSlicer(callback=callback)
-    # slicer = sv.InferenceSlicer(callback=callback, overlap_wh=(100, 100)) # 얘는 겹치는 거
-    detections = slicer(np.array(pil_image))
-
-    all_detections = []
-    for box, score, cls_id in zip(detections.xyxy, detections.confidence, detections.class_id):
-        all_detections.append({
-            "bbox": [float(v) for v in box],
-            "score": float(score),
-            "label": class_names[cls_id]
-        })
-
-    print(f"✅ Faster 전체 detection 개수: {len(all_detections)}")
-    return all_detections
-
-# ✅ 4. YOLO로 ssafy_laptop bbox 가져오기
-def detect_laptop_bbox(yolo_model, pil_image):
+# ✅ 5. YOLO 추론 결과 반환
+def detect_laptop_yolo(model, pil_image):
     img = np.array(pil_image.convert("RGB"))  # Pillow → numpy array
-    results = yolo_model.predict(img, conf=yolo_threshold)  # predict() 권장
-    laptop_bboxes = []
+    img = img[..., ::-1]  # RGB → BGR 변환 (YOLO는 BGR도 지원)
+    results = model.predict(img, conf=yolo_threshold)  # predict() 권장
+    
+    result = []
 
     for box in results[0].boxes:
         cls_id = int(box.cls)
-        label = yolo_model.names[cls_id]
+        label = model.names[cls_id]
         conf = float(box.conf)
         xyxy = box.xyxy.cpu().tolist()[0]
         if label == "ssafy_laptop":
-            laptop_bboxes.append([int(x) for x in xyxy])
+            result.append({
+                "bbox": xyxy,
+                "label": label,
+                "score": conf
+            })
 
-    print(f"✅ YOLO 결과 추론 완료: {len(laptop_bboxes)}개 bbox")
-    return laptop_bboxes
+    print(f"✅ YOLO 결과 추론 완료: {len(result)}개 bbox")
+    return result
 
-# ✅ 5. Faster 결과를 YOLO bbox 내부만 필터링
-def filter_by_yolo(faster_detections, laptop_bboxes):
-    if not laptop_bboxes:
-        print("⚠ ssafy_laptop bbox가 없습니다.")
+# 범위 안에 있는지 없는지 확인하는 함수
+def is_inside(inner_box, outer_box):
+    x1, y1, x2, y2 = inner_box
+    X1, Y1, X2, Y2 = outer_box
+    return (x1 >= X1) and (y1 >= Y1) and (x2 <= X2) and (y2 <= Y2)
+
+# ✅ 6. Faster 결과를 YOLO bbox 내부 결과만 필터링
+def filter_faster_by_yolo(faster_results, yolo_results):
+    if len(yolo_results) == 0:
+        print("⚠ YOLO 결과가 없습니다.")
         return []
 
-    X1, Y1, X2, Y2 = laptop_bboxes[0]  # laptop이 1개라고 가정
-
-    def is_inside(box):
-        x1, y1, x2, y2 = box
-        return (x1 >= X1) and (y1 >= Y1) and (x2 <= X2) and (y2 <= Y2)
-
-    filtered = [det for det in faster_detections if is_inside(det['bbox'])]
+    laptop_box = yolo_results[0]['bbox']
+    filtered = [det for det in faster_results if is_inside(det['bbox'], laptop_box)]
     print(f"✨ 필터링된 bbox 개수: {len(filtered)}")
     return filtered
 
-# ✅ 6. bbox 이미지 그리기 후 PIL Image 반환
-def save_annotated_image(pil_image, detections):
-    draw = ImageDraw.Draw(pil_image)
+# ✅ 7. bbox 이미지로 저장 (cv2 없이 PIL로만)
+def visualize_filtered(image_path, filtered_results):
+    image = Image.open(image_path).convert("RGB")
+    draw = ImageDraw.Draw(image)
 
-    for det in detections:
+    for det in filtered_results:
         box = det['bbox']
         score = det['score']
-        label = det['label']
         x1, y1, x2, y2 = map(int, box)
+        draw.rectangle([(x1, y1), (x2, y2)], outline=(255, 0, 0), width=2)
+        draw.text((x1, y1 - 10), f"damage {score:.2f}", fill=(255, 0, 0))
 
-        # ✅ bbox 그리기 (파란색)
-        draw.rectangle([x1, y1, x2, y2], outline=(0, 0, 255), width=3)
+    print(f"✅ 필터링된 bbox 이미지 변환 완료 (PIL 버전)")
+    return image
 
-        # ✅ label 및 score 출력
-        text = f"{label} {score:.2f}"
-        draw.text((x1, y1 - 10), text, fill=(0, 0, 255))
+# # ✅ 1, Faster R-CNN 모델 로드
+# def load_faster_model():
+#     model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=None, num_classes=2)
+#     model.load_state_dict(torch.load(faster_model_path, map_location=device))
+#     model.to(device)
+#     model.eval()
+#     print("✅ Faster R-CNN 모델 로드 완료")
+#     return model
 
-    print(f"✅ bbox 이미지(PIL) 변환 완료 (리턴 형태)")
-    return pil_image
+# # ✅ 2. YOLO 모델 로드
+# def load_yolo_model():
+#     model = YOLO(yolo_model_path)
+#     print("✅ YOLO 모델 로드 완료")
+#     return model
+
+# # ✅ 3. Faster R-CNN 전체 이미지 Slicer
+# def run_supervision_slicer(faster_model, pil_image):
+#     def callback(pil_slice: Image.Image) -> sv.Detections:
+#         pil_image = Image.fromarray(pil_slice)
+#         image_tensor = F.to_tensor(pil_image.convert("RGB")).unsqueeze(0).to(device)
+
+
+#         with torch.no_grad():
+#             output = faster_model(image_tensor)[0]
+
+#         boxes = output['boxes']
+#         scores = output['scores']
+#         labels = output['labels']
+
+#         keep = scores > faster_threshold
+
+#         boxes = boxes[keep].cpu().numpy()
+#         scores = scores[keep].cpu().numpy()
+#         labels = labels[keep].cpu().numpy()
+
+#         return sv.Detections(
+#             xyxy=boxes,
+#             confidence=scores,
+#             class_id=labels
+#         )
+
+#     slicer = sv.InferenceSlicer(callback=callback)
+#     # slicer = sv.InferenceSlicer(callback=callback, overlap_wh=(100, 100)) # 얘는 겹치는 거
+#     detections = slicer(np.array(pil_image))
+
+#     all_detections = []
+#     for box, score, cls_id in zip(detections.xyxy, detections.confidence, detections.class_id):
+#         all_detections.append({
+#             "bbox": [float(v) for v in box],
+#             "score": float(score),
+#             "label": class_names[cls_id]
+#         })
+
+#     print(f"✅ Faster 전체 detection 개수: {len(all_detections)}")
+#     return all_detections
+
+# # ✅ 4. YOLO로 ssafy_laptop bbox 가져오기
+# def detect_laptop_bbox(yolo_model, pil_image):
+#     img = np.array(pil_image.convert("RGB"))  # Pillow → numpy array
+#     results = yolo_model.predict(img, conf=yolo_threshold)  # predict() 권장
+#     laptop_bboxes = []
+
+#     for box in results[0].boxes:
+#         cls_id = int(box.cls)
+#         label = yolo_model.names[cls_id]
+#         conf = float(box.conf)
+#         xyxy = box.xyxy.cpu().tolist()[0]
+#         if label == "ssafy_laptop":
+#             laptop_bboxes.append([int(x) for x in xyxy])
+
+#     print(f"✅ YOLO 결과 추론 완료: {len(laptop_bboxes)}개 bbox")
+#     return laptop_bboxes
+
+# # ✅ 5. Faster 결과를 YOLO bbox 내부만 필터링
+# def filter_by_yolo(faster_detections, laptop_bboxes):
+#     if not laptop_bboxes:
+#         print("⚠ ssafy_laptop bbox가 없습니다.")
+#         return []
+
+#     X1, Y1, X2, Y2 = laptop_bboxes[0]  # laptop이 1개라고 가정
+
+#     def is_inside(box):
+#         x1, y1, x2, y2 = box
+#         return (x1 >= X1) and (y1 >= Y1) and (x2 <= X2) and (y2 <= Y2)
+
+#     filtered = [det for det in faster_detections if is_inside(det['bbox'])]
+#     print(f"✨ 필터링된 bbox 개수: {len(filtered)}")
+#     return filtered
+
+# # ✅ 6. bbox 이미지 그리기 후 PIL Image 반환
+# def save_annotated_image(pil_image, detections):
+#     draw = ImageDraw.Draw(pil_image)
+
+#     for det in detections:
+#         box = det['bbox']
+#         score = det['score']
+#         label = det['label']
+#         x1, y1, x2, y2 = map(int, box)
+
+#         # ✅ bbox 그리기 (파란색)
+#         draw.rectangle([x1, y1, x2, y2], outline=(0, 0, 255), width=3)
+
+#         # ✅ label 및 score 출력
+#         text = f"{label} {score:.2f}"
+#         draw.text((x1, y1 - 10), text, fill=(0, 0, 255))
+
+#     print(f"✅ bbox 이미지(PIL) 변환 완료 (리턴 형태)")
+#     return pil_image
 
 
 # Flask 앱 실행
