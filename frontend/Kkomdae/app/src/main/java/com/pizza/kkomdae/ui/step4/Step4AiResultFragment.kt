@@ -33,6 +33,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 ) {
     private lateinit var mainActivity: MainActivity
     private val viewModel : FinalViewModel by activityViewModels()
+    private var adaterIndex =0
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -43,7 +44,6 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     private var param1: String? = null
     private var param2: String? = null
     private var step = 0
-    private var imageList : List<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +56,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.getAiPhoto()
+
         val data = listOf(
             Step4AiResult(R.drawable.ic_front_laptop, "전면부"),
             Step4AiResult(R.drawable.ic_guide_back, "후면부"),
@@ -66,14 +68,16 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         )
         val adapter =Step4AiResultAdapter(data, listen = {
             changeImage(it)
+            adaterIndex = it
         })
-
-        // api 호출
-        viewModel.getAiPhoto()
 
         // 재촬영 이미지 uri 서버로 보내기
         viewModel.reCameraUri.observe(viewLifecycleOwner){
             // todo 로딩 화면 추가
+            Glide.with(binding.ivImage)
+                .load("")
+                .into(binding.ivImage)
+
             viewModel.reCameraStage.value?.let {
                 adapter.showTextAt(it-1)
             }
@@ -86,32 +90,34 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         viewModel.rePhoto1.observe(viewLifecycleOwner){
             adapter.hideTextAt(0)
             viewModel.clearRePhoto1()
+            changeImage(adaterIndex)
 
         }
         viewModel.rePhoto2.observe(viewLifecycleOwner){
             adapter.hideTextAt(1)
             viewModel.clearRePhoto2()
+            changeImage(adaterIndex)
         }
         viewModel.rePhoto3.observe(viewLifecycleOwner){
             adapter.hideTextAt(2)
             viewModel.clearRePhoto3()
+            changeImage(adaterIndex)
         }
         viewModel.rePhoto4.observe(viewLifecycleOwner){
             adapter.hideTextAt(3)
             viewModel.clearRePhoto4()
+            changeImage(adaterIndex)
         }
         viewModel.rePhoto5.observe(viewLifecycleOwner){
             adapter.hideTextAt(4)
             viewModel.clearRePhoto5()
+            changeImage(adaterIndex)
         }
         viewModel.rePhoto6.observe(viewLifecycleOwner){
             adapter.hideTextAt(5)
             viewModel.clearRePhoto6()
+            changeImage(adaterIndex)
         }
-
-
-
-
 
 
         binding.ivImage.setOnClickListener {
@@ -127,20 +133,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             transaction.commit()
         }
 
-        viewModel.frontUri.observe(viewLifecycleOwner){
-            if (it==""){
-                Glide.with(this)
-                    .asGif()
-                    //todo 로딩 gif 추가
-                    .load(R.raw.loading1)
-                    .into(binding.ivImage)
-            }else{
-                Glide.with(binding.ivImage)
-                    .load(it)
-                    .into(binding.ivImage)
-            }
 
-        }
 
 
 
@@ -189,6 +182,13 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             mainActivity.reCamera(step)
         }
 
+        viewModel.frontUri.observe(viewLifecycleOwner){
+            Glide.with(binding.ivImage)
+                .load(it)
+                .into(binding.ivImage)
+        }
+
+
 
 
     }
@@ -235,8 +235,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         }
         if(url==""){
             Glide.with(this)
-                .asGif()
-                .load(R.raw.login_loading)
+                .load("")
                 .into(binding.ivImage)
         }else{
             Glide.with(binding.ivImage)

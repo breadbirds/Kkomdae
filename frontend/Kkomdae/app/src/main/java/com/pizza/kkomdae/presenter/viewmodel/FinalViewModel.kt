@@ -159,7 +159,6 @@ class FinalViewModel @Inject constructor(
         val loadingUrl = ""
         when(stage){
             1->{
-
                 _frontUri.postValue(loadingUrl)
             }
             2->{
