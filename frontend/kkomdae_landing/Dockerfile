@@ -32,3 +32,4 @@ EXPOSE 80
 # 11 Nginx를 데몬 모드가 아닌 포그라운드 모드로 실행
 CMD ["nginx", "-g", "daemon off;"]
 
+
