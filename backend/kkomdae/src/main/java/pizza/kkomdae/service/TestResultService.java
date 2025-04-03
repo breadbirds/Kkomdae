@@ -190,7 +190,8 @@ public class TestResultService {
         testResult.updateTestResult(
                 testResultReq.getTestType(),
                 testResultReq.isSuccess(),
-                (List) testResultReq.getDetail()
+                (List) testResultReq.getDetail(),
+                testResultReq.getSummary()
         );
 
         // 4. 저장
@@ -204,6 +205,7 @@ public class TestResultService {
         );
     }
 
+    @Transactional
     public void fourthStage(ForthStageReq forthStageReq) {
         LaptopTestResult result = lapTopTestResultRepository.findById(forthStageReq.getTestId()).orElseThrow(()->new RuntimeException("testId 오류"));
         result.setDescription(forthStageReq.getDescription());

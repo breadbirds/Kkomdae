@@ -48,6 +48,12 @@ object FinalMapper {
         Picture5_ai_name = apiPhotoDataDto.photo5_ai_name,
         Picture6_ai_url=apiPhotoDataDto.photo6_ai_url,
         Picture6_ai_name = apiPhotoDataDto.photo6_ai_name,
+        photo1_ai_damage = apiPhotoDataDto.photo1_ai_damage,
+        photo2_ai_damage = apiPhotoDataDto.photo2_ai_damage,
+        photo3_ai_damage=apiPhotoDataDto.photo3_ai_damage,
+        photo4_ai_damage = apiPhotoDataDto.photo4_ai_damage,
+        photo5_ai_damage = apiPhotoDataDto.photo5_ai_damage,
+        photo6_ai_damage = apiPhotoDataDto.photo6_ai_damage
     )
 
     fun toPostRePhotoResponse(postRePhotoResponseDto: PostRePhotoResponseDto) = PostRePhotoResponse(

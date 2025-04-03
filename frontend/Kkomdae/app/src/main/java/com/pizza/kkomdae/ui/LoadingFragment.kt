@@ -11,8 +11,10 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.pizza.kkomdae.R
+import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.ui.step3.FinalResultFragment
 import com.pizza.kkomdae.ui.step4.Step4AiResultFragment
 
@@ -39,6 +41,8 @@ class LoadingFragment : Fragment() {
     private lateinit var check3: ImageView
 
     private lateinit var btn_next: Button
+
+    private val viewModel : FinalViewModel by activityViewModels()
 
     // 제목
     private val stageTitles = arrayOf(
@@ -85,6 +89,9 @@ class LoadingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // api 호출
+
 
         // UI 요소 초기화
         tv_title = view.findViewById(R.id.tv_title)

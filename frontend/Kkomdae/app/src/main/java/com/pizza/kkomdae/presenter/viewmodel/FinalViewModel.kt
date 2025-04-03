@@ -41,6 +41,9 @@ class FinalViewModel @Inject constructor(
     private val finalUseCase: FinalUseCase
 ) :  AndroidViewModel(application) {
 
+    private val _initFrontUri = MutableLiveData<String?>()
+    val initFrontUri: LiveData<String?>
+        get() = _initFrontUri
 
     private val _pdfName = MutableLiveData<String>()
     val pdfName: LiveData<String>
@@ -93,6 +96,37 @@ class FinalViewModel @Inject constructor(
     val reCameraUri: LiveData<Uri?>
         get() = _reCameraUri
 
+    // 전면부 데미지 수
+    private val _frontDamage = MutableLiveData<Int?>()
+    val frontDamage: LiveData<Int?>
+        get() = _frontDamage
+
+    // 후면부 데미지 수
+    private val _backDamage = MutableLiveData<Int?>()
+    val backDamage: LiveData<Int?>
+        get() = _backDamage
+
+    //좌측면 전면부 데미지 수
+    private val _leftDamage = MutableLiveData<Int?>()
+    val leftDamage: LiveData<Int?>
+        get() = _leftDamage
+
+    // 우측면 데미지 수
+    private val _rightDamage = MutableLiveData<Int?>()
+    val rightDamage: LiveData<Int?>
+        get() = _rightDamage
+
+    // 모니터 데미지 수
+    private val _screenDamage = MutableLiveData<Int?>()
+    val screenDamage: LiveData<Int?>
+        get() = _screenDamage
+
+    // 키보드 데미지 수
+    private val _keyboardDamage = MutableLiveData<Int?>()
+    val keyboardDamage: LiveData<Int?>
+        get() = _keyboardDamage
+
+
     // 전면부 재촬영 결과
     private val _rePhoto1 = MutableLiveData<PostRePhotoResponse?>()
     val rePhoto1: LiveData<PostRePhotoResponse?>
@@ -123,8 +157,12 @@ class FinalViewModel @Inject constructor(
     val rePhoto6: LiveData<PostRePhotoResponse?>
         get() = _rePhoto6
 
-    val testId = sharedPreferences.getLong("test_id",0)
 
+
+
+    fun clearPostResponse(){
+        _initFrontUri.postValue(null)
+    }
     fun clearRePhoto1(){
         _rePhoto1.postValue(null)
     }
@@ -159,7 +197,6 @@ class FinalViewModel @Inject constructor(
         val loadingUrl = ""
         when(stage){
             1->{
-
                 _frontUri.postValue(loadingUrl)
             }
             2->{
@@ -189,7 +226,7 @@ class FinalViewModel @Inject constructor(
                 val file = uriToImagePart(it)
                 _reCameraUri.postValue(null)
                 try {
-                    finalUseCase.postRePhoto(testId = testId, photoType = reCameraStage.value?:1, file = file).collect { response ->
+                    finalUseCase.postRePhoto(testId = sharedPreferences.getLong("test_id", 0), photoType = reCameraStage.value?:1, file = file).collect { response ->
                         Log.d(TAG, "postRePhoto: $response")
 
                         when(stage){
@@ -298,7 +335,7 @@ class FinalViewModel @Inject constructor(
 
     fun postPdf(){
         viewModelScope.launch {
-            val result = finalUseCase.postPdf(testId)
+            val result = finalUseCase.postPdf(sharedPreferences.getLong("test_id", 0))
             Log.d(TAG, "postPdf: $result")
             result.onSuccess {
                 _pdfName.postValue(it.message)
@@ -308,7 +345,7 @@ class FinalViewModel @Inject constructor(
 
     fun getLaptopTotalResult(){
         viewModelScope.launch {
-            val result = finalUseCase.getLaptopTotalResult(testId)
+            val result = finalUseCase.getLaptopTotalResult(sharedPreferences.getLong("test_id", 0))
             Log.d(TAG, "getLaptopTotalResult: $result")
             result.onSuccess {
                 _getFinalResult.postValue(it)
@@ -320,7 +357,7 @@ class FinalViewModel @Inject constructor(
     fun postFourthStage(description:String){
         viewModelScope.launch {
             val data = FourthStageRequest(
-                testId = testId,
+                testId = sharedPreferences.getLong("test_id", 0),
                 description = description
             )
             val result = finalUseCase.postFourthStage(data)
@@ -336,15 +373,23 @@ class FinalViewModel @Inject constructor(
     fun getAiPhoto(){
 
         viewModelScope.launch {
-            val result = finalUseCase.getAiPhoto(testId)
+            val result = finalUseCase.getAiPhoto(sharedPreferences.getLong("test_id", 0))
+
             Log.d(TAG, "getAiPhoto: $result")
             result.onSuccess {
+                _initFrontUri.postValue(it.data.Picture1_ai_url)
                 _frontUri.postValue(it.data.Picture1_ai_url)
                 _backUri.postValue(it.data.Picture2_ai_url)
                 _leftUri.postValue(it.data.Picture3_ai_url)
                 _rightUri.postValue(it.data.Picture4_ai_url)
                 _screenUri.postValue(it.data.Picture5_ai_url)
                 _keypadUri.postValue(it.data.Picture6_ai_url)
+                _frontDamage.postValue(it.data.photo1_ai_damage)
+                _backDamage.postValue(it.data.photo2_ai_damage)
+                _leftDamage.postValue(it.data.photo3_ai_damage)
+                _rightDamage.postValue(it.data.photo4_ai_damage)
+                _screenDamage.postValue(it.data.photo5_ai_damage)
+                _keyboardDamage.postValue(it.data.photo6_ai_damage)
             }
 
 

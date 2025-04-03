@@ -36,7 +36,8 @@ public class LaptopTestResult {
     // 배터리 테스트 관련
     private Boolean batteryReport;
     private String batteryReportUrl;
-
+    private String batteryReportSummary;
+    
     private LocalDate date;
     private String pdfFileName;
     private Integer laptop;
@@ -85,7 +86,7 @@ public class LaptopTestResult {
         this.mousePad = thirdStageReq.getMousePad();
     }
 
-    public void updateTestResult(String testType, boolean success, List detail) {
+    public void updateTestResult(String testType, boolean success, List detail, String summary) {
         switch (testType) {
             case "키보드" -> {
                 this.keyboardStatus = success;
@@ -104,6 +105,7 @@ public class LaptopTestResult {
             case "배터리" -> {
                 this.batteryReport = success;
                 this.batteryReportUrl = success ? detail.toString() : null;
+                this.batteryReportSummary = success ? summary : null;
             }
             default -> throw new IllegalArgumentException("유효하지 않은 테스트 타입입니다: " + testType);
         }
