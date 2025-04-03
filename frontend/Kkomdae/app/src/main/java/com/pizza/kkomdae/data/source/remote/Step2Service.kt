@@ -1,9 +1,13 @@
 package com.pizza.kkomdae.data.source.remote
 
+import com.pizza.kkomdae.data.model.dto.GetStep2ResultResponseDto
+import com.pizza.kkomdae.data.model.dto.PostRandomKeyResponseDto
 import com.pizza.kkomdae.data.model.dto.PostSecondStageRequestDto
 import com.pizza.kkomdae.data.model.dto.PostResponseDto
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface Step2Service {
 
@@ -11,4 +15,15 @@ interface Step2Service {
     suspend fun postSecondStage(
         @Body postSecondStageRequestDto: PostSecondStageRequestDto
     ): PostResponseDto
+
+    @POST("api/random-key/{testId}")
+    suspend fun postRandomKey(
+        @Path("testId") testId: Long
+    ): PostRandomKeyResponseDto
+
+    @GET("api/test-result/{testId}")
+    suspend fun getStep2Result(
+        @Path("testId") testId: Long
+    ): GetStep2ResultResponseDto
+
 }
