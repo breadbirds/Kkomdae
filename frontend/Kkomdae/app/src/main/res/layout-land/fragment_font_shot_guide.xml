@@ -21,13 +21,27 @@
     <!-- 📌 오버레이: 네모 틀과 반투명 검은색 배경 -->
     <com.pizza.kkomdae.ui.CameraOverlayView
         android:id="@+id/overlayView"
-        app:layout_constraintDimensionRatio="4:3"
+        app:layout_constraintDimensionRatio="16:9"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:visibility="gone"/>
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/loadingLottie"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="false"
+        app:lottie_fileName="loading.json"
+        app:lottie_loop="true" />
 
     <ImageButton
         android:visibility="gone"
