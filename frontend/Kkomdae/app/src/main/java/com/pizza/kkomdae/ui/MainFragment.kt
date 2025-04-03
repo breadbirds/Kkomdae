@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -16,6 +17,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.pizza.kkomdae.MainActivity
 import com.pizza.kkomdae.R
@@ -30,6 +32,7 @@ import com.pizza.kkomdae.ui.guide.Step2GuideFragment
 import com.pizza.kkomdae.ui.step3.FinalResultFragment
 import com.pizza.kkomdae.ui.step3.LaptopInfoInputFragment
 import com.pizza.kkomdae.ui.step4.Step4AiResultFragment
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -81,6 +84,20 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
         val adapter = SubmissionAdapter(clickPdf = {
             Toast.makeText(requireContext(),"pdf 파일이 다운로드 중입니다.",Toast.LENGTH_SHORT).show()
             finalViewModel.getPdfUrl(it)
+        }, clickRelease = {
+
+            if(it.stage!=0 || it.picStage !=0){
+                showContinueDialog()
+                viewModel.saveTestId(it.onGoingTestId.toLong()) // 테스트 아이디
+                viewModel.setRelease(true) // 반납인지 체크
+                viewModel.setReleasePicStage(it.picStage) // 1단계 스테이지 저장
+                step=it.stage
+                Log.d("Post", "onViewCreated: $step")
+            }else{
+                newRelease(it.serialNum)
+            }
+
+
         })
         // 파일명 -> url 변환 통신 결과
         finalViewModel.pdfUrl.observe(viewLifecycleOwner){
@@ -106,9 +123,13 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
 
         // 노트북 카드뷰 클릭 이벤트
         binding.cvLaptop.setOnClickListener {
+
+            step= viewModel.stage.value?:0
+            viewModel.setRelease(false)
             if (step == 0) {
                 navigateToFragment(OathFragment())
             } else {
+                viewModel.saveTestId(viewModel.testId.value?:0)
                 showContinueDialog()
             }
         }
@@ -124,6 +145,20 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
         }
     }
 
+    // 반납 처음 시작할때 testId 생성
+    private fun newRelease(it: String) {
+        lifecycleScope.launch {
+            val response = viewModel.postReleaseTest(it)
+            response.onSuccess {
+                viewModel.setRelease(true)
+                viewModel.saveTestId(it)
+                navigateToFragment(Step1GuideFragment())
+            }.onFailure {
+
+            }
+        }
+    }
+
     private fun updateInProgressIndicator() {
         val inProgressView = binding.cvLaptop.findViewById<TextView>(R.id.tv_in_progress)
 
@@ -136,6 +171,7 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
     }
 
     // 임시저장 다이얼로그 표시
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun showContinueDialog() {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -155,7 +191,9 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
         // 이어하기 버튼
         val confirmButton = dialog.findViewById<TextView>(R.id.btn_confirm)
         confirmButton.setOnClickListener {
+
             dialog.dismiss()
+            Log.d("Post", "showContinueDialog: $step")
 
             // 현재 step에 맞는 화면으로 이동
             when(step) {

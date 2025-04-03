@@ -30,6 +30,7 @@ import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentBackShotGuideBinding
 import com.pizza.kkomdae.databinding.FragmentLaptopInfoInputBinding
+import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.presenter.viewmodel.Step2ViewModel
 import com.pizza.kkomdae.presenter.viewmodel.Step3ViewModel
 import com.pizza.kkomdae.ui.LoadingFragment
@@ -60,6 +61,7 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
 
     private var date = dateFormat.format(now)
     private val viewModel: Step3ViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     // 시스템 백 버튼 콜백 선언
     private lateinit var backPressedCallback: OnBackPressedCallback
@@ -510,7 +512,7 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         // 입력 완료하기 버튼 클릭 리스너
         val confirmButton = dialog.findViewById<View>(R.id.btn_confirm)
         confirmButton.setOnClickListener {
-            viewModel.postThirdStage()
+            viewModel.postThirdStage(mainViewModel.release.value?:false)
             dialog.dismiss()
 
         }
