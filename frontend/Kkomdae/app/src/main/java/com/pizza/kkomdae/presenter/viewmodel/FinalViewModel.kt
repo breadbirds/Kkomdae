@@ -41,6 +41,9 @@ class FinalViewModel @Inject constructor(
     private val finalUseCase: FinalUseCase
 ) :  AndroidViewModel(application) {
 
+    private val _postResponse = MutableLiveData<Boolean?>()
+    val postResponse: LiveData<Boolean?>
+        get() = _postResponse
 
     private val _pdfName = MutableLiveData<String>()
     val pdfName: LiveData<String>
@@ -125,6 +128,9 @@ class FinalViewModel @Inject constructor(
 
     val testId = sharedPreferences.getLong("test_id",0)
 
+    fun clearPostResponse(){
+        _postResponse.postValue(null)
+    }
     fun clearRePhoto1(){
         _rePhoto1.postValue(null)
     }
@@ -336,8 +342,10 @@ class FinalViewModel @Inject constructor(
 
         viewModelScope.launch {
             val result = finalUseCase.getAiPhoto(testId)
+
             Log.d(TAG, "getAiPhoto: $result")
             result.onSuccess {
+                _postResponse.postValue(true)
                 _frontUri.postValue(it.data.Picture1_ai_url)
                 _backUri.postValue(it.data.Picture2_ai_url)
                 _leftUri.postValue(it.data.Picture3_ai_url)

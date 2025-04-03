@@ -182,11 +182,14 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             mainActivity.reCamera(step)
         }
 
-        viewModel.frontUri.observe(viewLifecycleOwner){
+        viewModel.postResponse.observe(viewLifecycleOwner){
             Glide.with(binding.ivImage)
-                .load(it)
+                .load(viewModel.frontUri.value)
                 .into(binding.ivImage)
+            viewModel.clearPostResponse()
+
         }
+
 
 
 
