@@ -5,6 +5,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,6 +35,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     private lateinit var mainActivity: MainActivity
     private val viewModel : FinalViewModel by activityViewModels()
     private var adaterIndex =0
+
+    private var currentToast: Toast? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -75,9 +78,12 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         viewModel.reCameraUri.observe(viewLifecycleOwner){
             // todo 로딩 화면 추가
             Log.d(TAG, "onViewCreated: reCameraUri")
-            Glide.with(binding.ivImage)
-                .load("")
-                .into(binding.ivImage)
+//            Glide.with(binding.ivImage)
+//                .load("")
+//                .into(binding.ivImage)
+
+            binding.ivImage.visibility = View.INVISIBLE
+            binding.loadingAnimation.visibility = View.VISIBLE
 
             viewModel.reCameraStage.value?.let {
                 adapter.showTextAt(it-1)
@@ -90,36 +96,77 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
         viewModel.rePhoto1.observe(viewLifecycleOwner){
             adapter.hideTextAt(0)
+            // 로딩 애니메이션 숨기기
+            binding.loadingAnimation.visibility = View.GONE
+            binding.ivImage.visibility = View.VISIBLE
+
             viewModel.clearRePhoto1()
             changeImage(adaterIndex)
 
+            // 토스트 메시지 표시
+            showToast("전면부 사진이 재분석되었습니다.")
         }
+        
         viewModel.rePhoto2.observe(viewLifecycleOwner){
             adapter.hideTextAt(1)
+            // 로딩 애니메이션 숨기기
+            binding.loadingAnimation.visibility = View.GONE
+            binding.ivImage.visibility = View.VISIBLE
+
             viewModel.clearRePhoto2()
             changeImage(adaterIndex)
+
+            // 토스트 메시지 표시
+            showToast("후면부 사진이 재분석되었습니다.")
         }
         viewModel.rePhoto3.observe(viewLifecycleOwner){
             adapter.hideTextAt(2)
+            // 로딩 애니메이션 숨기기
+            binding.loadingAnimation.visibility = View.GONE
+            binding.ivImage.visibility = View.VISIBLE
+
             viewModel.clearRePhoto3()
             changeImage(adaterIndex)
+
+            // 토스트 메시지 표시
+            showToast("좌측면 사진이 재분석되었습니다.")
         }
         viewModel.rePhoto4.observe(viewLifecycleOwner){
             adapter.hideTextAt(3)
+            // 로딩 애니메이션 숨기기
+            binding.loadingAnimation.visibility = View.GONE
+            binding.ivImage.visibility = View.VISIBLE
+
             viewModel.clearRePhoto4()
             changeImage(adaterIndex)
+
+            // 토스트 메시지 표시
+            showToast("우측면 사진이 재분석되었습니다.")
         }
         viewModel.rePhoto5.observe(viewLifecycleOwner){
             adapter.hideTextAt(4)
+            // 로딩 애니메이션 숨기기
+            binding.loadingAnimation.visibility = View.GONE
+            binding.ivImage.visibility = View.VISIBLE
+
             viewModel.clearRePhoto5()
             changeImage(adaterIndex)
+
+            // 토스트 메시지 표시
+            showToast("모니터 사진이 재분석되었습니다.")
         }
         viewModel.rePhoto6.observe(viewLifecycleOwner){
             adapter.hideTextAt(5)
+            // 로딩 애니메이션 숨기기
+            binding.loadingAnimation.visibility = View.GONE
+            binding.ivImage.visibility = View.VISIBLE
+
             viewModel.clearRePhoto6()
             changeImage(adaterIndex)
-        }
 
+            // 토스트 메시지 표시
+            showToast("키보드 사진이 재분석되었습니다.")
+        }
 
         binding.ivImage.setOnClickListener {
             val bundle = Bundle()
@@ -133,9 +180,6 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             transaction.addToBackStack(null)
             transaction.commit()
         }
-
-
-
 
 
 
@@ -185,15 +229,15 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
         viewModel.initFrontUri.observe(viewLifecycleOwner){
             Log.d(TAG, "onViewCreated: postResponse")
+            // 로딩 애니메이션 숨기기
+            binding.loadingAnimation.visibility = View.GONE
+            binding.ivImage.visibility = View.VISIBLE
+
             Glide.with(binding.ivImage)
                 .load(viewModel.initFrontUri.value)
                 .into(binding.ivImage)
 
         }
-
-
-
-
 
     }
 
@@ -239,15 +283,25 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         }
         Log.d(TAG, "changeImage_url:$url ")
         if(url==""){
+            binding.loadingAnimation.visibility = View.VISIBLE
+            binding.ivImage.visibility = View.INVISIBLE
             Glide.with(this)
                 .load("")
                 .into(binding.ivImage)
         }else{
+            binding.loadingAnimation.visibility = View.GONE
+            binding.ivImage.visibility = View.VISIBLE
             Glide.with(binding.ivImage)
                 .load(url)
                 .into(binding.ivImage)
         }
 
+    }
+
+    private fun showToast(message: String) {
+        currentToast?.cancel()
+        currentToast = Toast.makeText(requireContext(), message, Toast.LENGTH_LONG)
+        currentToast?.show()
     }
 
     companion object {
