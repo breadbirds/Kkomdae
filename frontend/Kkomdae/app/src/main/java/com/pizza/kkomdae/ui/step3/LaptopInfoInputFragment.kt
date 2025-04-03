@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -60,6 +61,9 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
     private var date = dateFormat.format(now)
     private val viewModel: Step3ViewModel by activityViewModels()
 
+    // 시스템 백 버튼 콜백 선언
+    private lateinit var backPressedCallback: OnBackPressedCallback
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +71,20 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+        // 시스템 백 버튼 동작 설정
+        backPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                showQuitBottomSheet()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, backPressedCallback)
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        backPressedCallback.remove()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

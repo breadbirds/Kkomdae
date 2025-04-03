@@ -137,7 +137,7 @@ class AllStepOnboardingFragment : BaseFragment<FragmentAllStepOnboardingBinding>
                 super.onPageSelected(position)
                 updateIndicators(position)
 
-                // 마지막 페이지에서만 완료 버튼 표시
+                // 마지막 페이지에서만 버튼 표시
                 binding.btnFinish.visibility = if (position == onboardingSteps.size - 1) {
                     View.VISIBLE
                 } else {
