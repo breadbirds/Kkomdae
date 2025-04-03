@@ -58,6 +58,9 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
         viewModel.getAiPhoto()
 
+//        viewModel.frontDamage.value
+        // todo 개수
+
         val data = listOf(
             Step4AiResult(R.drawable.ic_front_laptop, "전면부"),
             Step4AiResult(R.drawable.ic_guide_back, "후면부"),

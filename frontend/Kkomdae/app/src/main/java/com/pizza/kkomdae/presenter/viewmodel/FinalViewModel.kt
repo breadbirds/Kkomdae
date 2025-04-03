@@ -96,6 +96,37 @@ class FinalViewModel @Inject constructor(
     val reCameraUri: LiveData<Uri?>
         get() = _reCameraUri
 
+    // 전면부 데미지 수
+    private val _frontDamage = MutableLiveData<Int?>()
+    val frontDamage: LiveData<Int?>
+        get() = _frontDamage
+
+    // 후면부 데미지 수
+    private val _backDamage = MutableLiveData<Int?>()
+    val backDamage: LiveData<Int?>
+        get() = _backDamage
+
+    //좌측면 전면부 데미지 수
+    private val _leftDamage = MutableLiveData<Int?>()
+    val leftDamage: LiveData<Int?>
+        get() = _leftDamage
+
+    // 우측면 데미지 수
+    private val _rightDamage = MutableLiveData<Int?>()
+    val rightDamage: LiveData<Int?>
+        get() = _rightDamage
+
+    // 모니터 데미지 수
+    private val _screenDamage = MutableLiveData<Int?>()
+    val screenDamage: LiveData<Int?>
+        get() = _screenDamage
+
+    // 키보드 데미지 수
+    private val _keyboardDamage = MutableLiveData<Int?>()
+    val keyboardDamage: LiveData<Int?>
+        get() = _keyboardDamage
+
+
     // 전면부 재촬영 결과
     private val _rePhoto1 = MutableLiveData<PostRePhotoResponse?>()
     val rePhoto1: LiveData<PostRePhotoResponse?>
@@ -125,6 +156,7 @@ class FinalViewModel @Inject constructor(
     private val _rePhoto6 = MutableLiveData<PostRePhotoResponse?>()
     val rePhoto6: LiveData<PostRePhotoResponse?>
         get() = _rePhoto6
+
 
 
 
@@ -352,6 +384,12 @@ class FinalViewModel @Inject constructor(
                 _rightUri.postValue(it.data.Picture4_ai_url)
                 _screenUri.postValue(it.data.Picture5_ai_url)
                 _keypadUri.postValue(it.data.Picture6_ai_url)
+                _frontDamage.postValue(it.data.photo1_ai_damage)
+                _backDamage.postValue(it.data.photo2_ai_damage)
+                _leftDamage.postValue(it.data.photo3_ai_damage)
+                _rightDamage.postValue(it.data.photo4_ai_damage)
+                _screenDamage.postValue(it.data.photo5_ai_damage)
+                _keyboardDamage.postValue(it.data.photo6_ai_damage)
             }
 
 
