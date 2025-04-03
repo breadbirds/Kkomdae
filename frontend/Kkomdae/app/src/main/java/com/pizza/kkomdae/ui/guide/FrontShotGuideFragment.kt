@@ -19,6 +19,7 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.util.Size
 import androidx.fragment.app.Fragment
@@ -59,6 +60,8 @@ import java.nio.channels.FileChannel
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.math.abs
+import kotlin.collections.ArrayDeque
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -92,14 +95,37 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
     // 이전 프레임과 비교를 위한 상태
     private var lastBox: BBox? = null
     private var stableFrameCount = 0
-    private val requiredStableFrames = 5
-    private val candidateBitmaps = mutableListOf<Bitmap>()
+    private val requiredStableFrames = 3
+    // Bitmap Pool (비트맵 재사용) 기법
+    private val MAX_CANDIDATE_FRAMES = 3   // 후보 프레임 최대 개수 제한
+    private val candidateBitmaps = ArrayDeque<Bitmap>() // → 큐 자료구조 사용
+    private var preview: Preview? = null
+
+    companion object {
+        /**
+         * Use this factory method to create a new instance of
+         * this fragment using the provided parameters.
+         *
+         * @param param1 Parameter 1.
+         * @param param2 Parameter 2.
+         * @return A new instance of fragment FontShotGuideFragment.
+         */
+        // TODO: Rename and change types and number of parameters
+        @JvmStatic
+        fun newInstance(param1: String, param2: String) =
+            FrontShotGuideFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_PARAM1, param1)
+                    putString(ARG_PARAM2, param2)
+                }
+            }
+    }
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         cameraActivity = context as CameraActivity
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -107,7 +133,6 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             param2 = it.getString(ARG_PARAM2)
         }
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
@@ -189,7 +214,7 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             // ✅ 1. Preview <- 미리 보기 구성. (Preview 화면 연결하여 미리보기 영상 출력)
-            val preview = Preview.Builder()
+            preview = Preview.Builder()
                 .setTargetResolution(my_preview_resolution) // 원하는 해상도 요청 <- 최대한 높은 걸로 달라고 요청
 //                .setTargetAspectRatio(AspectRatio.RATIO_4_3) // 📌 비율 설정
                 .build().also {
@@ -233,6 +258,7 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
+    // 촬영 버튼 눌러서 촬영 함수
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
 
@@ -244,16 +270,29 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
         imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(requireContext()),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-
-                    val savedUri = Uri.fromFile(photoFile)
-                    Log.d("CameraFragment", "사진 저장됨: $savedUri")
-
-                    // ✅ ViewModel에 사진 저장
-                    viewModel.setFront(savedUri)
-                    viewModel.setStep(1)
-
                     shutdownCamera()
-                    cameraActivity.changeFragment(0)
+
+                    // ✅ 2️⃣ 로티 띄우기
+                    binding.loadingLottie?.visibility = View.VISIBLE
+                    binding.loadingLottie?.playAnimation()
+
+                    Thread {
+                        val savedUri = Uri.fromFile(photoFile)
+                        Log.d("CameraFragment", "사진 저장됨: $savedUri")
+
+                        // ✅ 4️⃣ UI Thread 복귀
+                        Handler(Looper.getMainLooper()).post {
+                            Log.d("CameraFragment", "사진 저장됨: $savedUri")
+                            viewModel.setFront(savedUri)
+                            viewModel.setStep(1)
+
+                            binding.loadingLottie?.cancelAnimation()
+                            binding.loadingLottie?.visibility = View.GONE
+
+                            cameraActivity.changeFragment(0)
+                        }
+
+                    }.start()
                 }
 
                 override fun onError(exception: ImageCaptureException) {
@@ -262,6 +301,7 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             })
     }
 
+    // 자동 촬영 함수
     private fun autoTakePhoto() {
         val imageCapture = imageCapture ?: return
 
@@ -273,66 +313,79 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
         imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(requireContext()),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    Log.d("autoTakePhoto", "👍사진 저장하는 곳에 들어왔어!")
                     val box = lastCapturedBox ?: return
 
-                    val highResBitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
-                    val analyzedWidth = 1280f // 분석에 사용한 비율 그대로
-                    val analyzedHeight = 720f
-
-                    val scaleX = highResBitmap.width / analyzedWidth
-                    val scaleY = highResBitmap.height / analyzedHeight
-
-                    val rectF = RectF(
-                        box.rect.left * scaleX,
-                        box.rect.top * scaleY,
-                        box.rect.right * scaleX,
-                        box.rect.bottom * scaleY
-                    )
-
-                    // ✅ bbox를 중심으로 1.1배 확대
-                    val paddingScale = 1.1f
-                    val centerX = rectF.centerX()
-                    val centerY = rectF.centerY()
-                    val halfWidth = rectF.width() / 2 * paddingScale
-                    val halfHeight = rectF.height() / 2 * paddingScale
-
-                    val expandedRect = RectF(
-                        centerX - halfWidth,
-                        centerY - halfHeight,
-                        centerX + halfWidth,
-                        centerY + halfHeight
-                    )
-
-                    // ✅ [Crop] 이미지 경계 안으로 제한
-                    val cropRect = Rect(
-                        expandedRect.left.toInt().coerceAtLeast(0),
-                        expandedRect.top.toInt().coerceAtLeast(0),
-                        expandedRect.right.toInt().coerceAtMost(highResBitmap.width),
-                        expandedRect.bottom.toInt().coerceAtMost(highResBitmap.height)
-                    )
-
-                    // ✅ crop 된 비트맵 생성
-                    val croppedBitmap = Bitmap.createBitmap(
-                        highResBitmap,
-                        cropRect.left,
-                        cropRect.top,
-                        cropRect.width(),
-                        cropRect.height()
-                    )
-
-                    FileOutputStream(photoFile).use { out ->
-                        croppedBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-                    }
-
-                    val savedUri = Uri.fromFile(photoFile)
-                    Log.d("CameraFragment", "사진 저장됨: $savedUri")
-
-                    // ✅ ViewModel에 사진 저장
-                    viewModel.setFront(savedUri)
-                    viewModel.setStep(1)
-
                     shutdownCamera()
-                    cameraActivity.changeFragment(0)
+
+                    // ✅ 2️⃣ 로티 띄우기
+                    binding.loadingLottie?.visibility = View.VISIBLE
+                    binding.loadingLottie?.playAnimation()
+
+                    // ✅ 3️⃣ Heavy 작업 백그라운드 처리
+                    Thread {
+                        val highResBitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+
+                        val analyzedWidth = 1280f
+                        val analyzedHeight = 720f
+
+                        val scaleX = highResBitmap.width / analyzedWidth
+                        val scaleY = highResBitmap.height / analyzedHeight
+
+                        val rectF = RectF(
+                            box.rect.left * scaleX,
+                            box.rect.top * scaleY,
+                            box.rect.right * scaleX,
+                            box.rect.bottom * scaleY
+                        )
+
+                        val paddingScale = 1.1f
+                        val centerX = rectF.centerX()
+                        val centerY = rectF.centerY()
+                        val halfWidth = rectF.width() / 2 * paddingScale
+                        val halfHeight = rectF.height() / 2 * paddingScale
+
+                        val expandedRect = RectF(
+                            centerX - halfWidth,
+                            centerY - halfHeight,
+                            centerX + halfWidth,
+                            centerY + halfHeight
+                        )
+
+                        val cropRect = Rect(
+                            expandedRect.left.toInt().coerceAtLeast(0),
+                            expandedRect.top.toInt().coerceAtLeast(0),
+                            expandedRect.right.toInt().coerceAtMost(highResBitmap.width),
+                            expandedRect.bottom.toInt().coerceAtMost(highResBitmap.height)
+                        )
+
+                        val croppedBitmap = Bitmap.createBitmap(
+                            highResBitmap,
+                            cropRect.left,
+                            cropRect.top,
+                            cropRect.width(),
+                            cropRect.height()
+                        )
+
+                        FileOutputStream(photoFile).use { out ->
+                            croppedBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                        }
+
+                        val savedUri = Uri.fromFile(photoFile)
+
+                        // ✅ 4️⃣ UI Thread 복귀
+                        Handler(Looper.getMainLooper()).post {
+                            Log.d("CameraFragment", "사진 저장됨: $savedUri")
+                            viewModel.setFront(savedUri)
+                            viewModel.setStep(1)
+
+                            binding.loadingLottie?.cancelAnimation()
+                            binding.loadingLottie?.visibility = View.GONE
+
+                            cameraActivity.changeFragment(0)
+                        }
+
+                    }.start()
                 }
 
                 override fun onError(exception: ImageCaptureException) {
@@ -349,7 +402,7 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, fileDescriptor.startOffset, fileDescriptor.declaredLength)
     }
 
-    // 이미지를 분석시키는 함수
+    // 이미지를 분석하는 함수
     private fun analyzeImage(imageProxy: ImageProxy) {
         // ImageProxy에서 가져온 카메라 프레임을 Bitmap으로 변환 (YOLO 입력용)
         val bitmap = imageProxyToBitmap(imageProxy)
@@ -362,33 +415,32 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
 
         // YOLO 모델 실행
         // 입력: input
-        // 출력: [1, 5, 8400] 형식 (YOLOv8의 head 출력 → center x/y, width/height, confidence)
+        // 출력: [1, 5, 8400] 형식 (YOLOv11의 head 출력 → center x/y, width/height, confidence)
         val output = Array(1) { Array(5) { FloatArray(8400) } }
         tflite.run(input, output)
 
         // 추론 결과
         val predictions = output[0]
-        // confidence 90%이상만 검출
-        val threshold = 0.8f
-        // YOLO 입력은 항상 640x640
+        // confidence 85%이상만 검출
+        val threshold = 0.85f
         val modelInputSize = 640f
 
-        // 감지된 박스를 저장할 리스트
+        // confidence 75%이상만 검출
         val detectedBoxes = mutableListOf<BBox>()
 
-        // YOLOv8의 전체 anchor/grid 수 (8400개)
+        // YOLOv11의 전체 anchor/grid 수 (8400개)
         for (i in 0 until 8400) {
             val score = predictions[4][i]
+
             // confidence score가 기준을 넘으면 유효한 객체로 간주
             if (score > threshold) {
-
                 // YOLO 640 기준 bbox
                 val cx = predictions[0][i] * modelInputSize
                 val cy = predictions[1][i] * modelInputSize
                 val w = predictions[2][i] * modelInputSize
                 val h = predictions[3][i] * modelInputSize
 
-                // padding 고려해서 원본 비트맵 좌표로 역변환
+                // YOLO 640 기준 bbox
                 val x = (cx - dx) / scale
                 val y = (cy - dy) / scale
                 val width = w / scale
@@ -401,107 +453,98 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
 
                 // 최종적으로 계산한 박스를 BBox 객체로 만들어 리스트에 추가
                 // 나중에 오버레이에 그리거나 베스트 박스를 고르기 위해 사용
-                detectedBoxes.add(BBox(RectF(left, top, right, bottom), "laptop", score))
-                Log.d("BBoxFinal", "BBox: RectF($left, $top, $right, $bottom)")
-
-                // 실제로 Yolo 가 잘 detext하고 있는지 bbox쳐서 갤러리에 저장해주는 로직(삭제)
-//                if (detectedBoxes.isNotEmpty()) {
-//                     saveDebugBitmapWithBoxes(bitmap, detectedBoxes)
-//                }
+                detectedBoxes.add(BBox(RectF(left, top, right, bottom), "ssafy_laptop", score))
+//                Log.d("BBoxFinal", "BBox: RectF($left, $top, $right, $bottom)")
             }
         }
 
-        // 카메라 분석은 백그라운드 쓰레드에서 실행되기 때문에
-        // UI 요소(Toast, TextView 등)를 업데이트하려면 메인(UI) 쓰레드로 이동
-        requireActivity().runOnUiThread {
-            // 감지된 박스들 중에서 가장 넓은 박스 하나만 선택
-            val bestBox = detectedBoxes.maxByOrNull { it.rect.width() * it.rect.height() }
+        // runOnUIThread에서 돌리던 걸 백그라운드로 옮김
 
-            // 탐지된 객체가 있을 때만 아래 로직 실행
-            if (bestBox != null) {
-                val guideRect = binding.overlayView?.getGuideRect() ?: return@runOnUiThread
+        // 감지된 박스들 중에서 가장 넓은 박스 하나만 선택
+        val bestBox = detectedBoxes.maxByOrNull { it.rect.width() * it.rect.height() }
 
-                // 1️⃣ 비율 구하기 (bbox → overlay 변환)
-                val scaleX = binding.overlayView?.width?.div(bitmap.width.toFloat())
-                val scaleY = binding.overlayView?.height?.div(bitmap.height.toFloat())
+        // 탐지된 객체가 있을 때만 아래 로직 실행
+        if (bestBox != null) {
+            val guideRect = binding.overlayView?.getGuideRect() ?: run {
+                imageProxy.close()
+                return
+            }
 
-                // 2️⃣ bbox를 overlay 좌표계로 변환
-                val transformedRect = RectF(
-                    bestBox.rect.left * scaleX!!,
-                    bestBox.rect.top * scaleY!!,
-                    bestBox.rect.right * scaleX,
-                    bestBox.rect.bottom * scaleY
-                )
-                val iou = computeIoU(transformedRect, guideRect)
+            // 1️⃣ 비율 구하기 (bbox → overlay 변환)
+            val scaleX = (binding.overlayView?.width?.div(bitmap.width.toFloat())) ?: 1f
+            val scaleY = (binding.overlayView?.height?.div(bitmap.height.toFloat())) ?: 1f
 
-                // bestBox가 화면 전체에서 차지하는 비율(면적 비율) 계산
-                //  → 나중에 노트북이 충분히 클 때만 촬영하기 위해\
-                val bitmapWidth = bitmap.width.toFloat()
-                val bitmapHeight = bitmap.height.toFloat()
-//                Log.d("화면", "bestBox.rect.width(): ${bestBox.rect.width()} bestBox.rect.height():${bestBox.rect.height()}")
-                val areaRatio = (bestBox.rect.width() * bestBox.rect.height()) / (bitmapWidth * bitmapHeight)
+            // 2️⃣ bbox를 overlay 좌표계로 변환
+            val transformedRect = RectF(
+                bestBox.rect.left * scaleX,
+                bestBox.rect.top * scaleY,
+                bestBox.rect.right * scaleX,
+                bestBox.rect.bottom * scaleY
+            )
+            // bbox가 가이드 라인에 얼마나 유사한지 판단
+            val iou = computeIoU(transformedRect, guideRect)
 
-                // 이전 프레임의 bestBox와 비교해서
-                // 중심좌표의 이동이 100px 이하이면 → "카메라 흔들림 없음"으로 간주
-                // 이전 박스가 없으면 → 그냥 true (처음 프레임)
-                val isPositionStable = lastBox?.let {
-                    val dx = Math.abs(it.rect.centerX() - bestBox.rect.centerX())
-                    val dy = Math.abs(it.rect.centerY() - bestBox.rect.centerY())
-                    dx < 100 && dy < 100  // 100px 이내 움직임이면 "안정"
-                } ?: true
-                Log.d("StableFrames", "count = $stableFrameCount, 위치 통과: $isPositionStable")
+            // 이전 프레임의 bestBox와 비교해서
+            // 중심좌표의 이동이 20px 이하이면 → "카메라 흔들림 없음"으로 간주
+            // 이전 박스가 없으면 → 그냥 true (처음 프레임)
+            val isPositionStable = lastBox?.let {
+                val dx = abs(it.rect.centerX() - bestBox.rect.centerX())
+                val dy = abs(it.rect.centerY() - bestBox.rect.centerY())
+                dx < 20 && dy < 20
+            } ?: true
 
+            // 안정적인 위치에 있을 경우만
+            if (isPositionStable) {
+                // 안정된 프레임으로 인정되면 카운트 증가 (stableFrameCount)
+                stableFrameCount++
+                // 후보 프레임이 너무 많으면 앞에서부터 버림
+                if (candidateBitmaps.size >= MAX_CANDIDATE_FRAMES) {
+                    candidateBitmaps.removeFirst().recycle() // 비트맵 메모리 직접 해제
+                }
+                bitmap.config?.let { bitmap.copy(it, false) }?.let { candidateBitmaps.addLast(it) }
+            } else {
+                // 조건 불만족이면:
+                // 안정 프레임 수 초기화
+                // 후보 비트맵들 전부 삭제 (다시 모아야 함)
+                stableFrameCount = 0
+                candidateBitmaps.clear()
+            }
 
-                // 안정적인 위치에 있을 경우만
-                if (isPositionStable) {
-                    // 안정된 프레임으로 인정되면 카운트 증가 (stableFrameCount)
-                    stableFrameCount++
-                    // 현재 비트맵을 복사해서 candidateBitmaps에 저장
-                    // → 나중에 "베스트 컷" 고르기 위해
-                    bitmap.config?.let { bitmap.copy(it, false) }?.let { candidateBitmaps.add(it) }
-                } else {
-                    // 조건 불만족이면:
-                    // 안정 프레임 수 초기화
-                    // 후보 비트맵들 전부 삭제 (다시 모아야 함)
-                    stableFrameCount = 0
-                    candidateBitmaps.clear()
+            // 다음 프레임 비교를 위해 현재 박스를 저장
+            lastBox = bestBox
+
+            // 📌 IoU가 70% 이상일 때만 촬영 로직 실행
+            // ✅ 10프레임 연속 안정된 상태
+            // ✅ 현재 캡처하는 중이 아님
+            if (iou > 0.7f && stableFrameCount >= requiredStableFrames && !isCapturing) {
+                isCapturing = true
+                // 지금까지 모은 비트맵 중에서 가장 좋은 걸 선택해서 저장!
+                // 저장 후 초기화
+                val bestBitmap = candidateBitmaps.maxByOrNull {
+                    val lumaScore = calculateLuma(it).toDouble()
+                    val sharpnessScore = calculateSharpness(it) * 5000
+                    lumaScore + sharpnessScore
                 }
 
-                // 다음 프레임 비교를 위해 현재 박스를 저장
-                lastBox = bestBox
-                Log.d("IOU", "iou : $iou")
-                if (iou > 0.6f) {  // 📌 IoU가 90% 이상일 때만 촬영 로직 실행
-                    // ✅ 10프레임 연속 안정된 상태
-                    if (stableFrameCount >= requiredStableFrames && !isCapturing) {
-                        isCapturing = true
-                        // 지금까지 모은 비트맵 중에서 가장 좋은 걸 선택해서 저장!
-                        // 저장 후 초기화
-                        val bestBitmap = candidateBitmaps.maxByOrNull {
-                            val lumaScore = calculateLuma(it).toDouble()
-                            val sharpnessScore = calculateSharpness(it) * 5000 // 가중치 조정 가능
-                            lumaScore + sharpnessScore
-                        }
-                        if (bestBitmap != null) {
-                            lastCapturedBox = bestBox
-//                            saveDebugBitmapWithBoxes(bestBitmap, detectedBoxes)
-                            autoTakePhoto() // 사진 촬영
-                        }
-
-                        stableFrameCount = 0
-                        candidateBitmaps.clear()
-
-                        // 캡처 완료 후 2초 뒤에 다시 풀어줌
-                        Handler().postDelayed({ isCapturing = false }, 2000)
-                    }
+                if (bestBitmap != null) {
+                    lastCapturedBox = bestBox
+//                    yolo가 낸 best가 bbox를 잘 탐지하고 있는지 갤러리에 사진 저장
+//                    saveDebugBitmapWithBoxes(bestBitmap, detectedBoxes)
+                    autoTakePhoto() // 사진 촬영
                 }
 
-                // 오버레이에 감지된 박스 하나만 그리기
-                // → 화면에 사각형이 표시됨
-//                binding.overlayView!!.setBoxes(listOf(bestBox), bitmap.width, bitmap.height) // (삭제)
+                stableFrameCount = 0
+                candidateBitmaps.forEach { it.recycle() }
+                candidateBitmaps.clear()
+            }
+
+            // ✅ UI thread에는 오버레이만 넘김 (초경량)
+            requireActivity().runOnUiThread {
+//                화면에 탐지한 bbox를 그림
+                binding.overlayView?.setBoxes(listOf(bestBox), bitmap.width, bitmap.height)
             }
         }
 
-        // 현재 분석 중인 프레임 리소스 정리
         imageProxy.close()
     }
 
@@ -635,7 +678,40 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
         return sumDiff.toDouble() / (gray.width * gray.height)
     }
 
-    // yolo가 진짜로 잘 탐지했는지를 보기위해 laptop을 탐지하면 bbox를 그리고 갤러리에 저장.
+    // IoU 계산 함수 (IoU란, 가이드 라인과 탐지한 bbox가 얼마나 유사하나 판단하는 거임)
+    private fun computeIoU(rect1: RectF, rect2: RectF): Float {
+        val intersectionLeft = maxOf(rect1.left, rect2.left)
+        val intersectionTop = maxOf(rect1.top, rect2.top)
+        val intersectionRight = minOf(rect1.right, rect2.right)
+        val intersectionBottom = minOf(rect1.bottom, rect2.bottom)
+
+        // 면적이 얼마나 겹치는 걸로 판단!
+        val intersectionArea = maxOf(0f, intersectionRight - intersectionLeft) *
+                maxOf(0f, intersectionBottom - intersectionTop)
+        val rect1Area = rect1.width() * rect1.height()
+        val rect2Area = rect2.width() * rect2.height()
+
+        val unionArea = rect1Area + rect2Area - intersectionArea
+
+        return if (unionArea == 0f) 0f else intersectionArea / unionArea
+    }
+
+    private fun shutdownCamera() {
+        try {
+            // 카메라 사용 중지
+            camera?.cameraControl?.enableTorch(false) // 플래시 사용 중이면 종료
+            cameraProvider?.unbindAll() // 모든 카메라 바인딩 해제
+
+            // 실행자 종료
+            cameraExecutor?.shutdown()
+            cameraExecutor = null
+            camera = null
+        } catch (e: Exception) {
+
+        }
+    }
+
+    // yolo가 진짜로 잘 탐지했는지를 보기위해 laptop을 탐지하면 bbox를 그리고 갤러리에 저장. (삭제)
     private fun saveDebugBitmapWithBoxes(bitmap: Bitmap, boxes: List<BBox>) {
         val debugBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
         val canvas = Canvas(debugBitmap)
@@ -669,57 +745,4 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
 
         Log.d("MainActivity", "✅ YOLO 디버그 이미지 저장됨: ${debugFile.absolutePath}")
     }
-
-    private fun computeIoU(rect1: RectF, rect2: RectF): Float {
-        val intersectionLeft = maxOf(rect1.left, rect2.left)
-        val intersectionTop = maxOf(rect1.top, rect2.top)
-        val intersectionRight = minOf(rect1.right, rect2.right)
-        val intersectionBottom = minOf(rect1.bottom, rect2.bottom)
-
-        val intersectionArea = maxOf(0f, intersectionRight - intersectionLeft) *
-                maxOf(0f, intersectionBottom - intersectionTop)
-        val rect1Area = rect1.width() * rect1.height()
-        val rect2Area = rect2.width() * rect2.height()
-
-        val unionArea = rect1Area + rect2Area - intersectionArea
-
-        return if (unionArea == 0f) 0f else intersectionArea / unionArea
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FontShotGuideFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FrontShotGuideFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }
-
-    private fun shutdownCamera() {
-        try {
-            // 카메라 사용 중지
-            camera?.cameraControl?.enableTorch(false) // 플래시 사용 중이면 종료
-            cameraProvider?.unbindAll() // 모든 카메라 바인딩 해제
-
-            // 실행자 종료
-            cameraExecutor?.shutdown()
-            cameraExecutor = null
-            camera = null
-        } catch (e: Exception) {
-
-        }
-    }
-
-
 }

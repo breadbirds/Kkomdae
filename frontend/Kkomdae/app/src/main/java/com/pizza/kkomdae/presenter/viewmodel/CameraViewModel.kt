@@ -182,9 +182,12 @@ class CameraViewModel @Inject constructor(
             }
         }
         uri?.let {
+            Log.d("Post", "postPhoto: ${reCameraStage.value}")
             if(reCameraStage.value!=0){
+
                 _reCameraUri.postValue(uri)
             }else{
+                Log.d("Post", "postPhoto: 재촬영 실행안됨")
                 // 재촬영이 아닐떄
                 viewModelScope.launch {
                     val file = uriToImagePart(uri)
