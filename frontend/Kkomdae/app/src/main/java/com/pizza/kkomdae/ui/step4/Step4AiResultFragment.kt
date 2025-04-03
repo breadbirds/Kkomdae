@@ -74,6 +74,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         // 재촬영 이미지 uri 서버로 보내기
         viewModel.reCameraUri.observe(viewLifecycleOwner){
             // todo 로딩 화면 추가
+            Log.d(TAG, "onViewCreated: reCameraUri")
             Glide.with(binding.ivImage)
                 .load("")
                 .into(binding.ivImage)
@@ -182,11 +183,11 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             mainActivity.reCamera(step)
         }
 
-        viewModel.postResponse.observe(viewLifecycleOwner){
+        viewModel.initFrontUri.observe(viewLifecycleOwner){
+            Log.d(TAG, "onViewCreated: postResponse")
             Glide.with(binding.ivImage)
-                .load(viewModel.frontUri.value)
+                .load(viewModel.initFrontUri.value)
                 .into(binding.ivImage)
-            viewModel.clearPostResponse()
 
         }
 
@@ -236,6 +237,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             5 -> viewModel.keypadUri.value
             else -> ""
         }
+        Log.d(TAG, "changeImage_url:$url ")
         if(url==""){
             Glide.with(this)
                 .load("")
