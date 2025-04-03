@@ -41,9 +41,9 @@ class FinalViewModel @Inject constructor(
     private val finalUseCase: FinalUseCase
 ) :  AndroidViewModel(application) {
 
-    private val _postResponse = MutableLiveData<Boolean?>()
-    val postResponse: LiveData<Boolean?>
-        get() = _postResponse
+    private val _initFrontUri = MutableLiveData<String?>()
+    val initFrontUri: LiveData<String?>
+        get() = _initFrontUri
 
     private val _pdfName = MutableLiveData<String>()
     val pdfName: LiveData<String>
@@ -126,10 +126,10 @@ class FinalViewModel @Inject constructor(
     val rePhoto6: LiveData<PostRePhotoResponse?>
         get() = _rePhoto6
 
-    val testId = sharedPreferences.getLong("test_id",0)
+
 
     fun clearPostResponse(){
-        _postResponse.postValue(null)
+        _initFrontUri.postValue(null)
     }
     fun clearRePhoto1(){
         _rePhoto1.postValue(null)
@@ -194,7 +194,7 @@ class FinalViewModel @Inject constructor(
                 val file = uriToImagePart(it)
                 _reCameraUri.postValue(null)
                 try {
-                    finalUseCase.postRePhoto(testId = testId, photoType = reCameraStage.value?:1, file = file).collect { response ->
+                    finalUseCase.postRePhoto(testId = sharedPreferences.getLong("test_id", 0), photoType = reCameraStage.value?:1, file = file).collect { response ->
                         Log.d(TAG, "postRePhoto: $response")
 
                         when(stage){
@@ -303,7 +303,7 @@ class FinalViewModel @Inject constructor(
 
     fun postPdf(){
         viewModelScope.launch {
-            val result = finalUseCase.postPdf(testId)
+            val result = finalUseCase.postPdf(sharedPreferences.getLong("test_id", 0))
             Log.d(TAG, "postPdf: $result")
             result.onSuccess {
                 _pdfName.postValue(it.message)
@@ -313,7 +313,7 @@ class FinalViewModel @Inject constructor(
 
     fun getLaptopTotalResult(){
         viewModelScope.launch {
-            val result = finalUseCase.getLaptopTotalResult(testId)
+            val result = finalUseCase.getLaptopTotalResult(sharedPreferences.getLong("test_id", 0))
             Log.d(TAG, "getLaptopTotalResult: $result")
             result.onSuccess {
                 _getFinalResult.postValue(it)
@@ -325,7 +325,7 @@ class FinalViewModel @Inject constructor(
     fun postFourthStage(description:String){
         viewModelScope.launch {
             val data = FourthStageRequest(
-                testId = testId,
+                testId = sharedPreferences.getLong("test_id", 0),
                 description = description
             )
             val result = finalUseCase.postFourthStage(data)
@@ -341,11 +341,11 @@ class FinalViewModel @Inject constructor(
     fun getAiPhoto(){
 
         viewModelScope.launch {
-            val result = finalUseCase.getAiPhoto(testId)
+            val result = finalUseCase.getAiPhoto(sharedPreferences.getLong("test_id", 0))
 
             Log.d(TAG, "getAiPhoto: $result")
             result.onSuccess {
-                _postResponse.postValue(true)
+                _initFrontUri.postValue(it.data.Picture1_ai_url)
                 _frontUri.postValue(it.data.Picture1_ai_url)
                 _backUri.postValue(it.data.Picture2_ai_url)
                 _leftUri.postValue(it.data.Picture3_ai_url)
