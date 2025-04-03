@@ -8,10 +8,7 @@ import pizza.kkomdae.dto.request.ForthStageReq;
 import pizza.kkomdae.dto.request.SecondStageReq;
 import pizza.kkomdae.dto.request.TestResultReq;
 import pizza.kkomdae.dto.request.ThirdStageReq;
-import pizza.kkomdae.dto.respond.AiPhotoWithUrl;
-import pizza.kkomdae.dto.respond.LaptopTestResultWithStudent;
-import pizza.kkomdae.dto.respond.LaptopTotalResultRes;
-import pizza.kkomdae.dto.respond.PhotoWithUrl;
+import pizza.kkomdae.dto.respond.*;
 import pizza.kkomdae.entity.*;
 import pizza.kkomdae.repository.PhotoRepository;
 import pizza.kkomdae.repository.device.DeviceRepository;
@@ -187,12 +184,7 @@ public class TestResultService {
                 .orElseThrow(() -> new RuntimeException("저장된 테스트가 없습니다."));
 
         // 3. 테스트 결과 업데이트
-        testResult.updateTestResult(
-                testResultReq.getTestType(),
-                testResultReq.isSuccess(),
-                (List) testResultReq.getDetail(),
-                testResultReq.getSummary()
-        );
+        testResult.updateTestResult(testResultReq);
 
         // 4. 저장
         lapTopTestResultRepository.save(testResult);
@@ -203,6 +195,14 @@ public class TestResultService {
                 testResultReq.getTestType(),
                 testResultReq.isSuccess()
         );
+    }
+
+    @Transactional
+    public LaptopTestResultRes getTestResult(long testId) {
+
+        // 테스트 결과를 DTO로 변환
+        LaptopTestResult result = lapTopTestResultRepository.getReferenceById(testId);
+        return LaptopTestResultRes.fromEntity(result);
     }
 
     @Transactional
