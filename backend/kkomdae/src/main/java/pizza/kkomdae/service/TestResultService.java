@@ -205,6 +205,7 @@ public class TestResultService {
         );
     }
 
+    @Transactional
     public void fourthStage(ForthStageReq forthStageReq) {
         LaptopTestResult result = lapTopTestResultRepository.findById(forthStageReq.getTestId()).orElseThrow(()->new RuntimeException("testId 오류"));
         result.setDescription(forthStageReq.getDescription());

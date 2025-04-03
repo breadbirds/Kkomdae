@@ -533,6 +533,7 @@ class TestApp(ttkb.Window):
         """
         테스트 상태를 업데이트합니다.
         """
+        self.detail = None
         if new_status in ["테스트 완료", "생성 완료"]:
             if test_name == "배터리":
                 self.detail = self.report
@@ -1637,7 +1638,7 @@ class TestApp(ttkb.Window):
 
                 if resp.status_code == 200:
                     data = resp.json()
-                    messagebox.showinfo("업로드 완료", f"서버 업로드 성공")
+                    messagebox.showinfo("업로드 완료", f"Django 업로드 성공(파일을 s3에 업로드)")
                 else:
                     messagebox.showerror("업로드 오류", f"status={resp.status_code}, body={resp.text}")
         except Exception as e:
@@ -1660,14 +1661,88 @@ class TestApp(ttkb.Window):
 
     def summary_battery_report(self) -> None:
         """
-        배터리 리포트를 요약
+        배터리 리포트를 요약하여 중요 정보를 추출합니다.
+        - 현재 배터리 용량
+        - 설계 용량 
+        - 배터리 상태
+        - 배터리 수명 예측
         """
+        # 리포트 파일 경로가 없거나 파일이 존재하지 않으면 경고 메시지 출력
+        if not self.report_path or not os.path.exists(self.report_path):
+            messagebox.showwarning("리포트 없음", "배터리 리포트가 존재하지 않습니다.")
+            return
 
-        
+        try:
+            # 파일을 읽어 실제 HTML 콘텐츠를 가져옴
+            with open(self.report_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            summary = {}
+
+            # 실제 파일 구조에 맞게 정규 표현식을 수정하여 배터리 정보 추출
+            # DESIGN CAPACITY: 숫자에는 쉼표가 포함될 수 있고, "mWh" 단위가 있음 (예: 79,844 mWh)
+            design_capacity = re.search(r'DESIGN CAPACITY.*?([\d,]+)\s*mWh', content, re.DOTALL | re.IGNORECASE)
+            # FULL CHARGE CAPACITY: 숫자에는 쉼표가 포함될 수 있고, "mWh" 단위가 있음 (예: 71,750 mWh)
+            full_charge_capacity = re.search(r'FULL CHARGE CAPACITY.*?([\d,]+)\s*mWh', content, re.DOTALL | re.IGNORECASE)
+            # CYCLE COUNT: 단순 숫자 (예: 217)
+            cycle_count = re.search(r'CYCLE COUNT.*?(\d+)', content, re.DOTALL | re.IGNORECASE)
+
+            if design_capacity and full_charge_capacity:
+                # 추출한 숫자에서 쉼표 제거 후 정수로 변환
+                design_cap = int(design_capacity.group(1).replace(',', ''))
+                current_cap = int(full_charge_capacity.group(1).replace(',', ''))
+                health_percentage = (current_cap / design_cap) * 100
+
+                summary['design_capacity'] = design_cap
+                summary['current_capacity'] = current_cap
+                summary['health_percentage'] = round(health_percentage, 2)
+                summary['cycle_count'] = int(cycle_count.group(1)) if cycle_count else "N/A"
+
+                # 배터리 상태 판단
+                if health_percentage >= 80:
+                    summary['status'] = "양호"
+                elif health_percentage >= 60:
+                    summary['status'] = "주의"
+                else:
+                    summary['status'] = "교체 필요"
+
+                # 배터리 수명 예측 (단순화된 선형 예측: 최대 500회 충전 기준)
+                remaining_cycles = 500 - (summary['cycle_count'] if isinstance(summary['cycle_count'], int) else 0)
+                if remaining_cycles > 0:
+                    summary['life_expectancy'] = f"약 {remaining_cycles}회 충전 가능"
+                else:
+                    summary['life_expectancy'] = "수명 초과"
+
+                # # 서버에 배터리 상태 전송 (실제 리포트 내용을 detail에 포함)
+                # self.send_test_result(
+                #     test_type="배터리",
+                #     success=True,
+                #     detail=content,  # 실제 파일 내용 전달 (&#8203;:contentReference[oaicite:0]{index=0}&#8203;:contentReference[oaicite:1]{index=1})
+                #     summary=summary
+                # )
+
+                # 사용자에게 결과 표시
+                message = (
+                    f"배터리 상태 요약:\n\n"
+                    f"설계 용량: {summary['design_capacity']} mWh\n"
+                    f"현재 용량: {summary['current_capacity']} mWh\n"
+                    f"배터리 수명: {summary['health_percentage']}%\n"
+                    f"충전 횟수: {summary['cycle_count']}\n"
+                    f"배터리 상태: {summary['status']}\n"
+                    f"예상 수명: {summary['life_expectancy']}"
+                )
+                messagebox.showinfo("배터리 요약", message)
+                return message
+            else:
+                raise ValueError("배터리 정보를 찾을 수 없습니다.")
+
+        except Exception as e:
+            messagebox.showerror("요약 오류", f"배터리 리포트 요약 중 오류 발생:\n{e}")
+
     # -------------------------------
     # 서버로 테스트 결과 전송 관련 메서드
     # -------------------------------
-    def send_test_result(self, test_type: str, success: bool, detail: str = None) -> bool:
+    def send_test_result(self, test_type: str, success: bool, detail: str = None, summary:str = None) -> bool:
         """
         테스트 결과를 서버에 전송합니다.
         Args:
@@ -1679,14 +1754,15 @@ class TestApp(ttkb.Window):
         """
             
         try:
-            # url = "http://localhost:8080/api/test-result"  # 테스트 서버 URL
-            url = "https://j12d101.p.ssafy.io/api/test-result"  # 운영 서버 URL
+            url = "http://localhost:8080/api/test-result"  # 테스트 서버 URL
+            # url = "https://j12d101.p.ssafy.io/api/test-result"  # 운영 서버 URL
             if test_type == '배터리':
                 data = {
                     "randomKey": self.random_key,  # 클래스 변수로 저장된 랜덤키
                     "testType": test_type,
                     "success": success,
                     "detail": detail,
+                    "summary": self.summary_battery_report()
                 }
                 response = requests.post(url, json=data)
             else:
@@ -1716,7 +1792,6 @@ class TestApp(ttkb.Window):
         """
         테스트 결과를 JSON 형식으로 구성 후 QR 코드를 생성하여 표시합니다.
         """
-
         
         if len(self.test_list) == 0:
             results = {
