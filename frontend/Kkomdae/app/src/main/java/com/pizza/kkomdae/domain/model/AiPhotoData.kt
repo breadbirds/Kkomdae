@@ -13,4 +13,10 @@ data class AiPhotoData(
     val Picture5_ai_name: String?,
     val Picture6_ai_url: String?,
     val Picture6_ai_name: String?,
+    val photo1_ai_damage:Int?,
+    val photo2_ai_damage:Int?,
+    val photo3_ai_damage:Int?,
+    val photo4_ai_damage:Int?,
+    val photo5_ai_damage:Int?,
+    val photo6_ai_damage:Int?
 )
