@@ -213,6 +213,13 @@ public class ApiController {
         }
     }
 
+    @Operation(summary = "Step2 기기 점검 정보 반환", description = "기기를 점검 후 정보를 반환하기 위한 api")
+    @GetMapping("/test-result/{testId}")
+    public ApiResponse getTestResult(@PathVariable long testId) {
+        LaptopTestResultRes testResult = testResultService.getTestResult(testId);
+        return new ApiResponse(true, "테스트 결과를 성공적으로 반환", testResult);
+    }
+
     @Operation(summary = "테스트 최종 결과", description = "테스트 최종 결과를 반환")
     @GetMapping("/laptopTotalResult")
     public LaptopTotalResultRes laptopTotalResult(@RequestParam long testId ) {
@@ -224,5 +231,7 @@ public class ApiController {
 //        mattermostNotificationService.createGroupChannel(names);
         mattermostNotificationService.sendGroupMessage(names);
     }
+
+
 }
 

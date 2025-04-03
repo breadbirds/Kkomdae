@@ -21,6 +21,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -40,13 +41,32 @@ class Step2GuideFragment : BaseFragment<FragmentStep2GuideBinding>(
     private var param1: String? = null
     private var param2: String? = null
 
+    // 시스템 백 버튼 콜백 선언
+    private lateinit var backPressedCallback: OnBackPressedCallback
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+        // 시스템 백 버튼 동작 설정
+        backPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                showQuitBottomSheet()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, backPressedCallback)
+
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        backPressedCallback.remove()
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

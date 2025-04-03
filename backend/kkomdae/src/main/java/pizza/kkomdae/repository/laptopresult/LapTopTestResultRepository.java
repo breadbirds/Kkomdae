@@ -20,4 +20,5 @@ public interface LapTopTestResultRepository extends JpaRepository<LaptopTestResu
 
     Optional<LaptopTestResult> findByRandomKey(String randomKey);
 
+
 }
