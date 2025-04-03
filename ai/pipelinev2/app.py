@@ -99,80 +99,80 @@ def detect_laptop_bbox(yolo_model, image_path):
     print(f"✅ YOLO ssafy_laptop bbox 개수: {len(laptop_bboxes)}")
     return laptop_bboxes
 
-# ✅ 5-1. Faster 결과를 YOLO bbox 내부만 필터링 & GPT 분석
-def filter_and_classify(faster_detections, laptop_bboxes, image):
-    if not laptop_bboxes:
-        print("⚠ ssafy_laptop bbox가 없습니다.")
-        return []
-
-    X1, Y1, X2, Y2 = laptop_bboxes[0]
-
-    results = []
-
-    for det in faster_detections:
-        box = det['bbox']
-        x1, y1, x2, y2 = map(int, box)
-
-        if x1 >= X1 and y1 >= Y1 and x2 <= X2 and y2 <= Y2:
-            crop = image[y1:y2, x1:x2]
-            crop_pil = Image.fromarray(cv2.cvtColor(crop, cv2.COLOR_BGR2RGB))
-
-            gpt_result = classify_damage_with_gpt(crop_pil)
-            print(f"🤖GPT 분석 결과: {gpt_result}")
-
-            det['gpt_result'] = gpt_result
-            results.append(det)
-
-    print(f"✨ GPT 분석 bbox 개수: {len(results)}")
-    return results
-
-# ✅ 5-2. GPT 분석
-def classify_damage_with_gpt(crop_image):
-    buffer = BytesIO()
-    crop_image.save(buffer, format="JPEG")
-    buffer.seek(0)
-
-    # ✅ base64로 이미지 encode
-    base64_image = base64.b64encode(buffer.read()).decode('utf-8')
-
-    # ✅ 최신 GPT Vision API 호출
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": "이미지는 분석해서 다음 클래스를 구분해줘.\n 1. 스크래치야 아님 흠집이야?\n2. 각 손상에 대해서 손상도를 판단해줘.(상, 중, 하)"},
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{base64_image}"
-                        }
-                    }
-                ]
-            }
-        ],
-        max_tokens=300
-    )
-
-    result = response.choices[0].message.content
-    return result
-
-# # ✅ 5. Faster 결과를 YOLO bbox 내부만 필터링
-# def filter_by_yolo(faster_detections, laptop_bboxes):
+# # ✅ 5-1. Faster 결과를 YOLO bbox 내부만 필터링 & GPT 분석
+# def filter_and_classify(faster_detections, laptop_bboxes, image):
 #     if not laptop_bboxes:
 #         print("⚠ ssafy_laptop bbox가 없습니다.")
 #         return []
 
-#     X1, Y1, X2, Y2 = laptop_bboxes[0]  # laptop이 1개라고 가정
+#     X1, Y1, X2, Y2 = laptop_bboxes[0]
 
-#     def is_inside(box):
-#         x1, y1, x2, y2 = box
-#         return (x1 >= X1) and (y1 >= Y1) and (x2 <= X2) and (y2 <= Y2)
+#     results = []
 
-#     filtered = [det for det in faster_detections if is_inside(det['bbox'])]
-#     print(f"✨ 필터링된 bbox 개수: {len(filtered)}")
-#     return filtered
+#     for det in faster_detections:
+#         box = det['bbox']
+#         x1, y1, x2, y2 = map(int, box)
+
+#         if x1 >= X1 and y1 >= Y1 and x2 <= X2 and y2 <= Y2:
+#             crop = image[y1:y2, x1:x2]
+#             crop_pil = Image.fromarray(cv2.cvtColor(crop, cv2.COLOR_BGR2RGB))
+
+#             gpt_result = classify_damage_with_gpt(crop_pil)
+#             print(f"🤖GPT 분석 결과: {gpt_result}")
+
+#             det['gpt_result'] = gpt_result
+#             results.append(det)
+
+#     print(f"✨ GPT 분석 bbox 개수: {len(results)}")
+#     return results
+
+# # ✅ 5-2. GPT 분석
+# def classify_damage_with_gpt(crop_image):
+#     buffer = BytesIO()
+#     crop_image.save(buffer, format="JPEG")
+#     buffer.seek(0)
+
+#     # ✅ base64로 이미지 encode
+#     base64_image = base64.b64encode(buffer.read()).decode('utf-8')
+
+#     # ✅ 최신 GPT Vision API 호출
+#     response = client.chat.completions.create(
+#         model="gpt-4o",
+#         messages=[
+#             {
+#                 "role": "user",
+#                 "content": [
+#                     {"type": "text", "text": "이미지는 분석해서 다음 클래스를 구분해줘.\n 1. 스크래치야 아님 흠집이야?\n2. 각 손상에 대해서 손상도를 판단해줘.(상, 중, 하)"},
+#                     {
+#                         "type": "image_url",
+#                         "image_url": {
+#                             "url": f"data:image/jpeg;base64,{base64_image}"
+#                         }
+#                     }
+#                 ]
+#             }
+#         ],
+#         max_tokens=300
+#     )
+
+#     result = response.choices[0].message.content
+#     return result
+
+# ✅ 5. Faster 결과를 YOLO bbox 내부만 필터링
+def filter_by_yolo(faster_detections, laptop_bboxes):
+    if not laptop_bboxes:
+        print("⚠ ssafy_laptop bbox가 없습니다.")
+        return []
+
+    X1, Y1, X2, Y2 = laptop_bboxes[0]  # laptop이 1개라고 가정
+
+    def is_inside(box):
+        x1, y1, x2, y2 = box
+        return (x1 >= X1) and (y1 >= Y1) and (x2 <= X2) and (y2 <= Y2)
+
+    filtered = [det for det in faster_detections if is_inside(det['bbox'])]
+    print(f"✨ 필터링된 bbox 개수: {len(filtered)}")
+    return filtered
 
 # ✅ 6. bbox 이미지 저장
 def save_annotated_image(image, detections, save_path):
@@ -208,8 +208,8 @@ if __name__ == "__main__":
     laptop_bboxes = detect_laptop_bbox(yolo_model, image_path)
 
     # 3. Faster detection 중 laptop bbox 내부 결과만 필터링
-    # filtered_detections = filter_by_yolo(faster_detections, laptop_bboxes)
-    filtered_detections = filter_and_classify(faster_detections, laptop_bboxes, image)
+    filtered_detections = filter_by_yolo(faster_detections, laptop_bboxes)
+    # filtered_detections = filter_and_classify(faster_detections, laptop_bboxes, image)
 
     # 4. 이미지 시각화만 저장
     save_annotated_image(image, filtered_detections, image_save_path)
