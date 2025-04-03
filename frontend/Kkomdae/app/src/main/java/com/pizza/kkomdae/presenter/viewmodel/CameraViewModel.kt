@@ -68,6 +68,10 @@ class CameraViewModel @Inject constructor(
 
 
 
+    private val _reCameraStage = MutableLiveData<Int>()
+    val reCameraStage: LiveData<Int>
+        get() = _reCameraStage
+
     private val _myPageOrderId = MutableLiveData<Int>()
     val myPageOrderId: LiveData<Int>
         get() = _myPageOrderId
@@ -79,6 +83,11 @@ class CameraViewModel @Inject constructor(
     private val _postResult= MutableLiveData<PhotoResponse?>()
     val postResult: LiveData<PhotoResponse?>
         get() = _postResult
+
+
+    private val _reCameraUri = MutableLiveData<Uri>()
+    val reCameraUri: LiveData<Uri>
+        get() = _reCameraUri
 
 
     private val _frontUri = MutableLiveData<Uri?>()
@@ -130,9 +139,17 @@ class CameraViewModel @Inject constructor(
         _keypadUri.value = uri
     }
 
+    fun setReCameraStage(stage: Int) {
+        _reCameraStage.value = stage
+    }
+
     // ✅ 사진 저장 메서드
     fun setStep(step: Int) {
         _step.value = step
+    }
+
+    fun confirmPhoto(step: Int) {
+        savePhotoStage(step)
     }
 
     fun clearResult(){
@@ -141,6 +158,7 @@ class CameraViewModel @Inject constructor(
 
     fun postPhoto(){
         var uri = frontUri.value
+//        val testId = 2L
         val testId = sharedPreferences.getLong("test_id",0)
         Log.d("Post", "postPhoto: ${step.value}")
         when(step.value){
@@ -164,31 +182,34 @@ class CameraViewModel @Inject constructor(
             }
         }
         uri?.let {
-            viewModelScope.launch {
-                val file = uriToImagePart(uri)
-                val result =step1UseCase.postPhoto(
-                    testId = testId,
-                    photoType = step.value?:0,
-                    file = file
-                )
+            if(reCameraStage.value!=0){
+                _reCameraUri.postValue(uri)
+            }else{
+                // 재촬영이 아닐떄
+                viewModelScope.launch {
+                    val file = uriToImagePart(uri)
+                    val result =step1UseCase.postPhoto(
+                        testId = testId,
+                        photoType = step.value?:0,
+                        file = file
+                    )
 
-                result.onSuccess { testResponse ->
-                    // 로그인 성공 시 실제 데이터 처리
-                    testResponse?.let {
+                    result.onSuccess { testResponse ->
+                        // 로그인 성공 시 실제 데이터 처리
+                        testResponse?.let {
 
-                        _postResult.postValue(it)
+                            _postResult.postValue(it)
+                        }
+
+                    }.onFailure { exception ->
+                        // 로그인 정보 불러오기 실패
 
                     }
 
-
-                }.onFailure { exception ->
-                    // 로그인 정보 불러오기 실패
-
                 }
-
             }
-        }
 
+        }
 
     }
 
@@ -259,6 +280,14 @@ class CameraViewModel @Inject constructor(
         val newHeight = (height * ratio).toInt()
 
         return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+    }
+
+    fun getPhotoStage():Int{
+        return sharedPreferences.getInt("photoStage",0)
+    }
+
+    private fun savePhotoStage(step: Int) {
+        sharedPreferences.edit().putInt("photoStage", step).apply()
     }
 
 }

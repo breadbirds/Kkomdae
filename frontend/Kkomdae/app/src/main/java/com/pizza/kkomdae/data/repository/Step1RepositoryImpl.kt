@@ -4,6 +4,7 @@ import com.pizza.kkomdae.data.model.Step1Mapper
 import com.pizza.kkomdae.data.model.UserMapper
 import com.pizza.kkomdae.data.source.remote.Step1Service
 import com.pizza.kkomdae.data.source.remote.UserService
+import com.pizza.kkomdae.domain.model.GetPhotoResponse
 import com.pizza.kkomdae.domain.model.PhotoResponse
 import com.pizza.kkomdae.domain.repository.Step1Repository
 import okhttp3.MultipartBody
@@ -24,6 +25,14 @@ class Step1RepositoryImpl@Inject constructor(
                 testId = testId
                 ))
         }catch (e: Exception){
+            throw e
+        }
+    }
+
+    override suspend fun getPhoto(testId: Long): GetPhotoResponse {
+        return try {
+            Step1Mapper.toGetPhotoResponse(step1Service.getPhoto(testId))
+        }catch (e:Exception){
             throw e
         }
     }

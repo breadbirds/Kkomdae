@@ -63,10 +63,9 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
 
     override fun onResume() {
         super.onResume()
-        step =AppData.step
-        if (AppData.step==0){
-            step=viewModel.picStage.value?:0
-        }
+
+            step=viewModel.getPhotoStage()
+
         val color = ContextCompat.getColorStateList(requireContext(), R.color.blue500)
 
 
@@ -135,18 +134,45 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
 
         binding.layoutStep.flStep1
 
-        // X 클릭 이벤트 설정
+        // X 버튼
         binding.topBar.backButtonContainer.setOnClickListener {
             showQuitBottomSheet()
         }
 
+        // 촬영하기 버튼
         binding.btnNext.setOnClickListener {
-            mainActivity.next(viewModel.picStage.value?:1)
-            Log.d("Post", "onViewCreated: ${viewModel.picStage.value}")
+            if (step == 6) {
+                // 완료 버튼 클릭 시 Step2GuideFragment로 이동
+                val transaction = mainActivity.supportFragmentManager.beginTransaction()
+                mainActivity.supportFragmentManager.popBackStack()
+                transaction.replace(R.id.fl_main, Step2GuideFragment())
+                    .addToBackStack("")
+                transaction.commit()
+            } else {
+                // 촬영 단계가 완료되지 않았으면 촬영 계속
+                mainActivity.next()
+            }
         }
 
-        showIntroDialog()
+        // SharedPreferences에서 다이얼로그 표시 여부 확인
+        val sharedPreferences = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val sessionId = sharedPreferences.getString("current_session_id", null)
 
+        // 현재 세션 ID가 없다면 생성 (앱 시작 시)
+        val currentSessionId = sessionId ?: System.currentTimeMillis().toString().also {
+            sharedPreferences.edit().putString("current_session_id", it).apply()
+        }
+
+        // 이 세션에서 다이얼로그를 표시했는지 확인
+        val dialogKey = "shown_step1_dialog_$currentSessionId"
+        val hasShownDialog = sharedPreferences.getBoolean(dialogKey, false)
+
+        // 다이얼로그를 아직 표시하지 않았고, 촬영을 시작하지 않았으면 표시
+        if (!hasShownDialog && step == 0) {
+            showIntroDialog()
+            // 다이얼로그를 표시했음을 저장
+            sharedPreferences.edit().putBoolean(dialogKey, true).apply()
+        }
     }
 
     private fun showIntroDialog() {
@@ -167,9 +193,6 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
         dialog.show()
     }
 
-    /**
-     * X 버튼 클릭 시 나타나는 등록 취소 확인 바텀시트를 표시
-     */
     private fun showQuitBottomSheet() {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         val bottomSheetView = layoutInflater.inflate(R.layout.layout_bottom_sheet, null)
@@ -184,11 +207,22 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
         val btnQuit = bottomSheetView.findViewById<View>(R.id.btn_quit)
         btnQuit.setOnClickListener {
             bottomSheetDialog.dismiss()
-            // 메인 화면으로 이동
-            val transaction = mainActivity.supportFragmentManager.beginTransaction()
-            mainActivity.supportFragmentManager.popBackStack()
-            transaction.replace(R.id.fl_main, com.pizza.kkomdae.ui.MainFragment())
-            transaction.commit()
+
+            // UI 스레드에서 약간의 지연 후 화면 전환
+            view?.post {
+                try {
+                    // 메인 화면으로 이동
+                    val transaction = mainActivity.supportFragmentManager.beginTransaction()
+                    transaction.setReorderingAllowed(true)
+                    transaction.replace(R.id.fl_main, com.pizza.kkomdae.ui.MainFragment())
+                    transaction.commit()
+
+                    // 백스택 즉시 비우기
+                    mainActivity.supportFragmentManager.popBackStackImmediate(null, 1)
+                } catch (e: Exception) {
+                    Log.e("Step1GuideFragment", "MainFragment로 이동 중 오류: ${e.message}", e)
+                }
+            }
         }
 
         bottomSheetDialog.setContentView(bottomSheetView)

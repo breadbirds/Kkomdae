@@ -16,7 +16,12 @@ import androidx.viewbinding.ViewBinding
 abstract class BaseFragment<B : ViewBinding>(private val bind: (View) -> B, @LayoutRes layoutResId: Int) : Fragment(layoutResId) {
     private var _binding: B? = null
 
-    protected val binding get() = _binding!!
+    // 바인딩 접근 시 안전 체크 추가
+    protected val binding: B
+        get() = _binding ?: throw IllegalStateException("바인딩이 null입니다. 프래그먼트가 이미 destroyed 되었을 수 있습니다.")
+
+    // 안전하게 바인딩 접근을 위한 메서드 추가
+    protected fun getBindingSafely(): B? = _binding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,6 +36,7 @@ abstract class BaseFragment<B : ViewBinding>(private val bind: (View) -> B, @Lay
         _binding = null
         super.onDestroyView()
     }
+
 
 
 }

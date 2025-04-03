@@ -1,0 +1,4 @@
+<!-- res/values/dimens.xml -->
+<resources>
+    <dimen name="recyclerview_item_horizontal_spacing">4dp</dimen>
+</resources>

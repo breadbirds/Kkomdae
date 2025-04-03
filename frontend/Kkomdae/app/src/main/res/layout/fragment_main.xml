@@ -101,8 +101,8 @@
                     android:id="@+id/tv_sub_message_part3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="가 찾아드려요."
-                    style="@style/Display2"
+                    android:text="가 찾아드려요"
+                    style="@style/Display3"
                     android:textColor="@color/gray700"
                     app:layout_constraintBottom_toBottomOf="@id/tv_sub_message_part2"
                     app:layout_constraintStart_toEndOf="@id/tv_sub_message_part2"
@@ -168,6 +168,25 @@
                             android:layout_height="match_parent">
 
                             <TextView
+                                android:id="@+id/tv_in_progress"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="진행중"
+                                style="@style/Label4"
+                                android:textColor="#FF0000"
+                                android:paddingTop="4dp"
+                                android:paddingBottom="4dp"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:background="@drawable/status_border_rounded_red"
+                                android:layout_marginTop="12dp"
+                                android:layout_marginEnd="12dp"
+                                android:visibility="gone"
+                                tools:visibility="visible"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"/>
+
+                            <TextView
                                 style="@style/Display2"
                                 android:textColor="@color/gray700"
                                 android:id="@+id/tv_laptop_title"
@@ -188,7 +207,7 @@
                                 android:layout_marginTop="10dp"
                                 app:layout_constraintStart_toStartOf="@id/tv_laptop_title"
                                 app:layout_constraintTop_toBottomOf="@id/tv_laptop_title"
-                                android:text="AI로 상태를 점검하고,"/>
+                                android:text="AI로 상태를 점검하고"/>
 
                             <TextView
                                 android:id="@+id/tv_laptop_sub2"
@@ -269,7 +288,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:text="모바일 기기 상태를 기록하고,"
+                                android:text="모바일 기기 상태를 기록하고"
                                 app:layout_constraintStart_toStartOf="@id/tv_mobile_title"
                                 app:layout_constraintTop_toBottomOf="@id/tv_mobile_title" />
 
@@ -354,7 +373,7 @@
                                 android:layout_marginTop="10dp"
                                 app:layout_constraintStart_toStartOf="@id/tv_iot_title"
                                 app:layout_constraintTop_toBottomOf="@id/tv_iot_title"
-                                android:text="스마트 기기 상태를 점검하고,"/>
+                                android:text="스마트 기기 상태를 점검하고"/>
 
                             <TextView
                                 android:id="@+id/tv_iot_sub2"

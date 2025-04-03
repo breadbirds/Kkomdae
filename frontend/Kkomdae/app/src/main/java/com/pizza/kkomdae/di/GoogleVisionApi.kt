@@ -18,7 +18,7 @@ import org.json.JSONObject
 import java.io.IOException
 
 // 🔐 Google Cloud Vision API 키 (노출 주의!)
-private const val VISION_API_URL = "https://vision.googleapis.com/v1/images:annotate?key=${BuildConfig.VISION_API_KEY}"
+private val VISION_API_URL = "https://vision.googleapis.com/v1/images:annotate?key=${BuildConfig.VISION_API_KEY}"
 
 object GoogleVisionApi {
     // Vision API 호출 함수

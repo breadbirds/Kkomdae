@@ -6,12 +6,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.tabs.TabLayoutMediator
 import com.pizza.kkomdae.AppData
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentFontResultBinding
 import com.pizza.kkomdae.databinding.FragmentImageDetailBinding
+import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.ui.guide.AllStepOnboardingFragment.OnboardingStep
 import com.pizza.kkomdae.ui.guide.Step2GuideFragment
 
@@ -32,42 +35,14 @@ class ImageDetailFragment :  BaseFragment<FragmentImageDetailBinding>(
     // TODO: Rename and change types of parameters
     private var param1: Int? = null
     private var param2: String? = null
+    private val viewModel : MainViewModel by activityViewModels()
 
     data class ImageDetailStep(
         val title: String,
         val stepNumber: Int,
-        val url: Uri?=null,
+        val url: String?=null,
     )
 
-    private val list = listOf(
-        ImageDetailStep(
-            "전면부",
-            1,
-            AppData.frontUri,
-        ),
-        ImageDetailStep(
-            "후면부",
-            2,
-            AppData.backUri
-        ),
-        ImageDetailStep(
-            "좌측면",
-            3,
-            AppData.leftUri
-        ),ImageDetailStep(
-            "우측면",
-            4,
-            AppData.rightUri
-        ),ImageDetailStep(
-            "모니터",
-            5,
-            AppData.screenUri
-        ),ImageDetailStep(
-            "키보드",
-            6,
-            AppData.keypadUri
-        ),
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,6 +54,38 @@ class ImageDetailFragment :  BaseFragment<FragmentImageDetailBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val imageList = viewModel.resultImage.value
+
+       val list = listOf(
+            ImageDetailStep(
+                "전면부",
+                1,
+                imageList?.get(0),
+            ),
+            ImageDetailStep(
+                "후면부",
+                2,
+                imageList?.get(1),
+            ),
+            ImageDetailStep(
+                "좌측면",
+                3,
+                imageList?.get(2),
+            ),ImageDetailStep(
+                "우측면",
+                4,
+                imageList?.get(3),
+            ),ImageDetailStep(
+                "모니터",
+                5,
+                imageList?.get(4),
+            ),ImageDetailStep(
+                "키보드",
+                6,
+                imageList?.get(5),
+            ),
+        )
 
         binding.viewPager.adapter=ImageDetailAdapter(list)
         binding.viewPager.setCurrentItem((param1?:1)-1,false)

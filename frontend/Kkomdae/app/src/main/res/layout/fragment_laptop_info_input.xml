@@ -25,7 +25,10 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="24dp">
+            android:paddingTop="32dp"
+            android:paddingBottom="24dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp">
 
             <TextView
                 android:id="@+id/tv_title"
@@ -38,15 +41,27 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                app:layout_constraintStart_toStartOf="parent"
+                android:id="@+id/tv_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="노트북의 세부정보를 정확히 입력해주세요. "
+                app:layout_constraintTop_toBottomOf="@id/tv_title"
+                style="@style/Label1"
+                android:textColor="@color/gray700"
+                android:layout_marginTop="10dp"/>
+
+
+            <TextView
                 android:id="@+id/tv_serial"
                 style="@style/Title1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
+                android:layout_marginTop="30dp"
                 android:text="시리얼번호"
                 android:textColor="@color/gray700"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_title" />
+                app:layout_constraintTop_toBottomOf="@id/tv_subtitle" />
 
 
             <com.google.android.material.textfield.TextInputLayout
@@ -65,7 +80,7 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_serial"
-                    style="@style/Title2"
+                    style="@style/Body2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="시리얼 번호를 입력해주세요"
@@ -80,6 +95,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_retake_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:elevation="8dp"
+                android:focusableInTouchMode="true"
                 app:layout_constraintEnd_toEndOf="@+id/il_serial"
                 app:layout_constraintBottom_toBottomOf="@id/il_serial"
                 app:layout_constraintTop_toTopOf="@+id/il_serial"
@@ -90,7 +109,7 @@
                 style="@style/Title1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="24dp"
                 android:text="바코드번호"
                 android:textColor="@color/gray700"
                 app:layout_constraintStart_toStartOf="parent"
@@ -111,7 +130,7 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_barcode"
-                    style="@style/Title2"
+                    style="@style/Body2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="바코드 번호를 입력해주세요"
@@ -124,7 +143,7 @@
                 style="@style/Title1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="24dp"
                 android:text="모델명"
                 android:textColor="@color/gray700"
                 app:layout_constraintStart_toStartOf="parent"
@@ -147,7 +166,7 @@
 
                 <AutoCompleteTextView
                     android:id="@+id/atv_model_name"
-                    style="@style/Title2"
+                    style="@style/Body2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="none"
@@ -160,7 +179,7 @@
                 style="@style/Title1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="24dp"
                 android:text="수령일자"
                 android:textColor="@color/gray700"
                 app:layout_constraintStart_toStartOf="parent"
@@ -178,11 +197,11 @@
 
                 <TextView
                     android:id="@+id/tv_date"
-                    style="@style/Title2"
+                    style="@style/Body2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="16dp"
-                    android:text="2025년 3월 11일"
+                    android:text="날짜 선택"
                     android:textColor="@color/gray700"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -207,7 +226,7 @@
                 style="@style/Title1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="24dp"
                 android:text="구성품목"
                 android:textColor="@color/gray700"
                 app:layout_constraintStart_toStartOf="parent"
@@ -242,7 +261,7 @@
                         app:tint="@color/gray700" />
 
                     <TextView
-                        style="@style/Title1"
+                        style="@style/Title2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
@@ -254,8 +273,8 @@
 
                     <ImageButton
                         android:id="@+id/btn_laptop_plus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:background="@drawable/ic_plus"
                         android:backgroundTint="@color/gray500"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -264,7 +283,6 @@
                     <TextView
                         android:id="@+id/tv_laptop_count"
                         style="@style/Title1"
-
                         android:layout_height="wrap_content"
                         android:text="1"
                         android:layout_width="40dp"
@@ -275,8 +293,8 @@
 
                     <ImageButton
                         android:id="@+id/btn_laptop_minus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:background="@drawable/ic_minus"
                         android:backgroundTint="@color/gray500"
                         app:layout_constraintEnd_toStartOf="@id/tv_laptop_count"
@@ -301,7 +319,7 @@
                         app:tint="@color/gray700" />
 
                     <TextView
-                        style="@style/Title1"
+                        style="@style/Title2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
@@ -313,8 +331,8 @@
 
                     <ImageButton
                         android:id="@+id/btn_power_plus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:background="@drawable/ic_plus"
                         android:backgroundTint="@color/gray500"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -333,8 +351,8 @@
 
                     <ImageButton
                         android:id="@+id/btn_power_minus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:background="@drawable/ic_minus"
                         android:backgroundTint="@color/gray500"
                         app:layout_constraintEnd_toStartOf="@id/tv_power_count"
@@ -360,7 +378,7 @@
                         app:tint="@color/gray700" />
 
                     <TextView
-                        style="@style/Title1"
+                        style="@style/Title2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
@@ -372,8 +390,8 @@
 
                     <ImageButton
                         android:id="@+id/btn_adapter_plus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:background="@drawable/ic_plus"
                         android:backgroundTint="@color/gray500"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -393,8 +411,8 @@
 
                     <ImageButton
                         android:id="@+id/btn_adapter_minus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:background="@drawable/ic_minus"
                         android:backgroundTint="@color/gray500"
                         app:layout_constraintEnd_toStartOf="@id/tv_adapter_count"
@@ -419,7 +437,7 @@
                         app:tint="@color/gray700" />
 
                     <TextView
-                        style="@style/Title1"
+                        style="@style/Title2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
@@ -431,8 +449,8 @@
 
                     <ImageButton
                         android:id="@+id/btn_mouse_plus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:background="@drawable/ic_plus"
                         android:backgroundTint="@color/gray500"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -451,8 +469,8 @@
 
                     <ImageButton
                         android:id="@+id/btn_mouse_minus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:background="@drawable/ic_minus"
                         android:backgroundTint="@color/gray500"
                         app:layout_constraintEnd_toStartOf="@id/tv_mouse_count"
@@ -477,7 +495,7 @@
                         app:tint="@color/gray700" />
 
                     <TextView
-                        style="@style/Title1"
+                        style="@style/Title2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
@@ -489,8 +507,8 @@
 
                     <ImageButton
                         android:id="@+id/btn_bag_plus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:background="@drawable/ic_plus"
                         android:backgroundTint="@color/gray500"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -509,8 +527,8 @@
 
                     <ImageButton
                         android:id="@+id/btn_bag_minus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:background="@drawable/ic_minus"
                         android:backgroundTint="@color/gray500"
                         app:layout_constraintEnd_toStartOf="@id/tv_bag_count"
@@ -536,7 +554,7 @@
                         app:tint="@color/gray700" />
 
                     <TextView
-                        style="@style/Title1"
+                        style="@style/Title2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
@@ -548,8 +566,8 @@
 
                     <ImageButton
                         android:id="@+id/btn_pad_plus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:background="@drawable/ic_plus"
                         android:backgroundTint="@color/gray500"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -568,8 +586,8 @@
 
                     <ImageButton
                         android:id="@+id/btn_pad_minus"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:background="@drawable/ic_minus"
                         android:backgroundTint="@color/gray500"
                         app:layout_constraintEnd_toStartOf="@id/tv_pad_count"
@@ -581,17 +599,17 @@
 
             </LinearLayout>
 
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
     <Button
         android:id="@+id/btn_confirm"
         android:layout_width="0dp"
-        android:layout_height="51dp"
+        android:layout_height="60dp"
         android:layout_margin="24dp"
         android:backgroundTint="@color/blue200"
         android:clickable="false"
+        style="@style/Title1"
         android:text="완료"
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
@@ -39,8 +40,6 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
     private val viewModel: CameraViewModel by activityViewModels()
 
 
-
-
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -62,6 +61,7 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
         super.onViewCreated(view, savedInstanceState)
 
         Log.d(TAG, "onViewCreated: ${viewModel.frontUri.value}")
+        Log.d(TAG, "onViewCreated stage: ${viewModel.step.value}")
         var url :Uri? = null
         if(viewModel.step.value ==1){
             url = viewModel.frontUri.value
@@ -77,7 +77,7 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
             url = viewModel.keypadUri.value
         }
         binding.ivProduct?.let {
-            Log.d(TAG, "CameraFragment: ")
+            Log.d(TAG, "CameraFragment uri: $it")
             Glide.with(it)
                 .load(url)
                 .into(it)
@@ -86,20 +86,32 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
         binding.btnBack?.setOnClickListener {
             cameraActivity.changeFragment(viewModel.step.value?:0)
         }
+
+        // 체크 버튼
         binding.btnCheck?.setOnClickListener {
             viewModel.postPhoto()
-//            cameraActivity.changeFragment((viewModel.step.value?:-1)+1)
         }
+
         // X 버튼 눌렀을 때
         binding.btnCancel?.setOnClickListener {
             showStopCameraDialog()
         }
 
-        viewModel.postResult.observe(requireActivity()){
+        viewModel.postResult.observe(viewLifecycleOwner){
             if(it?.success == true){
+                // 서버에 사진 전송 성공시에만 프론트에 단계 저장
+                viewModel.confirmPhoto(viewModel.step.value ?: 0)
+                // 다음 단계로 이동
                 cameraActivity.changeFragment((viewModel.step.value?:-1)+1)
                 viewModel.clearResult()
+            } else if (it != null) {
+                showNetworkErrorDialog()
             }
+        }
+
+        // 재촬영 url
+        viewModel.reCameraUri.observe(viewLifecycleOwner){
+            cameraActivity.moveToBackReCamera(it)
         }
 
     }
@@ -132,6 +144,25 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
         dialog.show()
     }
 
+    private fun showNetworkErrorDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.layout_error_dialog)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val width = (resources.displayMetrics.widthPixels * 0.4).toInt()
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        // 확인 버튼
+        val confirmButton = dialog.findViewById<TextView>(R.id.tv_confirm)
+        confirmButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -152,13 +183,10 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
             }
     }
 
-
     override fun onResume() {
         super.onResume()
         cameraActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
     }
-
-
 
 
 }

@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pizza.kkomdae.dto.request.ForthStageReq;
 import pizza.kkomdae.dto.request.SecondStageReq;
+import pizza.kkomdae.dto.request.TestResultReq;
 import pizza.kkomdae.dto.request.ThirdStageReq;
 import pizza.kkomdae.dto.respond.AiPhotoWithUrl;
 import pizza.kkomdae.dto.respond.LaptopTestResultWithStudent;
+import pizza.kkomdae.dto.respond.LaptopTotalResultRes;
 import pizza.kkomdae.dto.respond.PhotoWithUrl;
 import pizza.kkomdae.entity.*;
 import pizza.kkomdae.repository.PhotoRepository;
@@ -20,6 +23,7 @@ import pizza.kkomdae.security.dto.CustomUserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -55,7 +59,7 @@ public class TestResultService {
     @Transactional
     public long initTest(long userId, String serialNum) {
         Student student = studentRepository.getReferenceById(userId);
-        LaptopTestResult laptopTestResult = lapTopTestResultRepository.findByStudentAndStageIsLessThan(student, 5);
+        LaptopTestResult laptopTestResult = lapTopTestResultRepository.findByStudentAndStageIsLessThan(student, 6);
         if (laptopTestResult == null) {
             laptopTestResult = new LaptopTestResult(student);
             if (serialNum != null) {
@@ -95,6 +99,13 @@ public class TestResultService {
                 .collect(Collectors.toList());
     }
 
+    public AiPhotoWithUrl getAiPhoto(long testId, int type) {
+        LaptopTestResult laptopResult = lapTopTestResultRepository.getReferenceById(testId);
+        Photo photo = photoRepository.getPhotoByLaptopTestResultAndType(laptopResult, type);
+        String presignedUrl = s3Service.generatePresignedUrl(photo.getAiName());
+        return new AiPhotoWithUrl(photo, presignedUrl);
+    }
+
     @Transactional
     public void secondStage(CustomUserDetails userDetails, SecondStageReq secondStageReq) {
         Student student = studentRepository.getReferenceById(userDetails.getUserId());
@@ -114,15 +125,103 @@ public class TestResultService {
             throw new RuntimeException("저장된 테스트 없음");
         }
         testResult.saveThirdStage(thirdStageReq);
-        Rent rent = new Rent();
-        rent.setStudent(student);
-        rent.setRentDateTime(thirdStageReq.getLocalDate());
         Device device = deviceRepository.findDeviceBySerialNum(thirdStageReq.getSerialNum());
         if (device == null) {
             throw new RuntimeException("deivce 시리얼 에러");
         }
-        testResult.setDevice(device);
-        rent.setDevice(device);
+        Rent rent;
+        if (testResult.getRelease() == false) { // 대여로직
+            rent = new Rent();
+            rent.setStudent(student);
+            rent.setRentDateTime(thirdStageReq.getLocalDate());
+            testResult.setDevice(device);
+            rent.setDevice(device);
+        } else { // 반납 로직
+            rent = rentRepository.findByDeviceAndStudent(device, student);
+            rent.setReleaseDateTime(testResult.getDate());
+        }
+
         rentRepository.save(rent);
+    }
+
+    @Transactional
+    public String randomKey(long testId) {
+        // DB에서 해당 testId의 LaptopTestResult 조회
+        LaptopTestResult testResult = lapTopTestResultRepository.findById(testId)
+            .orElseThrow(() -> new RuntimeException("해당 테스트 결과가 존재하지 않습니다."));
+
+        // 알파벳 소문자 (a-z)
+        char letter = (char) ('a' + Math.random() * 26);
+        // 9000까지 의 랜덤 숫자 생성 후 1000을 더해 4자리 숫자 생성
+        int number = (int) (Math.random() * 9000) + 1000;
+
+        // 랜덤 키 생성
+        String random_key = String.format("%c%d", letter, number);
+
+        // 랜덤 키 저장
+        testResult.setRandomKey(random_key);
+
+        // DB에 저장
+        lapTopTestResultRepository.save(testResult);
+
+        // 랜덤 키를 반환
+        return random_key;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean verifyRandomKey(String key) {
+        // DB에서 랜덤 키가 존재하는지 확인
+        return lapTopTestResultRepository.findByRandomKey(key).isPresent();
+    }
+
+    @Transactional
+    public void updateTestResult(TestResultReq testResultReq) {
+        // 1. 입력값 검증
+        if (testResultReq.getRandomKey() == null || testResultReq.getRandomKey().isEmpty()) {
+            throw new RuntimeException("랜덤키가 필요합니다.");
+        }
+
+        // 2. 테스트 결과 조회
+        LaptopTestResult testResult = lapTopTestResultRepository
+                .findByRandomKey(testResultReq.getRandomKey())
+                .orElseThrow(() -> new RuntimeException("저장된 테스트가 없습니다."));
+
+        // 3. 테스트 결과 업데이트
+        testResult.updateTestResult(
+                testResultReq.getTestType(),
+                testResultReq.isSuccess(),
+                (List) testResultReq.getDetail(),
+                testResultReq.getSummary()
+        );
+
+        // 4. 저장
+        lapTopTestResultRepository.save(testResult);
+
+        // 5. 로깅 추가
+        log.info("테스트 결과 업데이트 완료 - randomKey: {}, testType: {}, success: {}",
+                testResultReq.getRandomKey(),
+                testResultReq.getTestType(),
+                testResultReq.isSuccess()
+        );
+    }
+
+    @Transactional
+    public void fourthStage(ForthStageReq forthStageReq) {
+        LaptopTestResult result = lapTopTestResultRepository.findById(forthStageReq.getTestId()).orElseThrow(()->new RuntimeException("testId 오류"));
+        result.setDescription(forthStageReq.getDescription());
+        result.setStage(5);
+    }
+
+    public LaptopTotalResultRes laptopTotalResult(long testId) {
+        LaptopTestResult result = lapTopTestResultRepository.findByIdWithStudentAndDeviceAndPhotos(testId);
+        LaptopTotalResultRes res = new LaptopTotalResultRes(result);
+        List<Photo> photos = result.getPhotos();
+        List<String> urls = new ArrayList<>();
+        for (Photo photo : photos) {
+            urls.add(s3Service.generatePresignedUrl(photo.getName()));
+        }
+        res.setImageUrls(urls);
+        
+        return res;
     }
 }

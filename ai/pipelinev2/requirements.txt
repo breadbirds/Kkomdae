@@ -1,0 +1,9 @@
+flask
+torch
+torchvision
+pillow
+numpy
+ultralytics
+opencv-python
+supervision
+openai

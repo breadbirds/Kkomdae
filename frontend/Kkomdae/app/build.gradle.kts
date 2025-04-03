@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
    // id("com.google.gms.google-services")
-    id("kotlin-kapt")
+    id("org.jetbrains.kotlin.kapt")
     id("dagger.hilt.android.plugin")
 }
 
@@ -30,12 +30,7 @@ android {
 
         // Server URL 추가
         buildConfigField("String", "SERVER_URL", "\"${localProperties.getProperty("SERVER_URL", "")}\"")
-        // Vision API 추가
-        buildConfigField(
-            "String",
-            "VISION_API_KEY",
-            "\"${localProperties.getProperty("VISION_API_KEY")}\""
-        )
+        buildConfigField("String", "VISION_API_KEY", "\"${localProperties.getProperty("VISION_API_KEY", "")}\"")
     }
 
     buildFeatures {
@@ -143,6 +138,15 @@ dependencies {
     // hilt
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-compiler:2.48")
+
+    // CameraX HDR (High Dynamic Range)
+    implementation ("androidx.camera:camera-extensions:1.3.0")
+
+    // TensorFlow Lite
+    implementation ("org.tensorflow:tensorflow-lite:2.13.0")
+    implementation ("org.tensorflow:tensorflow-lite-support:0.4.3")
+    implementation ("org.tensorflow:tensorflow-lite-task-vision:0.4.3")
+
 
     //OCR
     implementation("com.squareup.okhttp3:okhttp:4.10.0")

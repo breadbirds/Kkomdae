@@ -105,7 +105,7 @@ class AllStepOnboardingFragment : BaseFragment<FragmentAllStepOnboardingBinding>
             
         }
         
-        viewModel.testId.observe(requireActivity()){
+        viewModel.testId.observe(viewLifecycleOwner){
             Log.d(TAG, "onViewCreated: $it")
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
             transaction.replace(R.id.fl_main, Step1GuideFragment())

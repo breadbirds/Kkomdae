@@ -1,26 +1,31 @@
 import character from "../assets/character.svg";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { initScrollAnimations } from "../utils/animations";
 import "../styles/Download.css";
-import Modal from "./Modal"; // Modal 컴포넌트 import
+import axios from 'axios';
 
 const Download: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   useEffect(() => {
     initScrollAnimations();
   }, []);
 
-  const openModal = () => {
-    console.log("openModal called");
-    setIsModalOpen(true);
-    console.log("isModalOpen:", isModalOpen);
-  };
+  const handleDownload = async () => {
+    try {
+      // 배포
+      const response = await axios.get(`https://j12d101.p.ssafy.io/django/s3app/presigned-url/?file=kkomdae_diagnostics.exe`);
 
-  const closeModal = () => {
-    console.log("closeModal called");
-    setIsModalOpen(false);
-    console.log("isModalOpen:", isModalOpen);
+      // 개발
+      // const response = await axios.get(`http://127.0.0.1:8000/s3app/presigned-url/?file=kkomdae_diagnostics.exe`);
+
+      const presignedUrl = response.data.url;
+      console.log(response);
+
+      // presigned URL로 브라우저를 이동하면 S3에서 직접 다운로드 시작
+      window.location.href = presignedUrl;
+    } catch (error) {
+      console.error(error);
+      alert("파일 다운로드 중 오류가 발생했습니다.");
+    }
   };
 
   return (
@@ -56,7 +61,7 @@ const Download: React.FC = () => {
             </div>
             <div className="download-note">
               <p>* 자가진단 프로그램은 Windows PC에서만 실행 가능합니다.</p>
-              <button onClick={openModal} className="diagnostics-link">
+              <button onClick={handleDownload} className="diagnostics-link">
                 자가진단 프로그램 다운로드
               </button>
             </div>
@@ -68,7 +73,6 @@ const Download: React.FC = () => {
           </div>
         </div>
       </div>
-      <Modal isOpen={isModalOpen} onClose={closeModal} /> {/* Modal 컴포넌트 사용 */}
     </section>
   );
 };

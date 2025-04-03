@@ -100,6 +100,7 @@
         android:layout_height="0dp">
 
         <ImageView
+            android:id="@+id/iv_ex"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -109,6 +110,7 @@
             android:src="@drawable/ic_guide_screen"/>
 
         <ImageView
+            android:id="@+id/iv_frame"
             android:layout_margin="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -151,6 +153,7 @@
             />
 
         <TextView
+            android:id="@+id/tv_description1"
             android:layout_marginStart="12dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -181,6 +184,7 @@
             />
 
         <TextView
+            android:id="@+id/tv_description2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
@@ -211,6 +215,7 @@
             />
 
         <TextView
+            android:id="@+id/tv_description3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="화면의 모든 가장자리가 보이도록 촬영하세요"
@@ -241,6 +246,7 @@
                 />
 
             <TextView
+                android:id="@+id/tv_description4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="반사광이 없도록 각도를 조절하세요"

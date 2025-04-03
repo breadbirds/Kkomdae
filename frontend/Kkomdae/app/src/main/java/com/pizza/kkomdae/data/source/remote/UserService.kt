@@ -10,4 +10,7 @@ interface UserService {
     @GET("api/user-info")
     suspend fun getUserInfo(): UserResponseDto
 
+    @GET("api/test-file/{file-name}")
+    suspend fun getTestFile(fileName:String)
+
 }

@@ -64,7 +64,7 @@ class OathFragment : BaseFragment<FragmentOathBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /// 다이얼로그 표시
+        // 다이얼로그 표시
         showIntroDialog()
 
         // 제목 설정
@@ -172,7 +172,7 @@ class OathFragment : BaseFragment<FragmentOathBinding>(
 
         }
 
-        // 다음 화면 수정한 기기등록 화면으로 넘어가기
+        // 다음 기기등록 화면으로 넘어가기
         binding.btnNext.setOnClickListener {
             if (isOath1Checked && isOath2Checked && isOath3Checked && isOath4Checked) {
                 val transaction = requireActivity().supportFragmentManager.beginTransaction()
