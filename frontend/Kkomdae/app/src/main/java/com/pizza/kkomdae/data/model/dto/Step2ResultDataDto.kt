@@ -9,4 +9,5 @@ data class Step2ResultDataDto(
     val failed_keys: String?,
     val battery_report_url: String?,
     val failed_ports: String?,
+    val success: Boolean?
 )

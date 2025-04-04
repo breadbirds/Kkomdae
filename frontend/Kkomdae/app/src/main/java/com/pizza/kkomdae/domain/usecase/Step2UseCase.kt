@@ -46,4 +46,15 @@ class Step2UseCase@Inject constructor(
         }
     }
 
+    suspend fun postSecondToThird(
+        testId: Long
+    ): Result<PostResponse>{
+        return try {
+            val response = step2Repository.postSecondToThird(testId)
+            Result.success(response)
+        }catch (e: Exception){
+            Result.failure(e)
+        }
+    }
+
 }

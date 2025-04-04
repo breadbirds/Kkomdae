@@ -53,4 +53,17 @@ class Step2RepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun postSecondToThird(testId: Long): PostResponse {
+        return try {
+            Step2Mapper.toPostStageResponse(
+                step2Service.postSecondToThird(
+                    testId
+                )
+            )
+
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
 }

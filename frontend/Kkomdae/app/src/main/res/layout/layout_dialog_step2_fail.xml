@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="24dp"
+    app:cardCornerRadius="30dp"
+    app:cardElevation="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingBottom="32dp">
+
+        <ImageView
+            android:id="@+id/iv_character"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_marginTop="32dp"
+            android:src="@drawable/ic_developing_kkomi"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_description1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="자가진단이 아직 완료되지 않았어요!"
+            android:textColor="@color/gray700"
+            style="@style/Title2"
+            android:lineSpacingExtra="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_character" />
+
+
+
+
+        <TextView
+            android:id="@+id/tv_description2_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="미진단 항목"
+            android:textColor="#7E5724"
+            style="@style/Title4"
+            android:gravity="center"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="@id/cv_description2"
+            app:layout_constraintEnd_toEndOf="@id/cv_description2"
+            app:layout_constraintTop_toBottomOf="@id/tv_description1"
+           />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:background="@drawable/border_gray_rounded"
+            android:backgroundTint="#FFF8E1"
+            android:layout_marginTop="7dp"
+            android:id="@+id/cv_description2"
+            app:layout_constraintTop_toBottomOf="@id/tv_description2_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="26dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:id="@+id/tv_description2"
+                android:layout_width="wrap_content"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_height="wrap_content"
+                android:text="키보드, 충전기, 배터리, 웹캠, USB"
+                android:textColor="#7E5724"
+                style="@style/Label3"
+                android:textAlignment="center"
+                android:lineSpacingExtra="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_confirm"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="32dp"
+            android:background="@drawable/bg_button_orange"
+            android:backgroundTint="@color/gray100"
+            android:text="확인"
+            android:textColor="@color/gray600"
+            style="@style/Title1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cv_description2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

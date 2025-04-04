@@ -108,12 +108,13 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_random_key"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/step_1"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="60dp"
+            app:layout_constraintTop_toBottomOf="@id/layout_device_images"
             tools:layout_editor_absoluteX="36dp">
 
             <TextView
@@ -127,13 +128,15 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/step_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             android:layout_marginEnd="24dp"
-            android:layout_marginTop="60dp"
-            app:layout_constraintTop_toBottomOf="@id/layout_device_images">
+            app:layout_constraintTop_toBottomOf="@id/cl_random_key">
 
             <TextView
                 android:id="@+id/tv_step1_number"
@@ -149,7 +152,7 @@
                 android:id="@+id/tv_step1_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="자가진단"
+                android:text="프로그램 실행"
                 style="@style/Headline2"
                 android:textColor="@color/gray700"
                 android:layout_marginStart="24dp"
@@ -205,7 +208,7 @@
                 android:id="@+id/tv_step2_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="QR 스캔"
+                android:text="코드 입력"
                 style="@style/Headline2"
                 android:textColor="@color/gray700"
                 android:layout_marginStart="24dp"
@@ -218,7 +221,7 @@
                 android:layout_height="wrap_content"
                 style="@style/Body2"
                 android:textColor="@color/gray300"
-                android:text="자가진단 완료 후 생성된 QR코드를\n모바일 앱으로 스캔해주세요."
+                android:text="모바일에 생성된 코드번호를\n노트북에 입력해주세요."
                 android:layout_marginTop="8dp"
                 app:layout_constraintStart_toStartOf="@id/tv_step2_title"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -260,7 +263,7 @@
                 android:id="@+id/tv_step3_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="결과전송"
+                android:text="자가진단"
                 style="@style/Headline2"
                 android:textColor="@color/gray700"
                 android:layout_marginStart="24dp"
@@ -271,7 +274,7 @@
                 android:id="@+id/tv_step3_description"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="자가진단 결과가 앱으로 자동 전송됩니다."
+                android:text="진단 완료 후 결과 보기 버튼을 눌러주세요"
                 style="@style/Body2"
                 android:textColor="@color/gray300"
                 android:layout_marginTop="8dp"
@@ -283,12 +286,25 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
+        android:id="@+id/btn_pass"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:backgroundTint="@color/gray500"
+        android:textColor="@color/white"
+        android:text="건너뛰기"
+        android:layout_margin="24dp"
+        style="@style/Title1"
+        app:layout_constraintBottom_toTopOf="@id/btn_next"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
         android:id="@+id/btn_next"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:backgroundTint="@color/gray500"
         android:textColor="@color/white"
-        android:text="QR코드 스캔하기"
+        android:text="자가진단 결과보기"
         android:layout_margin="24dp"
         style="@style/Title1"
         app:layout_constraintBottom_toBottomOf="parent"

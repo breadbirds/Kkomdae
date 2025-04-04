@@ -60,7 +60,8 @@ object Step2Mapper {
         keyboard_status = step2ResultDataDto.keyboard_status,
         failed_keys = step2ResultDataDto.failed_keys,
         failed_ports = step2ResultDataDto.failed_ports,
-        battery_report_url = step2ResultDataDto.battery_report_url
+        battery_report_url = step2ResultDataDto.battery_report_url,
+        success = step2ResultDataDto.success
     )
 
 }

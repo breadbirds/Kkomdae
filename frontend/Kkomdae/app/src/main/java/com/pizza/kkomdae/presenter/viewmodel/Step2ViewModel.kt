@@ -95,17 +95,26 @@ class Step2ViewModel@Inject constructor(
         }
     }
 
-    fun getStep2Result(){
-        viewModelScope.launch {
-            val result= step2UseCase.getStep2Result(testId = sharedPreferences.getLong("test_id",0))
-            result.onSuccess {
-                _getStep2Result.postValue(it)
-            }
+    suspend fun getStep2Result(): Result<GetStep2ResultResponse>{
+
+          return try {
+              step2UseCase.getStep2Result(testId = sharedPreferences.getLong("test_id",0))
+          }catch (e: Exception){
+              Result.failure(e)
+          }
+
+    }
+
+    suspend fun postSecondToThird():Result<PostResponse>{
+        return try {
+            step2UseCase.postSecondToThird(testId = sharedPreferences.getLong("test_id",0))
+        }catch (e: Exception){
+            Result.failure(e)
         }
     }
 
-    fun postSecondStage(){
-        viewModelScope.launch {
+    suspend fun postSecondStage():Result<PostResponse>{
+
             val result = step2UseCase.postSecondStage(PostSecondStageRequest(
                 testId = sharedPreferences.getLong("test_id",0),
                 keyboardStatus = keyboardStatus.value?.status == "pass",
@@ -116,7 +125,6 @@ class Step2ViewModel@Inject constructor(
                 chargerStatus = chargerStatus.value?.status == "pass",
                 batteryReport = batteryStatus.value?.status == "pass",
                 batteryReportUrl =batteryStatus.value?.reportName ?:""
-
             ))
             Log.d(TAG, "getUserInfo: $result")
 
@@ -132,7 +140,7 @@ class Step2ViewModel@Inject constructor(
 
             }
 
-        }
+
     }
 
 }
