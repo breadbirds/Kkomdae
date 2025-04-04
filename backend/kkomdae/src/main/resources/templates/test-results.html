@@ -84,8 +84,8 @@
                 <td th:text="${result.studentRegion}">지역</td>
                 <td th:text="${result.studentName}">교육생 이름</td>
                 <td th:text="${result.studentNum}">교육생 학번</td>
-                <td th:text="${result.failedKeys != null ? result.failedKeys : '정상'}">실패한 키</td>
-                <td th:text="${result.failedPorts != null ? result.failedPorts : '정상'}">실패한 포트</td>
+                <td th:text="${!result.failedKeys.isBlank() ? result.failedKeys : '정상'}">실패한 키</td>
+                <td th:text="${!result.failedPorts.isBlank() ? result.failedPorts : '정상'}">실패한 포트</td>
                 <td>
                     <span class="status-badge" th:classappend="${result.cameraStatus ? 'status-success' : 'status-danger'}"
                           th:text="${result.cameraStatus ? '정상' : '고장'}">카메라 상태</span>
