@@ -9,5 +9,6 @@ data class UserRentTestRes(
     val onGoingTestId : Int,
     val stage : Int,
     val picStage : Int,
-    val serialNum:String
+    val serialNum:String,
+    val rentId: Int
 )
