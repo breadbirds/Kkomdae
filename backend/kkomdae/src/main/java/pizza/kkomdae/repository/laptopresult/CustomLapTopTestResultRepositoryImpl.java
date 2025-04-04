@@ -42,6 +42,16 @@ public class CustomLapTopTestResultRepositoryImpl implements CustomLapTopTestRes
                 .fetchOne();
     }
 
+    @Override
+    public LaptopTestResult findByStudentAndStageIsLessThanAndReleaseIsFalse(Student student, Integer stageIsLessThan) {
+        QLaptopTestResult laptopTestResult = QLaptopTestResult.laptopTestResult;
+        QStudent student1 = QStudent.student;
+
+        return query.selectFrom(laptopTestResult)
+                .where(laptopTestResult.stage.lt(stageIsLessThan).and(laptopTestResult.release.eq(false).and(laptopTestResult.student.eq(student1))))
+                .fetchOne();
+    }
+
     private Predicate isCond(Student student, Device device) {
         if (student != null && device != null) {
             return QStudent.student.eq(student).and(QDevice.device.eq(device));

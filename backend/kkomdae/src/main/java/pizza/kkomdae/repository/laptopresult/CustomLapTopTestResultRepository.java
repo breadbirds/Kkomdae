@@ -11,4 +11,6 @@ public interface CustomLapTopTestResultRepository {
     List<LaptopTestResult> findByStudentOrDevice(Student student, Device device);
 
     LaptopTestResult findByIdWithStudentAndDeviceAndPhotos(long testId);
+
+    LaptopTestResult findByStudentAndStageIsLessThanAndReleaseIsFalse(Student student, Integer stageIsLessThan);
 }
