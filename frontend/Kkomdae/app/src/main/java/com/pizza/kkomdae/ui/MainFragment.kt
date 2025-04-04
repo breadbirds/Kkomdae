@@ -83,7 +83,15 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
 
         val adapter = SubmissionAdapter(clickPdf = {
             Toast.makeText(requireContext(),"pdf 파일이 다운로드 중입니다.",Toast.LENGTH_SHORT).show()
-            finalViewModel.getPdfUrl(it)
+            lifecycleScope.launch {
+                val result = finalViewModel.getPdfUrl(it)
+                result.onSuccess {
+                    viewModel.downloadPdf(it.url)
+                }.onFailure {
+                    // todo 에러 다이얼 로그 띄우기
+                }
+            }
+
         }, clickRelease = {
 
             if(it.stage!=0 || it.picStage !=0){
@@ -91,18 +99,17 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
                 viewModel.saveTestId(it.onGoingTestId.toLong()) // 테스트 아이디
                 viewModel.setRelease(true) // 반납인지 체크
                 viewModel.setReleasePicStage(it.picStage) // 1단계 스테이지 저장
+
                 step=it.stage
                 Log.d("Post", "onViewCreated: $step")
             }else{
                 newRelease(it.rentId)
+                viewModel.savePhotoStage(0)
             }
 
 
         })
-        // 파일명 -> url 변환 통신 결과
-        finalViewModel.pdfUrl.observe(viewLifecycleOwner){
-            viewModel.downloadPdf(it)
-        }
+
         binding.rvSubmission.adapter =adapter
         binding.rvSubmission.layoutManager = LinearLayoutManager(mainActivity)
 
