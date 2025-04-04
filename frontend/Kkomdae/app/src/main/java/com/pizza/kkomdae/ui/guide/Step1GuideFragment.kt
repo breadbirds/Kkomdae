@@ -85,7 +85,14 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
     override fun onResume() {
         super.onResume()
 
-            step=viewModel.getPhotoStage()
+            if(viewModel.release.value==true){
+                // 반납 상태
+                step = viewModel.releasePicStage.value?:0
+            }else{
+                // 대여 상태
+                step=viewModel.getPhotoStage()
+            }
+
 
         val color = ContextCompat.getColorStateList(requireContext(), R.color.blue500)
 

@@ -20,8 +20,11 @@ import com.pizza.kkomdae.ui.step2.QrScanFragment
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.activityViewModels
+import com.pizza.kkomdae.presenter.viewmodel.Step2ViewModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -43,6 +46,7 @@ class Step2GuideFragment : BaseFragment<FragmentStep2GuideBinding>(
 
     // 시스템 백 버튼 콜백 선언
     private lateinit var backPressedCallback: OnBackPressedCallback
+    private val viewModel: Step2ViewModel by activityViewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,6 +74,10 @@ class Step2GuideFragment : BaseFragment<FragmentStep2GuideBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // 랜덤키 생성
+        crateRandom()
+
         binding.topBar.tvTitle.text = "Step 2"
         binding.topBar.pbStep.progress=200/3
 
@@ -96,13 +104,24 @@ class Step2GuideFragment : BaseFragment<FragmentStep2GuideBinding>(
         }
 
         binding.btnNext.setOnClickListener {
+
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
             transaction.replace(R.id.fl_main, QrScanFragment())
             transaction.addToBackStack(null)
             transaction.commit()
         }
 
+
         showIntroDialog()
+    }
+
+    // 랜덤키 생성
+    private fun crateRandom() {
+        viewModel.postRandomKey()
+        viewModel.randomKey.observe(viewLifecycleOwner) {
+            binding.tvRandom.text="코드 번호 : $it"
+            Log.d("Post", "onViewCreated: $it")
+        }
     }
 
     private fun showIntroDialog() {
