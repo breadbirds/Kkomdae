@@ -231,28 +231,34 @@ class FinalViewModel @Inject constructor(
 
                         when(stage){
                             1->{
-                                _rePhoto1.postValue(response)
                                 _frontUri.postValue(response.data.photo_ai_url)
+                                _rePhoto1.postValue(response)
+
                             }
                             2->{
-                                _rePhoto2.postValue(response)
                                 _backUri.postValue(response.data.photo_ai_url)
+                                _rePhoto2.postValue(response)
+
                             }
                             3->{
-                                _rePhoto3.postValue(response)
                                 _leftUri.postValue(response.data.photo_ai_url)
+                                _rePhoto3.postValue(response)
+
                             }
                             4->{
-                                _rePhoto4.postValue(response)
                                 _rightUri.postValue(response.data.photo_ai_url)
+                                _rePhoto4.postValue(response)
+
                             }
                             5->{
-                                _rePhoto5.postValue(response)
                                 _screenUri.postValue(response.data.photo_ai_url)
+
+                                _rePhoto5.postValue(response)
                             }
                             6->{
-                                _rePhoto6.postValue(response)
                                 _keypadUri.postValue(response.data.photo_ai_url)
+                                _rePhoto6.postValue(response)
+
                             }
                         }
                     }
