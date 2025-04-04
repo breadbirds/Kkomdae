@@ -313,7 +313,7 @@
             const studentIds = [...selected].map(el => el.value);
 
             // AJAX 요청을 사용하여 POST 방식으로 학생 ID 배열 전송
-            fetch('https://j12d101.p.ssafy.io/api/admin/notification', {
+            fetch('/api/admin/notification', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
