@@ -22,17 +22,50 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
 }){
 
 
+
     inner class SubmissionViewHolder(val binding: ItemSubmissionBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(position: Int){
+
+            if(getItem(position).release){
+                binding.tvStateRelease.isVisible=true
+                binding.tvStateRant.isVisible=false
+                binding.btReturnDownload.isVisible=true
+                binding.btReturn.isVisible=false
+            }else{
+                binding.tvStateRelease.isVisible=false
+                binding.tvStateRant.isVisible=true
+                binding.btReturnDownload.isVisible=false
+                binding.btReturn.isVisible=true
+            }
             binding.btnDown.setOnClickListener {
-                binding.tvState.isVisible = false
+                binding.tvStateRant.isVisible = false
+                binding.tvStateRelease.isVisible=false
                 binding.clMenu.isVisible=true
                 binding.btnUp.isVisible=true
                 binding.btnDown.isVisible=false
+
+                if(getItem(position).release){
+                    binding.btReturnDownload.isVisible=true
+                    binding.btReturn.isVisible=false
+                    binding.tvDate.isVisible=false
+                    binding.tvInputDate.isVisible=false
+
+                }else{
+                    binding.btReturnDownload.isVisible=false
+                    binding.btReturn.isVisible=true
+                }
             }
 
             binding.btnUp.setOnClickListener {
-                binding.tvState.isVisible = true
+                if(getItem(position).release){
+                    binding.tvStateRelease.isVisible=true
+                    binding.tvStateRant.isVisible=false
+                }else{
+                    binding.tvStateRelease.isVisible=false
+                    binding.tvStateRant.isVisible=true
+                }
+                binding.btReturnDownload.isVisible=false
+                binding.btReturn.isVisible=false
                 binding.clMenu.isVisible=false
                 binding.btnUp.isVisible=false
                 binding.btnDown.isVisible=true
@@ -47,6 +80,12 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
             }
 
             binding.btReturnDownload.setOnClickListener {
+                getItem(position).releasePdfName?.let {
+                    clickPdf(it)
+                }
+            }
+
+            binding.btReturn.setOnClickListener {
 
                     clickRelease(getItem(position))
 

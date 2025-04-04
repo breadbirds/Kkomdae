@@ -124,7 +124,7 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
             binding.tvWelcomeMessage.text="${it.name}님 안녕하세요!"
             adapter.submitList(it.userRentTestRes.filter { item ->
                 item.rentPdfName != null
-            })
+            }.reversed())
 
             // 진행중인 과정이 있는지 확인하고 표시
             updateInProgressIndicator()
