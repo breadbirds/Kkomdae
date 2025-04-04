@@ -236,4 +236,10 @@ public class TestResultService {
         
         return res;
     }
+
+    @Transactional
+    public void secondToThird(long testId) {
+        LaptopTestResult result = lapTopTestResultRepository.getReferenceById(testId);
+        result.setStage(3);
+    }
 }

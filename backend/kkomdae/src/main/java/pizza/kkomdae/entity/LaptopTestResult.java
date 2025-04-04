@@ -112,13 +112,13 @@ public class LaptopTestResult {
             default -> throw new IllegalArgumentException("유효하지 않은 테스트 타입입니다: " + testResultReq.getTestType());
         }
     
-        // 테스트 결과가 모두 완료되었는지 확인하고 stage 업데이트
-        if (isAllTestCompleted()) {
-            this.stage = 3;  // 모든 테스트가 완료되면 다음 단계로
-        }
+//        // 테스트 결과가 모두 완료되었는지 확인하고 stage 업데이트
+//        if (isAllTestCompleted()) {
+//            this.stage = 3;  // 모든 테스트가 완료되면 다음 단계로
+//        }
     }
 
-    private boolean isAllTestCompleted() {
+    public boolean isAllTestCompleted() {
         return keyboardStatus != null &&
             cameraStatus != null &&
             usbStatus != null &&
