@@ -7,10 +7,12 @@ import pizza.kkomdae.entity.LaptopTestResult;
 import pizza.kkomdae.entity.Rent;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Slf4j
 @Getter
 public class UserRentTestRes {
+    private final long rentId;
     private final String modelCode;
     private final String serialNum;
     private final LocalDate dateTime;
@@ -22,20 +24,23 @@ public class UserRentTestRes {
     private int picStage = 0;
 
     public UserRentTestRes(Rent rent) {
+        this.rentId = rent.getRentId();
         Laptop laptop = (Laptop) rent.getDevice();
         this.modelCode = laptop.getModelCode();
         this.serialNum = laptop.getSerialNum();
-        this.rentPdfName = rent.getDevice().getLaptopTestResults().get(0).getPdfFileName();
+        List<LaptopTestResult> laptopTestResults = rent.getLaptopTestResults();
+
+        this.rentPdfName = laptopTestResults.get(0).getPdfFileName();
 //        log.info("테스트 번호 {}",rent.getDevice().getLaptopTestResults().get(0).getLaptopTestResultId());
         if (rent.getReleaseDateTime() != null) { // 반납했다면
             this.dateTime = rent.getReleaseDateTime();
             this.release = true;
-            this.releasePdfName = rent.getDevice().getLaptopTestResults().get(1).getPdfFileName();
+            this.releasePdfName = laptopTestResults.get(1).getPdfFileName();
         } else {
             this.dateTime = rent.getRentDateTime();
             this.release = false;
         }
-        if (rent.getDevice().getLaptopTestResults().size() > 1 && !rent.getDevice().isRelease()) { // 진행 중인 테스트가 있다면 getRentsByStudentInfo order by를 device Id, laptopId로 해두어서 0번이 대여, 1번이 반납인 것을 확정
+        if (laptopTestResults.size() > 1 && !rent.getDevice().isRelease()) { // 진행 중인 테스트가 있다면 getRentsByStudentInfo order by를 device Id, laptopId로 해두어서 0번이 대여, 1번이 반납인 것을 확정
             LaptopTestResult result = rent.getDevice().getLaptopTestResults().get(1);
             this.release=false;
             this.onGoingTestId = result.getLaptopTestResultId();
