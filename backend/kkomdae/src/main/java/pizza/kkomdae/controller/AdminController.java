@@ -57,6 +57,7 @@ public class AdminController {
             return "redirect:/error";
         }
     }
+
     // 세션 삭제
     @PostMapping("/logout")
     public String logout() {
@@ -72,7 +73,7 @@ public class AdminController {
         model.addAttribute("students", results);
         return "students";
     }
-    
+
 
     @GetMapping("/devices")
     public String devices(DeviceCond deviceCond, Model model) {
@@ -130,14 +131,20 @@ public class AdminController {
             RedirectAttributes redirectAttributes) {
 
         try {
-            mattermostNotificationService.sendGroupMessage(nicknames);
+            mattermostNotificationService.sendGroupInfoMessage(nicknames);
 
             redirectAttributes.addFlashAttribute("message", "알림 발송 완료");
         } catch (Exception e) {
             log.error("알림 발송 실패", e);
             redirectAttributes.addFlashAttribute("error", "알림 발송 실패");
         }
-        //TODO env 파일 teamID 변경
         return "redirect:/api/admin/students";
+    }
+
+    @PostMapping("/alert")
+    public String sendAlert(@RequestBody List<String> nicknames, RedirectAttributes redirectAttributes) {
+        mattermostNotificationService.sendGroupHurryMessage(nicknames);
+
+        return "redirect:/api/admin/student";
     }
 }
