@@ -53,7 +53,7 @@ public class PdfService {
         }
         result.setPdfFileName(fileName);
         result.setStage(6);
-        result.getDevice().setRelease(true);
+        if (result.getRelease()) result.getDevice().setRelease(true);
         lapTopTestResultRepository.save(result);
         return fileName;
     }
