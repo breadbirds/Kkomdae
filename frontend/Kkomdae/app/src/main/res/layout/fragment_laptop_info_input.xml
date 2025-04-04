@@ -74,7 +74,8 @@
                 app:boxCornerRadiusTopEnd="10dp"
                 app:boxCornerRadiusTopStart="10dp"
                 app:boxStrokeColor="@color/gray400"
-                app:layout_constraintTop_toBottomOf="@id/tv_serial">
+                app:layout_constraintTop_toBottomOf="@id/tv_serial"
+                >
 
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -85,7 +86,23 @@
                     android:hint="시리얼 번호를 입력해주세요"
                     android:paddingStart="16dp" />
 
+
+
             </com.google.android.material.textfield.TextInputLayout>
+
+            <ImageView
+                android:id="@+id/btn_ocr_serial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_retake_btn"
+                android:clickable="true"
+                android:focusable="true"
+                android:elevation="8dp"
+                android:focusableInTouchMode="true"
+                app:layout_constraintEnd_toEndOf="@+id/il_serial"
+                app:layout_constraintBottom_toBottomOf="@id/il_serial"
+                app:layout_constraintTop_toTopOf="@+id/il_serial"
+                app:tint="@color/gray700" />
 
             <TextView
                 android:id="@+id/tv_barcode"

@@ -30,6 +30,7 @@ android {
 
         // Server URL 추가
         buildConfigField("String", "SERVER_URL", "\"${localProperties.getProperty("SERVER_URL", "")}\"")
+        buildConfigField("String", "VISION_API_KEY", "\"${localProperties.getProperty("VISION_API_KEY", "")}\"")
     }
 
     buildFeatures {
@@ -108,7 +109,6 @@ dependencies {
     // CameraX - 미리보기
     implementation ("androidx.camera:camera-view:1.3.0")
 
-
     // Material
     implementation ("com.google.android.material:material:1.10.0")
 
@@ -147,4 +147,8 @@ dependencies {
     implementation ("org.tensorflow:tensorflow-lite-support:0.4.3")
     implementation ("org.tensorflow:tensorflow-lite-task-vision:0.4.3")
 
+
+    //OCR
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation ("org.json:json:20210307")
 }
