@@ -11,9 +11,9 @@ import javax.inject.Inject
 class InspectRepositoryImpl@Inject constructor(
     private val inspectService: InspectService
 ) : InspectRepository {
-    override suspend fun postText(serialNum: String?): Long {
+    override suspend fun postTest(rentId: Int?): Long {
         return try {
-            inspectService.postTest(serialNum)
+            inspectService.postTest(rentId)
 //            InspectMapper.toInspectResponse(inspectService.postTest(serialNum))
         }catch (e: Exception){
             throw e

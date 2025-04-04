@@ -94,7 +94,7 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
                 step=it.stage
                 Log.d("Post", "onViewCreated: $step")
             }else{
-                newRelease(it.serialNum)
+                newRelease(it.rentId)
             }
 
 
@@ -115,7 +115,9 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
         viewModel.userInfoResult.observe(viewLifecycleOwner){
             step=it.stage
             binding.tvWelcomeMessage.text="${it.name}님 안녕하세요!"
-            adapter.submitList(it.userRentTestRes)
+            adapter.submitList(it.userRentTestRes.filter { item ->
+                item.rentPdfName != null
+            })
 
             // 진행중인 과정이 있는지 확인하고 표시
             updateInProgressIndicator()
@@ -129,7 +131,6 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
             if (step == 0) {
                 navigateToFragment(OathFragment())
             } else {
-                viewModel.saveTestId(viewModel.testId.value?:0)
                 showContinueDialog()
             }
         }
@@ -146,7 +147,7 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
     }
 
     // 반납 처음 시작할때 testId 생성
-    private fun newRelease(it: String) {
+    private fun newRelease(it: Int) {
         lifecycleScope.launch {
             val response = viewModel.postReleaseTest(it)
             response.onSuccess {

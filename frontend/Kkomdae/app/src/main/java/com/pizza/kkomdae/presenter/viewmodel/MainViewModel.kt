@@ -78,9 +78,9 @@ class MainViewModel@Inject constructor(
         _release.postValue(release)
     }
 
-    suspend fun postTest(serialNum: String?): Result<Long>{
+    suspend fun postTest(rentId: Int?): Result<Long>{
       return try {
-            val result = inspectUseCase.postTest(serialNum = serialNum)
+            val result = inspectUseCase.postTest(rentId = rentId)
             Log.d(TAG, "getUserInfo: $result")
            result
         }catch (e:Exception){
@@ -88,11 +88,11 @@ class MainViewModel@Inject constructor(
         }
     }
 
-    suspend fun postReleaseTest(serialNum: String?):Result<Long>{
+    suspend fun postReleaseTest(rentId: Int):Result<Long>{
 
 
         return try {
-            val response = inspectUseCase.postTest(serialNum =serialNum )
+            val response = inspectUseCase.postTest(rentId =rentId )
             response // ✅ 성공 시 Result.success 반환
         } catch (e: Exception) {
             Result.failure(e)  // ✅ 실패 시 Result.failure 반환
@@ -160,7 +160,8 @@ class MainViewModel@Inject constructor(
                                 onGoingTestId = it.onGoingTestId,
                                 stage = it.stage,
                                 picStage = it.picStage,
-                                serialNum = it.serialNum
+                                serialNum = it.serialNum,
+                                rentId = it.rentId
                             )
                         }
                         )

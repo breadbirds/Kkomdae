@@ -56,17 +56,16 @@ public class TestResultService {
     @Transactional
     public long initTest(long userId, Long rentId) {
         Student student = studentRepository.getReferenceById(userId);
-        LaptopTestResult laptopTestResult = lapTopTestResultRepository.findByStudentAndStageIsLessThan(student, 6);
-        if (laptopTestResult == null) {
-            laptopTestResult = new LaptopTestResult(student);
-            if (rentId != null) { // 반납이라면
-                Rent rent = rentRepository.findById(rentId).orElseThrow(()-> new RuntimeException("없는 rentId 오류"));
-                laptopTestResult.setRent(rent);
-                laptopTestResult.setRelease(true);
-            }
-            lapTopTestResultRepository.save(laptopTestResult);
-            laptopTestResult.setStage(1);
+        LaptopTestResult laptopTestResult = new LaptopTestResult(student);
+
+        if (rentId != null) { // 반납이라면
+            Rent rent = rentRepository.findById(rentId).orElseThrow(()-> new RuntimeException("없는 rentId 오류"));
+            laptopTestResult.setRent(rent);
+            laptopTestResult.setRelease(true);
         }
+        lapTopTestResultRepository.save(laptopTestResult);
+        laptopTestResult.setStage(1);
+
         return laptopTestResult.getLaptopTestResultId();
     }
 
