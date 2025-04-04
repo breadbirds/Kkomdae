@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -61,6 +62,11 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
         binding.viewPager.adapter = adapter
 
         viewModel.getLaptopTotalResult()
+
+        binding.clStep1.slideInFromLeft(0L)
+        binding.clStep2.slideInFromLeft(100L)
+        binding.clStep3.slideInFromLeft(200L)
+        binding.clStep4.slideInFromLeft(350L)
 
 
         viewModel.getFinalResult.observe(viewLifecycleOwner){
@@ -218,6 +224,19 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
 
 
         dialog.show()
+    }
+
+    fun View.slideInFromLeft(delay: Long = 0L, duration: Long = 700L) {
+        translationX = 800f // 왼쪽 바깥에서 시작
+        alpha = 0f
+        postDelayed({
+            animate()
+                .translationX(0f)
+                .alpha(1f)
+                .setInterpolator(AccelerateDecelerateInterpolator())
+                .setDuration(duration)
+                .start()
+        }, delay)
     }
 
     companion object {

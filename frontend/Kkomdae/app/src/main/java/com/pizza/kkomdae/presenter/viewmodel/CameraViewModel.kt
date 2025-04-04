@@ -168,6 +168,7 @@ class CameraViewModel @Inject constructor(
 
     fun postPhoto(){
         var uri = frontUri.value
+        savePhotoStage(step.value?:0)
 //        val testId = 2L
         val testId = sharedPreferences.getLong("test_id",0)
         Log.d("Post", "postPhoto: ${step.value}")
