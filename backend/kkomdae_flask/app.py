@@ -38,7 +38,7 @@ folder = os.getenv('S3_PREFIX')
 # Faster R CNN
 faster_model_path = "model/faster_damage.pth"                  # 모델 pth 경로
 num_classes = 2                                         # class(damage, background)
-faster_threshold = 0.6                                   # threshold
+faster_threshold = 0.1                                   # threshold
 
 # YOLO
 yolo_model_path = "model/yolo_laptop.pt"
