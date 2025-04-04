@@ -31,7 +31,7 @@ folder = os.getenv('S3_PREFIX')
 
 # AI 모델 설정
 faster_model_path = "model/faster_damage.pth"
-yolo_model_path = "model/yolo_laptop.pt"
+yolo_model_path = "model/yolov8_laptop.pt"
 faster_threshold = 0.1
 yolo_threshold = 0.7
 class_names = ["background", "damage_bbox"]
