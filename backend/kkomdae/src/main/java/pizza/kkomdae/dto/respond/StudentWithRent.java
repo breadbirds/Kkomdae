@@ -3,6 +3,7 @@ package pizza.kkomdae.dto.respond;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import pizza.kkomdae.entity.Device;
 import pizza.kkomdae.entity.Laptop;
 import pizza.kkomdae.entity.Phone;
@@ -11,6 +12,7 @@ import pizza.kkomdae.entity.Student;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Getter
 @Setter
 public class StudentWithRent {
@@ -41,8 +43,8 @@ public class StudentWithRent {
 
         public DeviceRentHistory(Device device) {
             this.deviceId=device.getDeviceId();
-            if (device instanceof Laptop) {
-                Laptop laptop = (Laptop) device;
+            log.info("Device id : {}", deviceId);
+            if (device instanceof Laptop laptop) {
                 this.type = laptop.getDeviceType();
                 this.modelCode = laptop.getModelCode();
                 this.serialNum = laptop.getSerialNum();

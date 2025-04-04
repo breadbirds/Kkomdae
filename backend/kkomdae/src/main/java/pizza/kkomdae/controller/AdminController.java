@@ -68,7 +68,7 @@ public class AdminController {
     // 학생목록 + 학생 별 대여 품목
     @GetMapping("/students")
     public String students(StudentWithRentCond studentWithRentCond, Model model) {
-        List<StudentWithRent> results = rentService.getRentByStudent(studentWithRentCond);
+        List<StudentWithRent> results = rentService.getStudentsWithRent(studentWithRentCond);
         log.info("{}", results.size());
         model.addAttribute("students", results);
         return "students";
