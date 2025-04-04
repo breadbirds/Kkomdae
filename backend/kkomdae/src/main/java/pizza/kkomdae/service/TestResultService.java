@@ -127,6 +127,7 @@ public class TestResultService {
             device = new Laptop(thirdStageReq);
             deviceRepository.save(device);
         }
+        testResult.setDevice(device);
         Rent rent;
         if (testResult.getRelease() == false) { // 대여로직
             rent = new Rent();
