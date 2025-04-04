@@ -1,3 +1,5 @@
+# 수정된 FastAPI 코드 - 모델 캐싱 적용
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,12 +32,16 @@ folder = os.getenv('S3_PREFIX')
 
 # AI 모델 설정
 faster_model_path = "model/faster_damage.pth"
-yolo_model_path = "model/yolo_laptop.pt"
+yolo_model_path = "model/yolov8_laptop.pt"
 faster_threshold = 0.1
 yolo_threshold = 0.7
 class_names = ["background", "damage_bbox"]
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 num_classes = 2
+
+# 모델 캐싱용 전역 변수
+faster_model_cached = None
+yolo_model_cached = None
 
 app = FastAPI()
 
@@ -57,11 +63,15 @@ s3_client = boto3.client(
 class AnalyzeRequest(BaseModel):
     s3Key: str
 
+@app.on_event("startup")
+def load_models():
+    global faster_model_cached, yolo_model_cached
+    faster_model_cached = _load_faster_model()
+    yolo_model_cached = _load_yolo_model()
+
 @app.post("/analyze")
 async def analyze(data: AnalyzeRequest):
     s3_key = data.s3Key
-    logger.debug(f"s3_key: {s3_key}")
-
     temp_dir = tempfile.gettempdir()
     local_download_path = os.path.join(temp_dir, s3_key)
 
@@ -81,12 +91,9 @@ async def analyze(data: AnalyzeRequest):
         logger.error(f"Failed to open image: {e}")
         raise HTTPException(status_code=400, detail="이미지를 열 수 없습니다.")
 
-    model = load_model()
     image_tensor = load_image(original_image)
-    faster_results = predict_and_get_result(model, image_tensor)
-
-    yolo_model = load_yolo_model()
-    yolo_results = detect_laptop_yolo(yolo_model, original_image)
+    faster_results = predict_and_get_result(faster_model_cached, image_tensor)
+    yolo_results = detect_laptop_yolo(yolo_model_cached, original_image)
     filtered_results = filter_faster_by_yolo(faster_results, yolo_results)
     new_image = visualize_filtered(local_download_path, filtered_results)
 
@@ -117,7 +124,7 @@ async def analyze(data: AnalyzeRequest):
     }
     return JSONResponse(content=result)
 
-def load_model():
+def _load_faster_model():
     model = fasterrcnn_resnet50_fpn(weights=None)
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
@@ -125,6 +132,9 @@ def load_model():
     model.load_state_dict(state_dict)
     model.eval()
     return model
+
+def _load_yolo_model():
+    return YOLO(yolo_model_path)
 
 def load_image(pil_image):
     image = pil_image.convert("RGB")
@@ -134,19 +144,11 @@ def load_image(pil_image):
 def predict_and_get_result(model, image_tensor):
     with torch.no_grad():
         output = model(image_tensor)[0]
-
     result = []
     for box, score in zip(output['boxes'], output['scores']):
         if score >= faster_threshold:
-            result.append({
-                "bbox": box.tolist(),
-                "score": float(score)
-            })
+            result.append({"bbox": box.tolist(), "score": float(score)})
     return result
-
-def load_yolo_model():
-    model = YOLO(yolo_model_path)
-    return model
 
 def detect_laptop_yolo(model, pil_image):
     img = np.array(pil_image.convert("RGB"))
@@ -159,11 +161,7 @@ def detect_laptop_yolo(model, pil_image):
         conf = float(box.conf)
         xyxy = box.xyxy.cpu().tolist()[0]
         if label == "ssafy_laptop":
-            result.append({
-                "bbox": xyxy,
-                "label": label,
-                "score": conf
-            })
+            result.append({"bbox": xyxy, "label": label, "score": conf})
     return result
 
 def is_inside(inner_box, outer_box):
