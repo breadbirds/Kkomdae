@@ -103,7 +103,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
-            viewModel.clearRePhoto1()
+
             changeImage(adaterIndex)
 
             // 토스트 메시지 표시
@@ -116,7 +116,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
-            viewModel.clearRePhoto2()
+
             changeImage(adaterIndex)
 
             // 토스트 메시지 표시
@@ -128,7 +128,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
-            viewModel.clearRePhoto3()
+
             changeImage(adaterIndex)
 
             // 토스트 메시지 표시
@@ -140,7 +140,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
-            viewModel.clearRePhoto4()
+
             changeImage(adaterIndex)
 
             // 토스트 메시지 표시
@@ -152,7 +152,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
-            viewModel.clearRePhoto5()
+
             changeImage(adaterIndex)
 
             // 토스트 메시지 표시
@@ -164,7 +164,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
-            viewModel.clearRePhoto6()
+
             changeImage(adaterIndex)
 
             // 토스트 메시지 표시
