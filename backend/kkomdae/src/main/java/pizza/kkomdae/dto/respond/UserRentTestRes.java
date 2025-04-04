@@ -43,14 +43,14 @@ public class UserRentTestRes {
                 this.release = true;
                 this.releasePdfName = laptopTestResults.get(0).getPdfFileName();
                 this.rentPdfName = laptopTestResults.get(1).getPdfFileName();
-            } else {
+            } else if(laptopTestResults.size()==1){
                 this.rentPdfName = laptopTestResults.get(0).getPdfFileName();
                 log.info("반납 햇다면 아니면 : {}",rent.getRentDateTime());
                 this.dateTime = rent.getRentDateTime();
                 this.release = false;
             }
             if (laptopTestResults.size() > 1 && !rent.getDevice().isRelease()) { // 진행 중인 반납 테스트가 있다면 getRentsByStudentInfo order by를 device Id, laptopId로 해두어서 0번이 대여, 1번이 반납인 것을 확정
-                LaptopTestResult result = laptopTestResults.get(1);
+                LaptopTestResult result = laptopTestResults.get(0);
                 log.info("진행 중인 반납 테스트 : {}",rent.getRentDateTime());
                 this.release = false;
                 this.dateTime = rent.getRentDateTime();
