@@ -34,8 +34,8 @@
 
         <ImageView
             android:id="@+id/indicator2"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginHorizontal="5dp"
             android:src="@drawable/indicator_inactive" />
 

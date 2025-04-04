@@ -21,10 +21,15 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.util.Log
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.pizza.kkomdae.presenter.viewmodel.Step2ViewModel
+import com.pizza.kkomdae.ui.step2.Step2ResultFragment
+import com.pizza.kkomdae.ui.step3.LaptopInfoInputFragment
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -103,16 +108,113 @@ class Step2GuideFragment : BaseFragment<FragmentStep2GuideBinding>(
             showQuitBottomSheet()
         }
 
+        // todo 임시 건너뛰기 나중에 삭제 해야함
+        binding.btnPass.setOnClickListener {
+            lifecycleScope.launch {
+                val result = viewModel.postSecondStage()
+                result.onSuccess {
+                    if (it.success){
+                        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                        transaction.replace(R.id.fl_main, LaptopInfoInputFragment())
+                        transaction.addToBackStack(null)
+                        transaction.commit()
+                    }
+                }
+            }
+
+        }
+
+
+        // 자가진단 결과보기 버튼 클릭
         binding.btnNext.setOnClickListener {
 
-            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.fl_main, QrScanFragment())
-            transaction.addToBackStack(null)
-            transaction.commit()
+            lifecycleScope.launch {
+                val result = viewModel.getStep2Result()
+                result.onSuccess {
+                    if(it.data.success==true){
+                        // 자가진단 완료
+                        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                        transaction.replace(R.id.fl_main, Step2ResultFragment())
+                        transaction.addToBackStack(null)
+                        transaction.commit()
+                    }else{
+                        var data = ""
+                        it.data?.let {
+                            if(it.keyboard_status!=true){
+                                data += "키보드"
+                            }
+                            if(it.camera_status != true){
+                                if(data!=""){
+                                    data += ", "
+                                }
+                                data += "카메라"
+                            }
+                            if(it.usb_status != true){
+                                if(data!=""){
+                                    data += ", "
+                                }
+                                data += "USB"
+                            }
+                            if(it.charging_status != true){
+                                if(data!=""){
+                                    data += ", "
+                                }
+                                data += "충전기"
+                            }
+
+                            if(it.battery_report != true){
+                                if(data!=""){
+                                    data += ", "
+                                }
+                                data += "배터리"
+                            }
+                        }
+
+                        showDevelopingDialog(data)
+                    }
+
+
+                }.onFailure {
+
+                }
+            }
+            // 2단계 결과 받아오기
+
+
+
+        }
+
+        // 자가진단 결과가 완벽하게
+        viewModel.getStep2Result.observe(viewLifecycleOwner){
+            Log.d("Post", "onViewCreated: $it")
         }
 
 
         showIntroDialog()
+    }
+
+    // 개발 중 다이얼로그
+    private fun showDevelopingDialog(data : String) {
+
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.layout_dialog_step2_fail)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        val confirmButton = dialog.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btn_confirm)
+
+        val descriptionTextView = dialog.findViewById<TextView>(R.id.tv_description2)
+
+        descriptionTextView.text = data
+        confirmButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     // 랜덤키 생성

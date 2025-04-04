@@ -1,11 +1,19 @@
 package com.pizza.kkomdae.ui.step3
 
 import android.app.Dialog
+import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,13 +24,18 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.pizza.kkomdae.MainActivity
@@ -34,6 +47,10 @@ import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.presenter.viewmodel.Step2ViewModel
 import com.pizza.kkomdae.presenter.viewmodel.Step3ViewModel
 import com.pizza.kkomdae.ui.LoadingFragment
+import com.pizza.kkomdae.di.GoogleVisionApi
+import com.pizza.kkomdae.presenter.viewmodel.CameraViewModel
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -50,6 +67,7 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private var imageUri: Uri? = null
     private var laptopCount=1
     private var powerCount=1
     private var adapterCount=1
@@ -65,6 +83,13 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
 
     // 시스템 백 버튼 콜백 선언
     private lateinit var backPressedCallback: OnBackPressedCallback
+    private val REQUEST_IMAGE_CAPTURE = 1
+    private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
+    private val cameraViewModel: CameraViewModel by activityViewModels()
+    private lateinit var imageFile: File
+    private var introDialog: Dialog? = null
+    private var confirmDialog: Dialog? = null
+    private var endDialog: Dialog? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,7 +117,31 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.topBar.pbStep.progress=100
+        // ocr
+        // 1단계에서 감지된 livedata 반영
+        cameraViewModel.ocrSerial.value?.let {
+            binding.etSerial.setText(it)
+            Log.d("OCR", "💡 Already set serial: $it")
+        }
+
+        cameraViewModel.ocrBarcode.value?.let {
+            binding.etBarcode.setText(it)
+            Log.d("OCR", "💡 Already set barcode: $it")
+        }
+        // laptopinfoinput 화면에서 변화되는 livedata 감지
+        cameraViewModel.ocrSerial.observe(viewLifecycleOwner) {
+            Log.d("OCR", "LiveData observe - serial: $it")  // 👈 LiveData로 전달받은 값
+            binding.etSerial.setText(it)
+            Log.d("OCR", "serial: $it")
+        }
+
+        cameraViewModel.ocrBarcode.observe(viewLifecycleOwner) {
+            Log.d("OCR", "LiveData observe - barcode: $it")  // 👈 LiveData로 전달받은 값
+            binding.etBarcode.setText(it)
+            Log.d("OCR", "barcode: $it")
+        }
+
+        binding.topBar.pbStep.progress = 100
         binding.topBar.tvTitle.text = "Step3"
 
         showIntroDialog()
@@ -106,6 +155,9 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             // 유효성 검사
             checkNext()
         }
+
+        //ocr
+        loadOcrResult()
 
         // 날짜 설정
         settingDate()
@@ -136,7 +188,6 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             if(it.success && it.status=="OK"){ // 통신 성공
                 showEndDialog()
             }else{ // todo 통신 실패시
-
             }
         }
 
@@ -168,7 +219,79 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             }
         }
+
+//        // OCR
+//        // OCR 카메라 초기화
+        // OCR 카메라 초기화
+        cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == AppCompatActivity.RESULT_OK) {
+                if (::imageFile.isInitialized && imageFile.exists()) {
+                    val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                    bitmap?.let {
+                        Log.d("OCR", "비트맵 성공!")
+
+                        // OCR 결과 → SharedPreferences 저장
+                        GoogleVisionApi.callOcr(requireContext(), encodeImageToBase64(it)) { serial, barcode ->
+                            val prefs = requireContext().getSharedPreferences("ocr_prefs", Context.MODE_PRIVATE)
+                            prefs.edit().apply {
+                                putString("ocr_serial", serial)
+                                putString("ocr_barcode", barcode)
+                                apply()
+                            }
+                            Log.d("OCR", "📦 저장 완료 - serial: $serial, barcode: $barcode")
+
+                            // 화면에도 바로 반영
+                            binding.etSerial.setText(serial)
+                            binding.etBarcode.setText(barcode)
+                        }
+                    }
+                } else {
+                    Log.e("OCR", "imageFile is not initialized")
+                }
+            }
+        }
+
+
+        binding.btnOcrSerial.setOnClickListener {
+            imageFile = File(requireContext().cacheDir, "ocr_image_${System.currentTimeMillis()}.jpg")
+            imageUri = FileProvider.getUriForFile(
+                requireContext(),
+                "${requireContext().packageName}.fileprovider",
+                imageFile
+            )
+
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+            cameraLauncher.launch(intent)
+        }
+
     }
+    //ocr
+    private fun loadOcrResult() {
+        val prefs = requireContext().getSharedPreferences("ocr_prefs", Context.MODE_PRIVATE)
+        val serial = prefs.getString("ocr_serial", "")
+        val barcode = prefs.getString("ocr_barcode", "")
+
+        Log.d("OCR_SHARED_PREF", "🔎 불러온 값 - serial: $serial, barcode: $barcode")
+
+        if (!serial.isNullOrEmpty()) {
+            binding.etSerial.setText(serial)
+            Log.d("OCR", "💡 Loaded serial from prefs: $serial")
+        }
+        if (!barcode.isNullOrEmpty()) {
+            binding.etBarcode.setText(barcode)
+            Log.d("OCR", "💡 Loaded barcode from prefs: $barcode")
+        }
+    }
+
+    private fun encodeImageToBase64(bitmap: Bitmap): String {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream)
+        val byteArray = stream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.NO_WRAP)
+    }
+
+
 
 
 
@@ -217,7 +340,6 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         val barcodeValid = binding.etBarcode.text.toString().isNotEmpty()
         val modelValid = binding.atvModelName.text.toString().isNotEmpty()
         val dateValid = binding.tvDate.text.toString() != "날짜 선택"
-
         val allValid = serialValid && barcodeValid && modelValid && dateValid
 
         binding.btnConfirm.backgroundTintList = ColorStateList.valueOf(

@@ -237,4 +237,11 @@ public class ApiController {
     public void alert(@RequestBody List<String> names) {
         mattermostNotificationService.sendGroupHurryMessage(names);
     }
+
+    @Operation(summary = "Stage 2 -> Stage 3 스테이지 전환 api", description = "")
+    @PostMapping("/secondToThird/{testId}")
+    public ApiResponse secondToThird(@PathVariable long testId) {
+        testResultService.secondToThird(testId);
+        return new ApiResponse(true, "3스테이지 변경 완료");
+    }
 }

@@ -8,12 +8,14 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pizza.kkomdae.di.GoogleVisionApi
 import com.pizza.kkomdae.domain.model.PhotoResponse
 import com.pizza.kkomdae.domain.usecase.LoginUseCase
 import com.pizza.kkomdae.domain.usecase.Step1UseCase
@@ -25,6 +27,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
@@ -37,6 +40,42 @@ class CameraViewModel @Inject constructor(
 
     private val sharedPreferences: SharedPreferences =
         application.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+    // ocr 뷰모델
+    private val _ocrSerial = MutableLiveData<String>()
+    val ocrSerial: LiveData<String> get() = _ocrSerial
+
+    private val _ocrBarcode = MutableLiveData<String>()
+    val ocrBarcode: LiveData<String> get() = _ocrBarcode
+
+    fun callOcrFromBitmap(context: Context, bitmap: Bitmap) {
+        val base64 = encodeImageToBase64(bitmap)
+        // 🔍 비트맵 제대로 들어왔는지 확인
+        Log.d("OCR", "bitmap: $bitmap")
+        GoogleVisionApi.callOcr(context, base64) { serial, barcode ->
+            Log.d("OCR", "Parsed serial: $serial, barcode: $barcode")  // 👈 OCR 결과 로그
+//            _ocrSerial.postValue(serial)
+//            _ocrBarcode.postValue(barcode)
+            saveOcrResult(context, serial, barcode)
+        }
+    }
+
+    fun saveOcrResult(context: Context, serial: String, barcode: String) {
+        val prefs = context.getSharedPreferences("ocr_prefs", Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString("ocr_serial", serial)
+            .putString("ocr_barcode", barcode)
+            .apply()
+        Log.d("OCR_SHARED_PREF", "✅ 저장 완료 - serial: $serial, barcode: $barcode")
+    }
+
+    private fun encodeImageToBase64(bitmap: Bitmap): String {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream)
+        val byteArray = stream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.NO_WRAP)
+    }
+
 
 
     private val _reCameraStage = MutableLiveData<Int>()
