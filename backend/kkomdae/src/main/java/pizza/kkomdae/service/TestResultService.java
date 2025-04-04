@@ -73,7 +73,7 @@ public class TestResultService {
         // 테스트에 해당하는 laptopTestResult 조회
         LaptopTestResult laptopResult = lapTopTestResultRepository.getReferenceById(testId);
         // 해당하는 테스트에 연관된 Photo 목록 조회
-        List<Photo> photos = photoRepository.getPhotosByLaptopTestResult(laptopResult);
+        List<Photo> photos = photoRepository.getPhotosByLaptopTestResultOrderByTypeAsc(laptopResult);
 
         // 각 Photo마다 presigned URL 생성 후 PhotoWithUrl DTO로 변환
         return photos.stream()
