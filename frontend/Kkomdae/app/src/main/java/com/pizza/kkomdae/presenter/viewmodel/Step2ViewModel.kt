@@ -115,30 +115,23 @@ class Step2ViewModel@Inject constructor(
 
     suspend fun postSecondStage():Result<PostResponse>{
 
-            val result = step2UseCase.postSecondStage(PostSecondStageRequest(
-                testId = sharedPreferences.getLong("test_id",0),
-                keyboardStatus = keyboardStatus.value?.status == "pass",
-                failedKeys = keyboardStatus.value?.failed_keys?.joinToString("@")?:"",
-                usbStatus = usbStatus.value?.status== "pass",
-                failedPorts = usbStatus.value?.failed_ports?.joinToString("@")?:"",
-                cameraStatus = cameraStatus.value?.status == "pass",
-                chargerStatus = chargerStatus.value?.status == "pass",
-                batteryReport = batteryStatus.value?.status == "pass",
-                batteryReportUrl =batteryStatus.value?.reportName ?:""
-            ))
-            Log.d(TAG, "getUserInfo: $result")
-
-            result.onSuccess { response ->
-                // 로그인 성공 시 실제 데이터 처리
-                response?.let {
-                    _postResponse.postValue(it)
-                }
-
-
-            }.onFailure { exception ->
-                // 로그인 정보 불러오기 실패
-
+            return try {
+                step2UseCase.postSecondStage(PostSecondStageRequest(
+                    testId = sharedPreferences.getLong("test_id",0),
+                    keyboardStatus = keyboardStatus.value?.status == "pass",
+                    failedKeys = keyboardStatus.value?.failed_keys?.joinToString("@")?:"",
+                    usbStatus = usbStatus.value?.status== "pass",
+                    failedPorts = usbStatus.value?.failed_ports?.joinToString("@")?:"",
+                    cameraStatus = cameraStatus.value?.status == "pass",
+                    chargerStatus = chargerStatus.value?.status == "pass",
+                    batteryReport = batteryStatus.value?.status == "pass",
+                    batteryReportUrl =batteryStatus.value?.reportName ?:""
+                ))
+            }catch (e:Exception){
+                Result.failure(e)
             }
+
+
 
 
     }
