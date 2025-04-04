@@ -54,9 +54,19 @@ class CameraViewModel @Inject constructor(
         Log.d("OCR", "bitmap: $bitmap")
         GoogleVisionApi.callOcr(context, base64) { serial, barcode ->
             Log.d("OCR", "Parsed serial: $serial, barcode: $barcode")  // 👈 OCR 결과 로그
-            _ocrSerial.postValue(serial)
-            _ocrBarcode.postValue(barcode)
+//            _ocrSerial.postValue(serial)
+//            _ocrBarcode.postValue(barcode)
+            saveOcrResult(context, serial, barcode)
         }
+    }
+
+    fun saveOcrResult(context: Context, serial: String, barcode: String) {
+        val prefs = context.getSharedPreferences("ocr_prefs", Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString("ocr_serial", serial)
+            .putString("ocr_barcode", barcode)
+            .apply()
+        Log.d("OCR_SHARED_PREF", "✅ 저장 완료 - serial: $serial, barcode: $barcode")
     }
 
     private fun encodeImageToBase64(bitmap: Bitmap): String {

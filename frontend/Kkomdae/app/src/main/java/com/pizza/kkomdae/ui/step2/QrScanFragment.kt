@@ -85,6 +85,8 @@ class QrScanFragment : BaseFragment<FragmentQrScanBinding>(
                                 transaction.replace(R.id.fl_main, Step2ResultFragment())
                                 transaction.addToBackStack(null)
                                 transaction.commit()
+
+
                             }else{
                                 Toast.makeText(requireContext(),"잘못된 QR코드 정보입니다.",Toast.LENGTH_SHORT).show()
                             }
@@ -174,6 +176,17 @@ class QrScanFragment : BaseFragment<FragmentQrScanBinding>(
 
         }, ContextCompat.getMainExecutor(requireContext()))
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+        cameraProviderFuture.addListener({
+            val cameraProvider = cameraProviderFuture.get()
+            cameraProvider.unbindAll()  // 📌 카메라 리소스 완전히 해제
+            Log.d(TAG, "카메라 해제 완료")
+        }, ContextCompat.getMainExecutor(requireContext()))
+    }
+
 
 
 

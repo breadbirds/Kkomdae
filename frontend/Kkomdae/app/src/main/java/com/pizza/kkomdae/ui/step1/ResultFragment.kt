@@ -3,10 +3,14 @@ package com.pizza.kkomdae.ui.step1
 import android.app.Dialog
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.ImageDecoder
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -89,6 +93,19 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
 
         // 체크 버튼
         binding.btnCheck?.setOnClickListener {
+            // ✅ step 2 하판인 경우 OCR 호출
+            if (viewModel.step.value == 2) {
+                viewModel.backUri.value?.let { uri ->
+                    try {
+                        val bitmap = uriToBitmap(requireContext(), uri)
+                        viewModel.callOcrFromBitmap(requireContext(), bitmap)
+                        Log.d(TAG, "📸 OCR called from ResultFragment - step 2")
+                    } catch (e: Exception) {
+                        Log.e(TAG, "❌ OCR 오류: ${e.message}")
+                    }
+                }
+            }
+
             viewModel.postPhoto()
         }
 
@@ -113,8 +130,18 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
         viewModel.reCameraUri.observe(viewLifecycleOwner){
             cameraActivity.moveToBackReCamera(it)
         }
-
     }
+
+    //ocr
+    private fun uriToBitmap(context: Context, uri: Uri): Bitmap {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val source = ImageDecoder.createSource(context.contentResolver, uri)
+            ImageDecoder.decodeBitmap(source)
+        } else {
+            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+        }
+    }
+
 
     private fun showStopCameraDialog() {
         // 다이얼로그 생성

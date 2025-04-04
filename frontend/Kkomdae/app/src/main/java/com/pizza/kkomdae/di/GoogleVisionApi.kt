@@ -18,11 +18,16 @@ import org.json.JSONObject
 import java.io.IOException
 
 // 🔐 Google Cloud Vision API 키 (노출 주의!)
-private val VISION_API_URL = "https://vision.googleapis.com/v1/images:annotate?key=${BuildConfig.VISION_API_KEY}"
+private val VISION_API_URL =
+    "https://vision.googleapis.com/v1/images:annotate?key=${BuildConfig.VISION_API_KEY}"
 
 object GoogleVisionApi {
     // Vision API 호출 함수
-    fun callOcr(context: Context, base64Image: String, callback: (serial: String, barcode: String) -> Unit) {
+    fun callOcr(
+        context: Context,
+        base64Image: String,
+        callback: (serial: String, barcode: String) -> Unit
+    ) {
         val jsonRequest = JSONObject().apply {
             put("requests", JSONArray().put(
                 JSONObject().apply {
@@ -54,46 +59,104 @@ object GoogleVisionApi {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val responseBody = response.body?.string()
-                val fullText = try {
-                    JSONObject(responseBody)
-                        .getJSONArray("responses")
-                        .getJSONObject(0)
-                        .optJSONObject("fullTextAnnotation")
-                        ?.getString("text") ?: ""
+                try {
+                    val responseBody = response.body?.string()
+                    val fullText = try {
+                        JSONObject(responseBody)
+                            .getJSONArray("responses")
+                            .getJSONObject(0)
+                            .optJSONObject("fullTextAnnotation")
+                            ?.getString("text") ?: ""
+                    } catch (e: Exception) {
+                        Log.e("VisionAPI", "JSON 파싱 오류: $responseBody")
+                        ""
+                    }
+
+                    Log.d("VisionAPI", "인식된 전체 텍스트:\n$fullText")
+
+                    val lines = fullText.split("\n")
+                    var serial = ""
+                    var barcode = ""
+
+                    val serialRegex = Regex("^[A-Za-z0-9\\s#\\-_/\\\\]{6,}$")
+                    val barcodeRegex = Regex("^A\\d{8,13}A?$")
+
+                    // 📌 바코드 먼저 탐색
+                    for (line in lines) {
+                        val cleaned = line.replace(" ", "").trim()
+                        if (barcodeRegex.matches(cleaned)) {
+                            barcode = cleaned
+                            break
+                        }
+                    }
+
+                    // 📌 S/N 줄 인덱스
+                    val snLineIndex = lines.indexOfFirst {
+                        it.contains("S/N", ignoreCase = true) || it.contains("SN:", ignoreCase = true)
+                    }
+
+                    // 1️⃣ S/N 줄에서 추출
+                    if (snLineIndex != -1) {
+                        val snLine = lines[snLineIndex]
+                        val parts = snLine.split(":", "：", "-")
+                        for (part in parts) {
+                            val cleanedPart = part.trim()
+                            if (!cleanedPart.contains(Regex("[가-힣]")) &&
+                                cleanedPart.length >= 4 &&
+                                serialRegex.matches(cleanedPart)
+                            ) {
+                                serial = cleanedPart
+                                break
+                            }
+                        }
+
+                        // 2️⃣ S/N 다음 줄이 있으면 강력한 후보로 사용
+                        if (serial.isEmpty() && snLineIndex + 1 < lines.size) {
+                            val nextLine = lines[snLineIndex + 1].trim()
+                            if (nextLine.isNotEmpty() &&
+                                !nextLine.contains(Regex("[가-힣]")) &&
+                                nextLine.length >= 6
+                            ) {
+                                serial = nextLine // 정규식 안 맞아도 사용
+                            }
+                        }
+                    }
+
+                    // 3️⃣ 그래도 없으면 전체 탐색
+                    if (serial.isEmpty()) {
+                        for (line in lines) {
+                            val cleaned = line.trim()
+                            val noSpace = cleaned.replace(" ", "")
+                            if (!cleaned.contains(Regex("[가-힣]")) &&
+                                cleaned.length >= 6 &&
+                                !noSpace.startsWith("A") &&
+                                !barcodeRegex.matches(noSpace) &&
+                                cleaned != barcode
+                            ) {
+                                val filtered = cleaned.replace(Regex("[^A-Za-z0-9#\\-_/\\\\\\s]"), "")
+                                if (filtered.contains(Regex("[A-Za-z]")) &&
+                                    filtered.contains(Regex("[0-9]"))
+                                ) {
+                                    serial = filtered
+                                    break
+                                }
+                            }
+                        }
+                    }
+
+                    // 🎯 결과 콜백
+                    (context as? android.app.Activity)?.runOnUiThread {
+                        callback(serial, barcode)
+                    }
+
                 } catch (e: Exception) {
-                    Log.e("VisionAPI", "파싱 오류: $responseBody")
-                    ""
-                }
-
-                // 🔍 여기서 fullText 로그 찍기!
-                Log.d("VisionAPI", "인식된 전체 텍스트:\n$fullText")
-
-                val lines = fullText.split("\n")
-                var serial = ""
-                var barcode = ""
-
-                for (i in lines.indices) {
-                    val line = lines[i].trim()
-
-                    // S/N 다음 줄이 시리얼일 가능성
-                    if (line.contains("S/N") && i + 1 < lines.size) {
-                        serial = lines[i + 1].trim()
+                    Log.e("VisionAPI", "전체 OCR 처리 중 에러: ${e.message}")
+                    (context as? android.app.Activity)?.runOnUiThread {
+                        callback("", "") // 앱이 죽지 않도록 빈 값 전달
                     }
-
-                    // 바코드 패턴: A로 시작해서 숫자 8~13개, A로 끝날 수도 있음 (공백 제거 후 비교)
-                    val cleaned = line.replace(" ", "")
-                    if (Regex("A\\d{8,13}A?").matches(cleaned)) {
-                        barcode = cleaned
-                    }
-                }
-
-
-
-                (context as? android.app.Activity)?.runOnUiThread {
-                    callback(serial, barcode)
                 }
             }
+
         })
     }
 }
