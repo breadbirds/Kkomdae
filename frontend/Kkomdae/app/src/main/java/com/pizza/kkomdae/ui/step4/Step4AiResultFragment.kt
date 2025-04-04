@@ -91,7 +91,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         val adapter =Step4AiResultAdapter(data, listen = {
             changeImage(it)
             adaterIndex = it
-        })
+
+        }, viewModel = viewModel)
 
 
         // 재촬영 이미지 uri 서버로 보내기

@@ -10,8 +10,13 @@ import com.google.android.material.card.MaterialCardView
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.databinding.ItemStep1ResultBinding
 import com.pizza.kkomdae.presenter.model.Step4AiResult
+import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 
-class Step4AiResultAdapter(val list: List<Step4AiResult>, val listen:(Int)->Unit): RecyclerView.Adapter<Step4AiResultAdapter.Step1ResultViewHolder>() {
+class Step4AiResultAdapter(
+    val list: List<Step4AiResult>,
+    val listen: (Int) -> Unit,
+    private val viewModel: FinalViewModel
+): RecyclerView.Adapter<Step4AiResultAdapter.Step1ResultViewHolder>() {
     private var selectedPosition: Int = 0
 
     private val showPositions = mutableSetOf<Int>() // ✅ 숨긴 아이템을 저장하는 Set
@@ -22,17 +27,39 @@ class Step4AiResultAdapter(val list: List<Step4AiResult>, val listen:(Int)->Unit
                 .load(list[position].image)
                 .into(binding.ivPosition)
 
+
+            val damageCount = when(position) {
+                0 -> viewModel.frontDamage.value ?: 0
+                1 -> viewModel.backDamage.value ?: 0
+                2 -> viewModel.leftDamage.value ?: 0
+                3 -> viewModel.rightDamage.value ?: 0
+                4 -> viewModel.screenDamage.value ?: 0
+                5 -> viewModel.keyboardDamage.value ?: 0
+                else -> 0
+            }
+
+
             // 선택된 아이템 처리
             if (position == selectedPosition) {
-                // 선택된 아이템은 파란색 테두리와 파란색 텍스트
-                (binding.root as MaterialCardView).strokeColor =
-                    ContextCompat.getColor(binding.root.context, R.color.blue500)
-                binding.tvPosition.setTextColor(
-                    ContextCompat.getColor(binding.root.context, R.color.blue500)
-                )
+                // 선택된 아이템은 결함 유무에 따라 다른 색상 적용
+                if (damageCount > 0) {
+                    // 선택됨 + 결함 있음 = 빨간색
+                    binding.root.strokeColor =
+                        ContextCompat.getColor(binding.root.context, R.color.error)
+                    binding.tvPosition.setTextColor(
+                        ContextCompat.getColor(binding.root.context, R.color.error)
+                    )
+                } else {
+                    // 선택됨 + 결함 없음 = 파란색
+                    binding.root.strokeColor =
+                        ContextCompat.getColor(binding.root.context, R.color.blue500)
+                    binding.tvPosition.setTextColor(
+                        ContextCompat.getColor(binding.root.context, R.color.blue500)
+                    )
+                }
             } else {
-                // 선택되지 않은 아이템은 회색 테두리와 회색 텍스트
-                (binding.root as MaterialCardView).strokeColor =
+                // 선택되지 않은 아이템은 결함 유무와 관계없이 동일한 스타일
+                binding.root.strokeColor =
                     ContextCompat.getColor(binding.root.context, R.color.gray200)
                 binding.tvPosition.setTextColor(
                     ContextCompat.getColor(binding.root.context, R.color.gray500)
