@@ -19,6 +19,11 @@ import torchvision.transforms as T
 from ultralytics import YOLO
 import os
 import numpy as np
+from torchvision.transforms import functional as F
+import torchvision
+import supervision as sv
+import openai
+import base64
 
 
 # AWS 관련 설정 로드
@@ -31,13 +36,17 @@ folder = os.getenv('S3_PREFIX')
 # -------------------------------------
 # AI pipeline 전역 변수 설정
 # Faster R CNN
-model_path = "model/faster_damage.pth"                  # 모델 pth 경로
+faster_model_path = "model/faster_damage.pth"                  # 모델 pth 경로
 num_classes = 2                                         # class(damage, background)
-score_threshold = 0.2                                   # threshold
+faster_threshold = 0.6                                   # threshold
 
 # YOLO
 yolo_model_path = "model/yolo_laptop.pt"
 yolo_threshold = 0.7                                   # threshold
+
+# Supervision
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+class_names = ["background", "damage_bbox"]
 # -------------------------------------
 
 
@@ -107,8 +116,6 @@ def analyze():
         return jsonify({"error": "이미지를 열 수 없습니다.", "detail": str(e)}), 400
 
     # --- 이미지 분석 로직 예시 ---
-    # new_image = original_image.convert("L")  # 그레이스케일 변환
-    # 실제로는 OpenCV나 딥러닝 모델 등을 적용 가능
     # Faster R-CNN
     model = load_model()
     image_tensor = load_image(original_image)    
@@ -123,8 +130,22 @@ def analyze():
 
     # 이미지 저장
     new_image = visualize_filtered(local_download_path, filtered_results) 
-    # <- 이게 맞나..? 난 로컬로만 저장했는ㄷ...
-    # 밑에 또  이미지를 저장하는 로직이 또 있네..?
+
+    # faster_model = load_faster_model()
+    # yolo_model = load_yolo_model()
+
+    # # 1. supervision으로 전체 이미지에서 Faster R-CNN detection
+    # faster_detections = run_supervision_slicer(faster_model, original_image)
+
+    # # 2. YOLO로 ssafy_laptop bbox 탐지
+    # laptop_bboxes = detect_laptop_bbox(yolo_model, original_image)
+
+    # # 3. Faster detection 중 laptop bbox 내부 결과만 필터링
+    # filtered_detections = filter_by_yolo(faster_detections, laptop_bboxes)
+    # # filtered_detections = filter_and_classify(faster_detections, laptop_bboxes, image)
+
+    # # 4. 이미지 시각화만 저장
+    # new_image = save_annotated_image(original_image, filtered_detections)
     # ---------------------------------
 
     # 3) 새로운 이미지 S3 키 만들기
@@ -175,6 +196,7 @@ def analyze():
     # 최종 반환
     result = {
         "damage" : len(filtered_results), # 적용 결과 (✨수정함✨)
+        # "damage" : len(filtered_detections), # 적용 결과 (✨수정함✨)
         "uploadName" : f"analyzed_{s3_key}",
     }
     logger.debug(f"Response: {result}")
@@ -185,10 +207,10 @@ def load_model():
     model = fasterrcnn_resnet50_fpn(weights=None)
     in_features = model.roi_heads.box_predictor.cls_score.in_features
     model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
-    state_dict = torch.load(model_path, map_location=torch.device('cpu'))
+    state_dict = torch.load(faster_model_path, map_location=torch.device('cpu'))
     model.load_state_dict(state_dict)
     model.eval()
-    print("✅ 모델 로드 완료")
+    print("✅ Faster R-CNN 모델 로드 완료")
     return model
 
 # ✅ 2. 이미지 로드 및 전처리
@@ -204,7 +226,7 @@ def predict_and_get_result(model, image_tensor):
 
     result = []
     for box, score in zip(output['boxes'], output['scores']):
-        if score >= score_threshold:
+        if score >= faster_threshold:
             result.append({
                 "bbox": box.tolist(),
                 "score": float(score)
@@ -225,6 +247,7 @@ def detect_laptop_yolo(model, pil_image):
     results = model.predict(img, conf=yolo_threshold)  # predict() 권장
     
     result = []
+
     for box in results[0].boxes:
         cls_id = int(box.cls)
         label = model.names[cls_id]
@@ -236,9 +259,9 @@ def detect_laptop_yolo(model, pil_image):
                 "label": label,
                 "score": conf
             })
+
     print(f"✅ YOLO 결과 추론 완료: {len(result)}개 bbox")
     return result
-
 
 # 범위 안에 있는지 없는지 확인하는 함수
 def is_inside(inner_box, outer_box):
@@ -270,8 +293,116 @@ def visualize_filtered(image_path, filtered_results):
         draw.text((x1, y1 - 10), f"damage {score:.2f}", fill=(255, 0, 0))
 
     print(f"✅ 필터링된 bbox 이미지 변환 완료 (PIL 버전)")
-
     return image
+
+# # ✅ 1, Faster R-CNN 모델 로드
+# def load_faster_model():
+#     model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=None, num_classes=2)
+#     model.load_state_dict(torch.load(faster_model_path, map_location=device))
+#     model.to(device)
+#     model.eval()
+#     print("✅ Faster R-CNN 모델 로드 완료")
+#     return model
+
+# # ✅ 2. YOLO 모델 로드
+# def load_yolo_model():
+#     model = YOLO(yolo_model_path)
+#     print("✅ YOLO 모델 로드 완료")
+#     return model
+
+# # ✅ 3. Faster R-CNN 전체 이미지 Slicer
+# def run_supervision_slicer(faster_model, pil_image):
+#     def callback(pil_slice: Image.Image) -> sv.Detections:
+#         pil_image = Image.fromarray(pil_slice)
+#         image_tensor = F.to_tensor(pil_image.convert("RGB")).unsqueeze(0).to(device)
+
+
+#         with torch.no_grad():
+#             output = faster_model(image_tensor)[0]
+
+#         boxes = output['boxes']
+#         scores = output['scores']
+#         labels = output['labels']
+
+#         keep = scores > faster_threshold
+
+#         boxes = boxes[keep].cpu().numpy()
+#         scores = scores[keep].cpu().numpy()
+#         labels = labels[keep].cpu().numpy()
+
+#         return sv.Detections(
+#             xyxy=boxes,
+#             confidence=scores,
+#             class_id=labels
+#         )
+
+#     slicer = sv.InferenceSlicer(callback=callback)
+#     # slicer = sv.InferenceSlicer(callback=callback, overlap_wh=(100, 100)) # 얘는 겹치는 거
+#     detections = slicer(np.array(pil_image))
+
+#     all_detections = []
+#     for box, score, cls_id in zip(detections.xyxy, detections.confidence, detections.class_id):
+#         all_detections.append({
+#             "bbox": [float(v) for v in box],
+#             "score": float(score),
+#             "label": class_names[cls_id]
+#         })
+
+#     print(f"✅ Faster 전체 detection 개수: {len(all_detections)}")
+#     return all_detections
+
+# # ✅ 4. YOLO로 ssafy_laptop bbox 가져오기
+# def detect_laptop_bbox(yolo_model, pil_image):
+#     img = np.array(pil_image.convert("RGB"))  # Pillow → numpy array
+#     results = yolo_model.predict(img, conf=yolo_threshold)  # predict() 권장
+#     laptop_bboxes = []
+
+#     for box in results[0].boxes:
+#         cls_id = int(box.cls)
+#         label = yolo_model.names[cls_id]
+#         conf = float(box.conf)
+#         xyxy = box.xyxy.cpu().tolist()[0]
+#         if label == "ssafy_laptop":
+#             laptop_bboxes.append([int(x) for x in xyxy])
+
+#     print(f"✅ YOLO 결과 추론 완료: {len(laptop_bboxes)}개 bbox")
+#     return laptop_bboxes
+
+# # ✅ 5. Faster 결과를 YOLO bbox 내부만 필터링
+# def filter_by_yolo(faster_detections, laptop_bboxes):
+#     if not laptop_bboxes:
+#         print("⚠ ssafy_laptop bbox가 없습니다.")
+#         return []
+
+#     X1, Y1, X2, Y2 = laptop_bboxes[0]  # laptop이 1개라고 가정
+
+#     def is_inside(box):
+#         x1, y1, x2, y2 = box
+#         return (x1 >= X1) and (y1 >= Y1) and (x2 <= X2) and (y2 <= Y2)
+
+#     filtered = [det for det in faster_detections if is_inside(det['bbox'])]
+#     print(f"✨ 필터링된 bbox 개수: {len(filtered)}")
+#     return filtered
+
+# # ✅ 6. bbox 이미지 그리기 후 PIL Image 반환
+# def save_annotated_image(pil_image, detections):
+#     draw = ImageDraw.Draw(pil_image)
+
+#     for det in detections:
+#         box = det['bbox']
+#         score = det['score']
+#         label = det['label']
+#         x1, y1, x2, y2 = map(int, box)
+
+#         # ✅ bbox 그리기 (파란색)
+#         draw.rectangle([x1, y1, x2, y2], outline=(0, 0, 255), width=3)
+
+#         # ✅ label 및 score 출력
+#         text = f"{label} {score:.2f}"
+#         draw.text((x1, y1 - 10), text, fill=(0, 0, 255))
+
+#     print(f"✅ bbox 이미지(PIL) 변환 완료 (리턴 형태)")
+#     return pil_image
 
 
 # Flask 앱 실행

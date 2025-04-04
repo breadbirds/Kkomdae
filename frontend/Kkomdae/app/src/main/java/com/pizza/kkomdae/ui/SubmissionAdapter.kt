@@ -11,7 +11,7 @@ import com.pizza.kkomdae.databinding.ItemSubmissionBinding
 import com.pizza.kkomdae.presenter.model.UserRentTestResponse
 
 
-class SubmissionAdapter(val clickPdf:(String)->Unit): ListAdapter<UserRentTestResponse, SubmissionAdapter.SubmissionViewHolder>(object : DiffUtil.ItemCallback<UserRentTestResponse>(){
+class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val clickPdf:(String)->Unit): ListAdapter<UserRentTestResponse, SubmissionAdapter.SubmissionViewHolder>(object : DiffUtil.ItemCallback<UserRentTestResponse>(){
     override fun areContentsTheSame(oldItem: UserRentTestResponse, newItem: UserRentTestResponse): Boolean {
         return oldItem==newItem
     }
@@ -38,12 +38,21 @@ class SubmissionAdapter(val clickPdf:(String)->Unit): ListAdapter<UserRentTestRe
                 binding.btnDown.isVisible=true
             }
 
+            // 대여 pdf 다운로드
             binding.btFileDownload.setOnClickListener {
                 getItem(position).rentPdfName?.let {
                     clickPdf(it)
                 }
 
             }
+
+            binding.btReturnDownload.setOnClickListener {
+
+                    clickRelease(getItem(position))
+
+
+            }
+
 
             binding.tvModelNumber.text= getItem(position).modelCode
             binding.tvInputDate.text = getItem(position).dateTime

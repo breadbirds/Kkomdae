@@ -5,5 +5,5 @@ pillow
 numpy
 ultralytics
 opencv-python
-supervision
+supervision 
 openai

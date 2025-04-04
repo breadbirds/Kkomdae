@@ -49,6 +49,14 @@ class MainViewModel@Inject constructor(
     val picStage: LiveData<Int>
         get() = _picStage
 
+    private val _stage = MutableLiveData<Int>()
+    val stage: LiveData<Int>
+        get() = _stage
+
+    private val _releasePicStage = MutableLiveData<Int>()
+    val releasePicStage: LiveData<Int>
+        get() = _releasePicStage
+
     private val _userInfoResult = MutableLiveData<UserInfoResponse>()
     val userInfoResult: LiveData<UserInfoResponse>
         get() = _userInfoResult
@@ -57,30 +65,42 @@ class MainViewModel@Inject constructor(
     val resultImage: LiveData<List<String>>
         get() = _resultImage
 
+    private val _release = MutableLiveData<Boolean>()
+    val release: LiveData<Boolean>
+        get() = _release
 
 
+    fun setReleasePicStage(stage: Int){
+        _releasePicStage.postValue(stage)
+    }
 
+    fun setRelease(release:Boolean){
+        _release.postValue(release)
+    }
 
-    fun postTest(serialNum: String?){
-        viewModelScope.launch {
+    suspend fun postTest(serialNum: String?): Result<Long>{
+      return try {
             val result = inspectUseCase.postTest(serialNum = serialNum)
             Log.d(TAG, "getUserInfo: $result")
-
-            result.onSuccess { testResponse ->
-                // 로그인 성공 시 실제 데이터 처리
-                testResponse?.let {
-                    _testId.postValue(it)
-                    saveTestId(it)
-
-                }
-
-
-            }.onFailure { exception ->
-                // 로그인 정보 불러오기 실패
-
-            }
-
+           result
+        }catch (e:Exception){
+           Result.failure(e)
         }
+    }
+
+    suspend fun postReleaseTest(serialNum: String?):Result<Long>{
+
+
+        return try {
+            val response = inspectUseCase.postTest(serialNum =serialNum )
+            response // ✅ 성공 시 Result.success 반환
+        } catch (e: Exception) {
+            Result.failure(e)  // ✅ 실패 시 Result.failure 반환
+        }
+
+
+
+
     }
     
     // 사진 정보 불러오기
@@ -119,7 +139,9 @@ class MainViewModel@Inject constructor(
                         saveTestId(it.onGoingTestId.toLong())
                     }
 
+                    _testId.postValue(it.onGoingTestId.toLong())
                     _picStage.postValue(it.picStage)
+                    _stage.postValue(it.stage)
 
                     savePhotoStage(it.picStage)
 
@@ -137,7 +159,8 @@ class MainViewModel@Inject constructor(
                                 releasePdfName = it.releasePdfName,
                                 onGoingTestId = it.onGoingTestId,
                                 stage = it.stage,
-                                picStage = it.picStage
+                                picStage = it.picStage,
+                                serialNum = it.serialNum
                             )
                         }
                         )
@@ -159,7 +182,7 @@ class MainViewModel@Inject constructor(
         return sharedPreferences.getInt("photoStage",0)
     }
 
-    private fun saveTestId(testId: Long) {
+    fun saveTestId(testId: Long) {
         sharedPreferences.edit().putLong("test_id", testId).apply()
     }
     private fun savePhotoStage(step: Int) {

@@ -113,14 +113,14 @@ class Step3ViewModel@Inject constructor(
 
 
 
-    fun postThirdStage(){
+    fun postThirdStage(release: Boolean){
 
         viewModelScope.launch {
             val result = step3UseCase.postThirdStage(
                 postThirdStageRequest = PostThirdStageRequest(
                     testId = sharedPreferences.getLong("test_id", 0),
                     // todo 반납때 수정 필요
-                    release = false,
+                    release = release,
                     modelCode = modelCode.value ?: "",
                     serialNum = serialNum.value ?: "",
                     barcodeNum = barcodeNum.value ?: "",
