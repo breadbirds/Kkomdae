@@ -226,7 +226,7 @@ def predict_and_get_result(model, image_tensor):
 
     result = []
     for box, score in zip(output['boxes'], output['scores']):
-        if score >= score_threshold:
+        if score >= faster_threshold:
             result.append({
                 "bbox": box.tolist(),
                 "score": float(score)
