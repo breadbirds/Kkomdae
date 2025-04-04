@@ -52,7 +52,9 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
 
         // 건너뛰기 버튼 클릭 이벤트
         binding.btnSkip.setOnClickListener {
-            navigateToFinalResult()
+
+            viewModel.postFourthStage("")
+//            navigateToFinalResult()
         }
 
         // 저장하기 버튼 클릭 이벤트
