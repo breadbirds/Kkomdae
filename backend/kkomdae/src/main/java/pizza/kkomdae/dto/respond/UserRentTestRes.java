@@ -30,7 +30,7 @@ public class UserRentTestRes {
         this.serialNum = laptop.getSerialNum();
         List<LaptopTestResult> laptopTestResults = rent.getLaptopTestResults();
 
-        if (laptopTestResults.get(0).getStage() < 6) { //대여가 진행 중이라면
+        if ( laptopTestResults.get(0).getRelease()==false && laptopTestResults.get(0).getStage() < 6) { //대여가 진행 중이라면
             LaptopTestResult result = laptopTestResults.get(0);
             this.dateTime = result.getDate();
             this.rentPdfName = result.getPdfFileName();
@@ -41,15 +41,17 @@ public class UserRentTestRes {
             if (rent.getReleaseDateTime() != null) { // 반납했다면
                 this.dateTime = rent.getReleaseDateTime();
                 this.release = true;
-                this.releasePdfName = laptopTestResults.get(1).getPdfFileName();
-                this.rentPdfName = laptopTestResults.get(0).getPdfFileName();
+                this.releasePdfName = laptopTestResults.get(0).getPdfFileName();
+                this.rentPdfName = laptopTestResults.get(1).getPdfFileName();
             } else {
                 this.rentPdfName = laptopTestResults.get(0).getPdfFileName();
+                log.info("반납 햇다면 아니면 : {}",rent.getRentDateTime());
                 this.dateTime = rent.getRentDateTime();
                 this.release = false;
             }
             if (laptopTestResults.size() > 1 && !rent.getDevice().isRelease()) { // 진행 중인 반납 테스트가 있다면 getRentsByStudentInfo order by를 device Id, laptopId로 해두어서 0번이 대여, 1번이 반납인 것을 확정
                 LaptopTestResult result = laptopTestResults.get(1);
+                log.info("진행 중인 반납 테스트 : {}",rent.getRentDateTime());
                 this.release = false;
                 this.dateTime = rent.getRentDateTime();
                 this.onGoingTestId = result.getLaptopTestResultId();
