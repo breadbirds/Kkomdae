@@ -45,10 +45,9 @@ public class CustomLapTopTestResultRepositoryImpl implements CustomLapTopTestRes
     @Override
     public LaptopTestResult findByStudentAndStageIsLessThanAndReleaseIsFalse(Student student, Integer stageIsLessThan) {
         QLaptopTestResult laptopTestResult = QLaptopTestResult.laptopTestResult;
-        QStudent student1 = QStudent.student;
 
         return query.selectFrom(laptopTestResult)
-                .where(laptopTestResult.stage.lt(stageIsLessThan).and(laptopTestResult.release.eq(false).and(laptopTestResult.student.eq(student1))))
+                .where(laptopTestResult.stage.lt(stageIsLessThan).and(laptopTestResult.release.eq(false).and(laptopTestResult.student.eq(student))))
                 .fetchOne();
     }
 
