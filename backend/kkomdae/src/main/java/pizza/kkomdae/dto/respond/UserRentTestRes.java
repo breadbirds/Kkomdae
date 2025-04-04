@@ -12,10 +12,10 @@ import java.util.List;
 @Slf4j
 @Getter
 public class UserRentTestRes {
-    private final long rentId;
-    private final String modelCode;
-    private final String serialNum;
-    private final LocalDate dateTime;
+    private long rentId;
+    private String modelCode;
+    private String serialNum;
+    private LocalDate dateTime;
     private boolean release;
     private  String rentPdfName;
     private String releasePdfName;
@@ -51,6 +51,7 @@ public class UserRentTestRes {
             if (laptopTestResults.size() > 1 && !rent.getDevice().isRelease()) { // 진행 중인 반납 테스트가 있다면 getRentsByStudentInfo order by를 device Id, laptopId로 해두어서 0번이 대여, 1번이 반납인 것을 확정
                 LaptopTestResult result = laptopTestResults.get(1);
                 this.release = false;
+                this.dateTime = rent.getRentDateTime();
                 this.onGoingTestId = result.getLaptopTestResultId();
                 this.stage = result.getStage();
                 this.picStage = result.getPhotos().size();
