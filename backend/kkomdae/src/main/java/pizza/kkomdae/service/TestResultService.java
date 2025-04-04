@@ -8,10 +8,7 @@ import pizza.kkomdae.dto.request.ForthStageReq;
 import pizza.kkomdae.dto.request.SecondStageReq;
 import pizza.kkomdae.dto.request.TestResultReq;
 import pizza.kkomdae.dto.request.ThirdStageReq;
-import pizza.kkomdae.dto.respond.AiPhotoWithUrl;
-import pizza.kkomdae.dto.respond.LaptopTestResultWithStudent;
-import pizza.kkomdae.dto.respond.LaptopTotalResultRes;
-import pizza.kkomdae.dto.respond.PhotoWithUrl;
+import pizza.kkomdae.dto.respond.*;
 import pizza.kkomdae.entity.*;
 import pizza.kkomdae.repository.PhotoRepository;
 import pizza.kkomdae.repository.device.DeviceRepository;
@@ -150,23 +147,35 @@ public class TestResultService {
         LaptopTestResult testResult = lapTopTestResultRepository.findById(testId)
             .orElseThrow(() -> new RuntimeException("해당 테스트 결과가 존재하지 않습니다."));
 
-        // 알파벳 소문자 (a-z)
-        char letter = (char) ('a' + Math.random() * 26);
-        // 9000까지 의 랜덤 숫자 생성 후 1000을 더해 4자리 숫자 생성
-        int number = (int) (Math.random() * 9000) + 1000;
+        String existKey = testResult.getRandomKey();
+        if (existKey == null) {
+            String random_key;
+            int attempts = 0;
+            final int maxAttempts = 1000; // 최대 시도 횟수
+            do {
+                // 알파벳 대문자 (A-Z)
+                char letter = (char) ('A' + Math.random() * 26);
+                // 9000까지 의 랜덤 숫자 생성 후 1000을 더해 4자리 숫자 생성
+                int number = (int) (Math.random() * 9000) + 1000;
 
-        // 랜덤 키 생성
-        String random_key = String.format("%c%d", letter, number);
+                // 랜덤 키 생성
+                random_key = String.format("%c%d", letter, number);
 
-        // 랜덤 키 저장
-        testResult.setRandomKey(random_key);
-
-        // DB에 저장
-        lapTopTestResultRepository.save(testResult);
-
-        // 랜덤 키를 반환
-        return random_key;
+                attempts++;
+                // DB에서 랜덤 키가 존재하는지 확인
+                if (lapTopTestResultRepository.findByRandomKey(random_key).isEmpty()) {
+                    // 랜덤 키가 중복되지 않으면 DB에 저장
+                    testResult.setRandomKey(random_key);
+                    lapTopTestResultRepository.save(testResult);  
+                    return random_key; // 랜덤 키를 반환                 
+                }
+            } while (attempts < maxAttempts);
+            // 최대 시도 횟수를 초과하면 예외 처리
+            throw new RuntimeException("랜덤 키 생성 실패");
+        } 
+        return existKey;
     }
+           
 
     @Transactional(readOnly = true)
     public boolean verifyRandomKey(String key) {
@@ -187,12 +196,7 @@ public class TestResultService {
                 .orElseThrow(() -> new RuntimeException("저장된 테스트가 없습니다."));
 
         // 3. 테스트 결과 업데이트
-        testResult.updateTestResult(
-                testResultReq.getTestType(),
-                testResultReq.isSuccess(),
-                (List) testResultReq.getDetail(),
-                testResultReq.getSummary()
-        );
+        testResult.updateTestResult(testResultReq);
 
         // 4. 저장
         lapTopTestResultRepository.save(testResult);
@@ -203,6 +207,14 @@ public class TestResultService {
                 testResultReq.getTestType(),
                 testResultReq.isSuccess()
         );
+    }
+
+    @Transactional
+    public LaptopTestResultRes getTestResult(long testId) {
+
+        // 테스트 결과를 DTO로 변환
+        LaptopTestResult result = lapTopTestResultRepository.getReferenceById(testId);
+        return LaptopTestResultRes.fromEntity(result);
     }
 
     @Transactional
@@ -223,5 +235,11 @@ public class TestResultService {
         res.setImageUrls(urls);
         
         return res;
+    }
+
+    @Transactional
+    public void secondToThird(long testId) {
+        LaptopTestResult result = lapTopTestResultRepository.getReferenceById(testId);
+        result.setStage(3);
     }
 }

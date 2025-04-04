@@ -8,5 +8,6 @@ data class UserRentTestResponse(
     val releasePdfName : String?,
     val onGoingTestId : Int,
     val stage : Int,
-    val picStage : Int
+    val picStage : Int,
+    val serialNum:String
 )

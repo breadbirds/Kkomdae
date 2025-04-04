@@ -213,16 +213,35 @@ public class ApiController {
         }
     }
 
+    @Operation(summary = "Step2 기기 점검 정보 반환", description = "기기를 점검 후 정보를 반환하기 위한 api")
+    @GetMapping("/test-result/{testId}")
+    public ApiResponse getTestResult(@PathVariable long testId) {
+        LaptopTestResultRes testResult = testResultService.getTestResult(testId);
+        return new ApiResponse(true, "테스트 결과를 성공적으로 반환", testResult);
+    }
+
     @Operation(summary = "테스트 최종 결과", description = "테스트 최종 결과를 반환")
     @GetMapping("/laptopTotalResult")
     public LaptopTotalResultRes laptopTotalResult(@RequestParam long testId ) {
         return testResultService.laptopTotalResult(testId);
     }
-    @Operation(summary = "관리자 페이지 알림 테스트용", description = "리스트에 교육생 이름을 넣으면 그룹을 만들어서 알림 발송")
+
+    @Operation(summary = "관리자 페이지 정보 알림 테스트용", description = "리스트에 교육생 이름을 넣으면 그룹을 만들어서 알림 발송")
     @PostMapping("/notification")
     public void notification(@RequestBody List<String>names) {
-//        mattermostNotificationService.createGroupChannel(names);
-        mattermostNotificationService.sendGroupMessage(names);
+        mattermostNotificationService.sendGroupInfoMessage(names);
+    }
+
+    @Operation(summary = "관리자 페이지 재촉 알림 테스트용", description = "")
+    @PostMapping("/alert")
+    public void alert(@RequestBody List<String> names) {
+        mattermostNotificationService.sendGroupHurryMessage(names);
+    }
+
+    @Operation(summary = "Stage 2 -> Stage 3 스테이지 전환 api", description = "")
+    @PostMapping("/secondToThird/{testId}")
+    public ApiResponse secondToThird(@PathVariable long testId) {
+        testResultService.secondToThird(testId);
+        return new ApiResponse(true, "3스테이지 변경 완료");
     }
 }
-

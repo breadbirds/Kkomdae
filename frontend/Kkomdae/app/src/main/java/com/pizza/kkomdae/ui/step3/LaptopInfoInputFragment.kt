@@ -22,6 +22,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -42,6 +43,7 @@ import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentBackShotGuideBinding
 import com.pizza.kkomdae.databinding.FragmentLaptopInfoInputBinding
+import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.presenter.viewmodel.Step2ViewModel
 import com.pizza.kkomdae.presenter.viewmodel.Step3ViewModel
 import com.pizza.kkomdae.ui.LoadingFragment
@@ -77,6 +79,10 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
 
     private var date = dateFormat.format(now)
     private val viewModel: Step3ViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
+
+    // 시스템 백 버튼 콜백 선언
+    private lateinit var backPressedCallback: OnBackPressedCallback
     private val REQUEST_IMAGE_CAPTURE = 1
     private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
     private val cameraViewModel: CameraViewModel by activityViewModels()
@@ -86,14 +92,26 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
     private var endDialog: Dialog? = null
 
 
-//    private lateinit var dialog: Dialog
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+        // 시스템 백 버튼 동작 설정
+        backPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                showQuitBottomSheet()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, backPressedCallback)
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        backPressedCallback.remove()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -234,32 +252,6 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             }
         }
 
-//        cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-//            if (result.resultCode == AppCompatActivity.RESULT_OK) {
-//                if (::imageFile.isInitialized) {
-//                    val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
-//                    bitmap?.let {
-//                        Log.d("OCR", "bitmap loaded from file!")
-//                        cameraViewModel.callOcrFromBitmap(requireContext(), it)
-//                    }
-//                } else {
-//                    Log.e("OCR", "imageFile is not initialized")
-//                }
-//            }
-//        }
-//
-//        binding.btnOcrSerial.setOnClickListener {
-//            imageFile = File(requireContext().cacheDir, "ocr_image_${System.currentTimeMillis()}.jpg")
-//            imageUri = FileProvider.getUriForFile(
-//                requireContext(),
-//                "${requireContext().packageName}.fileprovider",
-//                imageFile
-//            )
-//
-//            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)  // 👉 고해상도 저장 설정
-//            cameraLauncher.launch(intent)
-//        }
 
         binding.btnOcrSerial.setOnClickListener {
             imageFile = File(requireContext().cacheDir, "ocr_image_${System.currentTimeMillis()}.jpg")
@@ -606,106 +598,66 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
 
     // 시작 다이얼로그
     private fun showIntroDialog() {
-//        val dialog = Dialog(requireContext())
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-//        dialog.setContentView(R.layout.layout_dialog_step3_intro)
-//
-//        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//
-//        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
-//        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
-//
-//        val confirmButton = dialog.findViewById<Button>(R.id.btn_confirm)
-//        confirmButton.setOnClickListener {
-//            dialog.dismiss()
-//        }
-//
-//        dialog.show()
-        introDialog = Dialog(requireContext())
-        introDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        introDialog?.setContentView(R.layout.layout_dialog_step3_intro)
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.layout_dialog_step3_intro)
 
-        introDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
-        introDialog?.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
 
-        val confirmButton = introDialog?.findViewById<Button>(R.id.btn_confirm)
-        confirmButton?.setOnClickListener {
-            introDialog?.dismiss()
+        val confirmButton = dialog.findViewById<Button>(R.id.btn_confirm)
+        confirmButton.setOnClickListener {
+            dialog.dismiss()
         }
 
-        introDialog?.show()
-
+        dialog.show()
     }
 
     // 완료 다이얼로그
     private fun showConfirmDialog() {
-//        val dialog = Dialog(requireContext())
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-//        dialog.setContentView(R.layout.layout_dialog_step3_confirm)
-//
-//        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//
-//        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
-//        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
-//
-//        // 닫기 버튼 클릭 리스너
-//        val cancelButton = dialog.findViewById<View>(R.id.btn_cancel)
-//        cancelButton.setOnClickListener {
-//            dialog.dismiss()
-//        }
-//
-//        // 입력 완료하기 버튼 클릭 리스너
-//        val confirmButton = dialog.findViewById<View>(R.id.btn_confirm)
-//        confirmButton.setOnClickListener {
-//            viewModel.postThirdStage()
-//            dialog.dismiss()
-//
-//        }
-//
-//        dialog.show()
-        confirmDialog = Dialog(requireContext())
-        confirmDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        confirmDialog?.setContentView(R.layout.layout_dialog_step3_confirm)
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.layout_dialog_step3_confirm)
 
-        confirmDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
-        confirmDialog?.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
 
         // 닫기 버튼 클릭 리스너
-        val cancelButton = confirmDialog?.findViewById<View>(R.id.btn_cancel)
-        cancelButton?.setOnClickListener {
-            confirmDialog?.dismiss()
+        val cancelButton = dialog.findViewById<View>(R.id.btn_cancel)
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
         }
 
         // 입력 완료하기 버튼 클릭 리스너
-        val confirmButton = confirmDialog?.findViewById<View>(R.id.btn_confirm)
-        confirmButton?.setOnClickListener {
-            viewModel.postThirdStage()
-            confirmDialog?.dismiss()
+        val confirmButton = dialog.findViewById<View>(R.id.btn_confirm)
+        confirmButton.setOnClickListener {
+            viewModel.postThirdStage(mainViewModel.release.value?:false)
+            dialog.dismiss()
+
         }
 
-        confirmDialog?.show()
-
+        dialog.show()
     }
 
     // 종료 다이얼로그
     private fun showEndDialog() {
-//        val dialog = Dialog(requireContext())
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-//        dialog.setContentView(R.layout.layout_dialog_step_end)
-//
-//        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//
-//        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
-//        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
-//
-//        // "분석하러 가기" 버튼에 클릭 리스너 추가
-//        val confirmButton = dialog.findViewById<Button>(R.id.btn_confirm)
-//        confirmButton.setOnClickListener {
-//            dialog.dismiss() // 다이얼로그 닫기
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.layout_dialog_step_end)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        // "분석하러 가기" 버튼에 클릭 리스너 추가
+        val confirmButton = dialog.findViewById<Button>(R.id.btn_confirm)
+        confirmButton.setOnClickListener {
+            dialog.dismiss() // 다이얼로그 닫기
 
             // AiResultFragment로 전환
 //            val transaction = requireActivity().supportFragmentManager.beginTransaction()
@@ -714,50 +666,13 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
 //            transaction.commit()
 
             // LoadingFragment 전환
-//            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-//            transaction.replace(R.id.fl_main, LoadingFragment())
-//            transaction.addToBackStack(null) // 뒤로 가기 버튼으로 이전 화면으로 돌아갈 수 있도록 설정
-//            transaction.commit()
-//        }
-//
-//        dialog.show()
-
-        endDialog = Dialog(requireContext())
-        endDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        endDialog?.setContentView(R.layout.layout_dialog_step_end)
-
-        endDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
-        endDialog?.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
-
-        // "분석하러 가기" 버튼에 클릭 리스너 추가
-        val confirmButton = endDialog?.findViewById<Button>(R.id.btn_confirm)
-        confirmButton?.setOnClickListener {
-            endDialog?.dismiss() // 다이얼로그 닫기
-
-            // LoadingFragment 전환
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
             transaction.replace(R.id.fl_main, LoadingFragment())
             transaction.addToBackStack(null) // 뒤로 가기 버튼으로 이전 화면으로 돌아갈 수 있도록 설정
             transaction.commit()
         }
 
-        endDialog?.show()
-    }
-
-    override fun onDestroyView() {
-
-        // 다이얼로그가 보여지고 있다면 닫기
-        introDialog?.dismiss()
-        confirmDialog?.dismiss()
-        endDialog?.dismiss()
-
-        // 참조 정리
-        introDialog = null
-        confirmDialog = null
-        endDialog = null
-        super.onDestroyView()
+        dialog.show()
     }
 
 

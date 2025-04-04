@@ -38,5 +38,3 @@ EXPOSE 8000
 # 실제 서비스에서는 데이터베이스 마이그레이션이나 기타 사전 작업을 별도의 엔트리포인트 스크립트로 분리할 수 있습니다.
 # gunicorn으로 WSGI 애플리케이션을 실행.
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4", "--timeout", "60"]
-
-

@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
@@ -14,6 +15,7 @@ import com.pizza.kkomdae.databinding.FragmentAllStepOnboardingBinding
 import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.ui.OathFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -101,17 +103,24 @@ class AllStepOnboardingFragment : BaseFragment<FragmentAllStepOnboardingBinding>
         // 등록 시작하기
         binding.btnFinish.setOnClickListener {
             Log.d(TAG, "onViewCreated: asdafdsf ")
-            viewModel.postTest(null)
+            lifecycleScope.launch {
+                val response =viewModel.postTest(null)
+                response.onSuccess {
+                    viewModel.saveTestId(it)
+
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    transaction.replace(R.id.fl_main, Step1GuideFragment())
+                    transaction.addToBackStack(null)
+                    transaction.commit()
+                }.onFailure {
+
+                }
+            }
+
             
         }
         
-        viewModel.testId.observe(viewLifecycleOwner){
-            Log.d(TAG, "onViewCreated: $it")
-            val transaction = requireActivity().supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.fl_main, Step1GuideFragment())
-            transaction.addToBackStack(null)
-            transaction.commit()
-        }
+
     }
 
     private fun setupViews() {
@@ -137,7 +146,7 @@ class AllStepOnboardingFragment : BaseFragment<FragmentAllStepOnboardingBinding>
                 super.onPageSelected(position)
                 updateIndicators(position)
 
-                // 마지막 페이지에서만 완료 버튼 표시
+                // 마지막 페이지에서만 버튼 표시
                 binding.btnFinish.visibility = if (position == onboardingSteps.size - 1) {
                     View.VISIBLE
                 } else {

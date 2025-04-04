@@ -299,42 +299,43 @@
             });
         });
 
-        // 알림 발송 버튼 클릭 이벤트
         document.getElementById('sendNotification').addEventListener('click', function () {
+            // 체크된 학생 체크박스 선택
             const selected = document.querySelectorAll('input[name="selectedStudents"]:checked');
+
+            // 선택된 학생이 없으면 경고 표시
             if (selected.length === 0) {
                 alert('알림을 발송할 학생을 선택해주세요.');
                 return;
             }
 
+            // 선택된 학생들의 ID 배열 생성
             const studentIds = [...selected].map(el => el.value);
 
-            // AJAX 요청을 사용하여 POST 방식으로 학생 ID를 전송
+            // AJAX 요청을 사용하여 POST 방식으로 학생 ID 배열 전송
             fetch('/api/admin/notification', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/json'
                 },
-                body: new URLSearchParams({
-                    'selectedStudents': studentIds
-                })
+                body: JSON.stringify(studentIds)
             })
                 .then(response => {
-                    if(response.redirected) {
-                        window.location.href = response.url;
+                    if (response.ok) {
+                        alert(`선택된 학생 ${selected.length}명에게 알림을 발송했습니다.`);
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        }
                     } else {
-                        alert('알림 발송 성공');
+                        throw new Error('알림 발송 실패');
                     }
                 })
                 .catch(error => {
                     console.error('알림 전송 에러:', error);
-                    alert('알림 발송 실패');
+                    alert('알림 발송에 실패했습니다.');
                 });
-
-            alert(`선택된 학생 ${selected.length}명에게 알림을 발송합니다.`);
-            // 실제 발송 로직은 서버에 구현 필요
-            console.log('선택된 학생 ID:', studentIds);
         });
+
     });
 
     document.querySelector('form').addEventListener('submit', function (e) {

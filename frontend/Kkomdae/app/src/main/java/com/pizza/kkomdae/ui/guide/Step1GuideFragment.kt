@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -43,6 +44,8 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
     R.layout.fragment_step1_guide
 ){
 
+    private lateinit var backPressedCallback: OnBackPressedCallback
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mainActivity = context as MainActivity
@@ -59,12 +62,37 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+        
+        // 시스템 백 버튼 동작 설정
+        backPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // 시스템 백 버튼 클릭 시 바텀시트 동작
+                showQuitBottomSheet()
+            }
+        }
+        // 콜백 등록
+        requireActivity().onBackPressedDispatcher.addCallback(this, backPressedCallback)
+
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // 콜백 해제
+        backPressedCallback.remove()
+    }
+
 
     override fun onResume() {
         super.onResume()
 
-            step=viewModel.getPhotoStage()
+            if(viewModel.release.value==true){
+                // 반납 상태
+                step = viewModel.releasePicStage.value?:0
+            }else{
+                // 대여 상태
+                step=viewModel.getPhotoStage()
+            }
+
 
         val color = ContextCompat.getColorStateList(requireContext(), R.color.blue500)
 
@@ -132,6 +160,10 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
         binding.topBar.tvTitle.text = "STEP 1"
         binding.topBar.pbStep.progress=100/3
 
+        // 로그 추가
+        step = viewModel.getPhotoStage()
+        Log.d("Step1GuideFragment", "onViewCreated - Current step value: $step")
+
         binding.layoutStep.flStep1
 
         // X 버튼
@@ -154,43 +186,41 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
             }
         }
 
-        // SharedPreferences에서 다이얼로그 표시 여부 확인
-        val sharedPreferences = requireActivity().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val sessionId = sharedPreferences.getString("current_session_id", null)
-
-        // 현재 세션 ID가 없다면 생성 (앱 시작 시)
-        val currentSessionId = sessionId ?: System.currentTimeMillis().toString().also {
-            sharedPreferences.edit().putString("current_session_id", it).apply()
-        }
-
-        // 이 세션에서 다이얼로그를 표시했는지 확인
-        val dialogKey = "shown_step1_dialog_$currentSessionId"
-        val hasShownDialog = sharedPreferences.getBoolean(dialogKey, false)
-
-        // 다이얼로그를 아직 표시하지 않았고, 촬영을 시작하지 않았으면 표시
-        if (!hasShownDialog && step == 0) {
+        if (step == 0) {
             showIntroDialog()
-            // 다이얼로그를 표시했음을 저장
-            sharedPreferences.edit().putBoolean(dialogKey, true).apply()
         }
     }
 
+    private var introDialog: Dialog? = null
+
     private fun showIntroDialog() {
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.layout_dialog_step1_intro)
+        introDialog?.dismiss()
 
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
+        introDialog = Dialog(requireContext())
+        introDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        introDialog?.setContentView(R.layout.layout_dialog_step1_intro)
+        
+        // 배경 투명하게
+        introDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        
+        // 너비 설정
         val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
-        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        introDialog?.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
 
-        val confirmButton = dialog.findViewById<Button>(R.id.btn_confirm)
-        confirmButton.setOnClickListener {
-            dialog.dismiss()
+        // 확인 버튼
+        val confirmButton = introDialog?.findViewById<Button>(R.id.btn_confirm)
+        confirmButton?.setOnClickListener {
+            introDialog?.dismiss()
+            introDialog = null
         }
 
-        dialog.show()
+        introDialog?.show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        introDialog?.dismiss()
+        introDialog = null
     }
 
     private fun showQuitBottomSheet() {

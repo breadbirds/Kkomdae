@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pizza.kkomdae.domain.model.GetStep2ResultResponse
 import com.pizza.kkomdae.domain.model.PostSecondStageRequest
 import com.pizza.kkomdae.domain.model.PostResponse
 import com.pizza.kkomdae.domain.usecase.Step2UseCase
@@ -53,6 +54,14 @@ class Step2ViewModel@Inject constructor(
     val postResponse: LiveData<PostResponse>
         get() = _postResponse
 
+    private var _randomKey = MutableLiveData<String>()
+    val randomKey: LiveData<String>
+        get() = _randomKey
+
+    private var _getStep2Result = MutableLiveData<GetStep2ResultResponse>()
+    val getStep2Result: LiveData<GetStep2ResultResponse>
+        get() = _getStep2Result
+
 
 
 
@@ -76,6 +85,24 @@ class Step2ViewModel@Inject constructor(
         _batteryStatus.value = data
     }
 
+    // 랜덤키 생성
+    fun postRandomKey(){
+        viewModelScope.launch {
+            val result = step2UseCase.postRandomKey(testId = sharedPreferences.getLong("test_id",0))
+            result.onSuccess {
+                _randomKey.postValue(it.data.randomKey)
+            }
+        }
+    }
+
+    fun getStep2Result(){
+        viewModelScope.launch {
+            val result= step2UseCase.getStep2Result(testId = sharedPreferences.getLong("test_id",0))
+            result.onSuccess {
+                _getStep2Result.postValue(it)
+            }
+        }
+    }
 
     fun postSecondStage(){
         viewModelScope.launch {

@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pizza.kkomdae.dto.request.SecondStageReq;
+import pizza.kkomdae.dto.request.TestResultReq;
 import pizza.kkomdae.dto.request.ThirdStageReq;
+import pizza.kkomdae.dto.respond.LaptopTestResultRes;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -86,37 +88,37 @@ public class LaptopTestResult {
         this.mousePad = thirdStageReq.getMousePad();
     }
 
-    public void updateTestResult(String testType, boolean success, List detail, String summary) {
-        switch (testType) {
+    public void updateTestResult(TestResultReq testResultReq) {
+        switch (testResultReq.getTestType()) {
             case "키보드" -> {
-                this.keyboardStatus = success;
-                this.failedKeys = success ? null : detail.toString();
+                this.keyboardStatus = testResultReq.isSuccess();
+                this.failedKeys = testResultReq.isSuccess() ? null : testResultReq.getDetail();
             }
             case "카메라" -> {
-                this.cameraStatus = success;
+                this.cameraStatus = testResultReq.isSuccess();
             }
             case "USB" -> {
-                this.usbStatus = success;
-                this.failedPorts = success ? null : detail.toString();
+                this.usbStatus = testResultReq.isSuccess();
+                this.failedPorts = testResultReq.isSuccess() ? null : testResultReq.getDetail();
             }
             case "충전" -> {
-                this.chargerStatus = success;
+                this.chargerStatus = testResultReq.isSuccess();
             }
             case "배터리" -> {
-                this.batteryReport = success;
-                this.batteryReportUrl = success ? detail.toString() : null;
-                this.batteryReportSummary = success ? summary : null;
+                this.batteryReport = testResultReq.isSuccess();
+                this.batteryReportUrl = testResultReq.isSuccess() ? testResultReq.getDetail() : null;
+                this.batteryReportSummary = testResultReq.isSuccess() ? testResultReq.getSummary() : null;
             }
-            default -> throw new IllegalArgumentException("유효하지 않은 테스트 타입입니다: " + testType);
+            default -> throw new IllegalArgumentException("유효하지 않은 테스트 타입입니다: " + testResultReq.getTestType());
         }
     
-        // 테스트 결과가 모두 완료되었는지 확인하고 stage 업데이트
-        if (isAllTestCompleted()) {
-            this.stage = 3;  // 모든 테스트가 완료되면 다음 단계로
-        }
+//        // 테스트 결과가 모두 완료되었는지 확인하고 stage 업데이트
+//        if (isAllTestCompleted()) {
+//            this.stage = 3;  // 모든 테스트가 완료되면 다음 단계로
+//        }
     }
 
-    private boolean isAllTestCompleted() {
+    public boolean isAllTestCompleted() {
         return keyboardStatus != null &&
             cameraStatus != null &&
             usbStatus != null &&
