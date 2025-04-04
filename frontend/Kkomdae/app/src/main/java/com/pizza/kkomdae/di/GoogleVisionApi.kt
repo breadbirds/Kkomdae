@@ -101,6 +101,9 @@ object GoogleVisionApi {
                         val parts = snLine.split(":", "：", "-")
                         for (part in parts) {
                             val cleanedPart = part.trim()
+                            // 🔥 S/N 또는 SN 같은 키워드 제외
+                            if (cleanedPart.equals("S/N", ignoreCase = true) || cleanedPart.equals("SN", ignoreCase = true)) continue
+
                             if (!cleanedPart.contains(Regex("[가-힣]")) &&
                                 cleanedPart.length >= 4 &&
                                 serialRegex.matches(cleanedPart)
@@ -115,7 +118,7 @@ object GoogleVisionApi {
                             val nextLine = lines[snLineIndex + 1].trim()
                             if (nextLine.isNotEmpty() &&
                                 !nextLine.contains(Regex("[가-힣]")) &&
-                                nextLine.length >= 6
+                                nextLine.length >= 5
                             ) {
                                 serial = nextLine // 정규식 안 맞아도 사용
                             }
@@ -128,7 +131,7 @@ object GoogleVisionApi {
                             val cleaned = line.trim()
                             val noSpace = cleaned.replace(" ", "")
                             if (!cleaned.contains(Regex("[가-힣]")) &&
-                                cleaned.length >= 6 &&
+                                cleaned.length >= 5 &&
                                 !noSpace.startsWith("A") &&
                                 !barcodeRegex.matches(noSpace) &&
                                 cleaned != barcode
