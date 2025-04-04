@@ -26,4 +26,9 @@ interface Step2Service {
         @Path("testId") testId: Long
     ): GetStep2ResultResponseDto
 
+    @POST("api/secondToThird/{testId}")
+    suspend fun postSecondToThird(
+        @Path("testId") testId: Long
+    ): PostResponseDto
+
 }

@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.pizza.kkomdae.MainActivity
 import com.pizza.kkomdae.R
@@ -14,6 +15,7 @@ import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentStep2ResultBinding
 import com.pizza.kkomdae.presenter.viewmodel.Step2ViewModel
 import com.pizza.kkomdae.ui.step3.LaptopInfoInputFragment
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -47,75 +49,91 @@ class Step2ResultFragment : BaseFragment<FragmentStep2ResultBinding>(
         binding.topBar.tvTitle.text = "Step 2"
         binding.topBar.pbStep.progress=200/3
 
-        // 키보드
-        if(viewModel.keyboardStatus.value?.status == "pass"){
-            binding.tvKeyboard.text="통과"
-            binding.tvKeyboard.setBackgroundResource(R.drawable.bg_rounded_blue_light)
-            binding.tvKeyboard.setTextColor(Color.parseColor("#485B78"))
-        }else{
-            binding.tvKeyboard.text="실패"
-            binding.tvKeyboard.setBackgroundResource(R.drawable.bg_rounded_red_light)
-            binding.tvKeyboard.setTextColor(Color.parseColor("#E4614F"))
-        }
+        // 자가진단 결과 받아오기
+        lifecycleScope.launch {
+            val result = viewModel.getStep2Result()
+            result.onSuccess {
+                it.data.apply {
+                    // 키보드
+                    if(it.data.keyboard_status == true){
+                        binding.tvKeyboard.text="통과"
+                        binding.tvKeyboard.setBackgroundResource(R.drawable.bg_rounded_blue_light)
+                        binding.tvKeyboard.setTextColor(Color.parseColor("#485B78"))
+                    }else{
+                        binding.tvKeyboard.text="실패"
+                        binding.tvKeyboard.setBackgroundResource(R.drawable.bg_rounded_red_light)
+                        binding.tvKeyboard.setTextColor(Color.parseColor("#E4614F"))
+                    }
 
-        // 카메라
-        if(viewModel.cameraStatus.value?.status == "pass"){
-            binding.tvCamera.text="통과"
-            binding.tvCamera.setBackgroundResource(R.drawable.bg_rounded_blue_light)
-            binding.tvCamera.setTextColor(Color.parseColor("#485B78"))
-        }else{
-            binding.tvCamera.text="실패"
-            binding.tvCamera.setBackgroundResource(R.drawable.bg_rounded_red_light)
-            binding.tvCamera.setTextColor(Color.parseColor("#E4614F"))
-        }
+                    // 카메라
+                    if(it.data.camera_status == true){
+                        binding.tvCamera.text="통과"
+                        binding.tvCamera.setBackgroundResource(R.drawable.bg_rounded_blue_light)
+                        binding.tvCamera.setTextColor(Color.parseColor("#485B78"))
+                    }else{
+                        binding.tvCamera.text="실패"
+                        binding.tvCamera.setBackgroundResource(R.drawable.bg_rounded_red_light)
+                        binding.tvCamera.setTextColor(Color.parseColor("#E4614F"))
+                    }
 
-        // USB
-        if(viewModel.usbStatus.value?.status == "pass"){
-            binding.tvUsb.text="통과"
-            binding.tvUsb.setBackgroundResource(R.drawable.bg_rounded_blue_light)
-            binding.tvUsb.setTextColor(Color.parseColor("#485B78"))
-        }else{
-            binding.tvUsb.text="실패"
-            binding.tvUsb.setBackgroundResource(R.drawable.bg_rounded_red_light)
-            binding.tvUsb.setTextColor(Color.parseColor("#E4614F"))
-        }
+                    // USB
+                    if(it.data.usb_status == true){
+                        binding.tvUsb.text="통과"
+                        binding.tvUsb.setBackgroundResource(R.drawable.bg_rounded_blue_light)
+                        binding.tvUsb.setTextColor(Color.parseColor("#485B78"))
+                    }else{
+                        binding.tvUsb.text="실패"
+                        binding.tvUsb.setBackgroundResource(R.drawable.bg_rounded_red_light)
+                        binding.tvUsb.setTextColor(Color.parseColor("#E4614F"))
+                    }
 
-        // 충전기
-        if(viewModel.chargerStatus.value?.status == "pass"){
-            binding.tvCharger.text="통과"
-            binding.tvCharger.setBackgroundResource(R.drawable.bg_rounded_blue_light)
-            binding.tvCharger.setTextColor(Color.parseColor("#485B78"))
-        }else{
-            binding.tvCharger.text="실패"
-            binding.tvCharger.setBackgroundResource(R.drawable.bg_rounded_red_light)
-            binding.tvCharger.setTextColor(Color.parseColor("#E4614F"))
-        }
+                    // 충전기
+                    if(it.data.charging_status == true){
+                        binding.tvCharger.text="통과"
+                        binding.tvCharger.setBackgroundResource(R.drawable.bg_rounded_blue_light)
+                        binding.tvCharger.setTextColor(Color.parseColor("#485B78"))
+                    }else{
+                        binding.tvCharger.text="실패"
+                        binding.tvCharger.setBackgroundResource(R.drawable.bg_rounded_red_light)
+                        binding.tvCharger.setTextColor(Color.parseColor("#E4614F"))
+                    }
 
-        // 배터리
-        if(viewModel.batteryStatus.value?.status == "pass"){
-            binding.tvBattery.text="통과"
-            binding.tvBattery.setBackgroundResource(R.drawable.bg_rounded_blue_light)
-            binding.tvBattery.setTextColor(Color.parseColor("#485B78"))
-        }else{
-            binding.tvBattery.text="실패"
-            binding.tvBattery.setBackgroundResource(R.drawable.bg_rounded_red_light)
-            binding.tvBattery.setTextColor(Color.parseColor("#E4614F"))
-        }
-
-        binding.btnNext.setOnClickListener {
-            viewModel.postSecondStage()
-
-        }
-
-        viewModel.postResponse.observe(viewLifecycleOwner){
-//            Log.d("Post", "onViewCreated: ${it.statusCode}")
-            if(it.success){
-                val transaction = requireActivity().supportFragmentManager.beginTransaction()
-                transaction.replace(R.id.fl_main, LaptopInfoInputFragment())
-                transaction.addToBackStack(null)
-                transaction.commit()
+                    // 배터리
+                    if(it.data.battery_report == true){
+                        binding.tvBattery.text="통과"
+                        binding.tvBattery.setBackgroundResource(R.drawable.bg_rounded_blue_light)
+                        binding.tvBattery.setTextColor(Color.parseColor("#485B78"))
+                    }else{
+                        binding.tvBattery.text="실패"
+                        binding.tvBattery.setBackgroundResource(R.drawable.bg_rounded_red_light)
+                        binding.tvBattery.setTextColor(Color.parseColor("#E4614F"))
+                    }
+                }
             }
         }
+
+
+
+
+        binding.btnNext.setOnClickListener {
+
+            lifecycleScope.launch {
+                val result = viewModel.postSecondToThird()
+                result.onSuccess {
+                    if (it.success){
+                        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                        transaction.replace(R.id.fl_main, LaptopInfoInputFragment())
+                        transaction.addToBackStack(null)
+                        transaction.commit()
+                    }else{
+                        // todo 에러 다이얼로그 추가
+                    }
+                }
+            }
+
+        }
+
+
 
         // X 클릭 이벤트 설정
         binding.topBar.backButtonContainer.setOnClickListener {

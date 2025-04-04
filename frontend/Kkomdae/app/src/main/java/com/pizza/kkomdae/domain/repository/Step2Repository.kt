@@ -18,4 +18,8 @@ interface Step2Repository {
     suspend fun getStep2Result(
         testId:Long
     ): GetStep2ResultResponse
+
+    suspend fun postSecondToThird(
+        testId:Long
+    ): PostResponse
 }
