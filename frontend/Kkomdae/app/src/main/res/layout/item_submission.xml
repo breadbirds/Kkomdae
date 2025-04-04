@@ -31,7 +31,7 @@
         app:layout_constraintStart_toEndOf="@id/iv_icon"/>
 
     <TextView
-        android:id="@+id/tv_state"
+        android:id="@+id/tv_state_rant"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="대여중"
@@ -41,10 +41,29 @@
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
         android:textColor="@color/blue300"
+
         android:background="@drawable/status_border_rounded"
         app:layout_constraintTop_toTopOf="@id/tv_model_number"
         app:layout_constraintBottom_toBottomOf="@id/tv_model_number"
        app:layout_constraintEnd_toStartOf="@id/btn_down"
+        android:layout_marginEnd="20dp"/>
+
+    <TextView
+        android:id="@+id/tv_state_release"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="반납완료"
+        style="@style/Label4"
+        android:visibility="gone"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:textColor="@color/gray300"
+        android:background="@drawable/status_border_rounded_release"
+        app:layout_constraintTop_toTopOf="@id/tv_model_number"
+        app:layout_constraintBottom_toBottomOf="@id/tv_model_number"
+        app:layout_constraintEnd_toStartOf="@id/btn_down"
         android:layout_marginEnd="20dp"/>
 
     <ImageView
@@ -114,44 +133,76 @@
         android:id="@+id/tv_input_date"/>
 
 
-    <TextView
-        android:id="@+id/bt_file_download"
-        style="@style/Label3"
-        android:textColor="#3391FF"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:background="@drawable/border_gray_rounded"
-        android:backgroundTint="@color/blue100"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="20dp"
-        android:gravity="center"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toStartOf="@id/bt_return_download"
-        app:layout_constraintTop_toBottomOf="@id/line"
-        android:text="대여 파일 다운로드"/>
+        <TextView
+            android:id="@+id/bt_file_download"
+            style="@style/Label3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/border_gray_rounded"
+            android:backgroundTint="@color/blue100"
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="8dp"
+            android:layout_marginStart="30dp"
+            android:text="대여 파일 다운로드"
+            android:textColor="#3391FF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/cl_return"
+            app:layout_constraintStart_toEndOf="@+id/tv_input_date"
+            app:layout_constraintTop_toBottomOf="@id/line" />
 
-    <TextView
-        android:id="@+id/bt_return_download"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/border_gray_rounded"
-        android:backgroundTint="#FBE6E2"
-        android:text="반납하기"
-        android:textColor="#E4614F"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        style="@style/Label3"
-        android:gravity="center"
-        android:layout_marginEnd="28dp"
-        app:layout_constraintEnd_toEndOf="parent"
-       app:layout_constraintTop_toTopOf="@id/bt_file_download" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_return"
+            android:layout_width="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/line"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/bt_return"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border_gray_rounded"
+                android:backgroundTint="#FBE6E2"
+                android:text="반납하기"
+                android:textColor="#E4614F"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                style="@style/Label3"
+                android:gravity="center"
+                android:layout_marginEnd="28dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/bt_file_download" />
+
+            <TextView
+                android:id="@+id/bt_return_download"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border_gray_rounded"
+                android:backgroundTint="#FBE6E2"
+                android:text="반납 파일 다운로드"
+                android:textColor="#E4614F"
+                android:paddingTop="8dp"
+                android:visibility="gone"
+                android:paddingBottom="8dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                style="@style/Label3"
+                android:gravity="center"
+                android:layout_marginEnd="28dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/bt_file_download" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
