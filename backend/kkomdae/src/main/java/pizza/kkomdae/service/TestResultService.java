@@ -54,14 +54,14 @@ public class TestResultService {
     }
 
     @Transactional
-    public long initTest(long userId, String serialNum) {
+    public long initTest(long userId, Long rentId) {
         Student student = studentRepository.getReferenceById(userId);
         LaptopTestResult laptopTestResult = lapTopTestResultRepository.findByStudentAndStageIsLessThan(student, 6);
         if (laptopTestResult == null) {
             laptopTestResult = new LaptopTestResult(student);
-            if (serialNum != null) {
-                Device device = deviceRepository.findDeviceBySerialNum(serialNum);
-                laptopTestResult.setDevice(device);
+            if (rentId != null) { // 반납이라면
+                Rent rent = rentRepository.findById(rentId).orElseThrow(()-> new RuntimeException("없는 rentId 오류"));
+                laptopTestResult.setRent(rent);
                 laptopTestResult.setRelease(true);
             }
             lapTopTestResultRepository.save(laptopTestResult);
@@ -124,7 +124,9 @@ public class TestResultService {
         testResult.saveThirdStage(thirdStageReq);
         Device device = deviceRepository.findDeviceBySerialNum(thirdStageReq.getSerialNum());
         if (device == null) {
-            throw new RuntimeException("deivce 시리얼 에러");
+            log.info("새 디바이스 생성");
+            device = new Laptop(thirdStageReq);
+            deviceRepository.save(device);
         }
         Rent rent;
         if (testResult.getRelease() == false) { // 대여로직
@@ -134,18 +136,19 @@ public class TestResultService {
             testResult.setDevice(device);
             rent.setDevice(device);
         } else { // 반납 로직
-            rent = rentRepository.findByDeviceAndStudent(device, student);
+            rent = testResult.getRent();
             rent.setReleaseDateTime(testResult.getDate());
         }
 
         rentRepository.save(rent);
+        testResult.setRent(rent);
     }
 
     @Transactional
     public String randomKey(long testId) {
         // DB에서 해당 testId의 LaptopTestResult 조회
         LaptopTestResult testResult = lapTopTestResultRepository.findById(testId)
-            .orElseThrow(() -> new RuntimeException("해당 테스트 결과가 존재하지 않습니다."));
+                .orElseThrow(() -> new RuntimeException("해당 테스트 결과가 존재하지 않습니다."));
 
         String existKey = testResult.getRandomKey();
         if (existKey == null) {
@@ -219,7 +222,7 @@ public class TestResultService {
 
     @Transactional
     public void fourthStage(ForthStageReq forthStageReq) {
-        LaptopTestResult result = lapTopTestResultRepository.findById(forthStageReq.getTestId()).orElseThrow(()->new RuntimeException("testId 오류"));
+        LaptopTestResult result = lapTopTestResultRepository.findById(forthStageReq.getTestId()).orElseThrow(() -> new RuntimeException("testId 오류"));
         result.setDescription(forthStageReq.getDescription());
         result.setStage(5);
     }
@@ -233,7 +236,7 @@ public class TestResultService {
             urls.add(s3Service.generatePresignedUrl(photo.getName()));
         }
         res.setImageUrls(urls);
-        
+
         return res;
     }
 

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -19,5 +20,6 @@ public class Rent {
     private Student student;
     @ManyToOne(fetch = FetchType.LAZY)
     private Device device;
-
+    @OneToMany(mappedBy = "rent")
+    private List<LaptopTestResult> laptopTestResults;
 }
