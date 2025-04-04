@@ -43,6 +43,7 @@ public class UserRentTestRes {
                 this.release = true;
                 this.releasePdfName = laptopTestResults.get(1).getPdfFileName();
             } else {
+                this.rentPdfName = laptopTestResults.get(0).getPdfFileName();
                 this.dateTime = rent.getRentDateTime();
                 this.release = false;
             }
