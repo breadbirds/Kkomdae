@@ -17,6 +17,7 @@ import androidx.lifecycle.viewModelScope
 import com.pizza.kkomdae.domain.model.AiPhotoData
 import com.pizza.kkomdae.domain.model.FourthStageRequest
 import com.pizza.kkomdae.domain.model.GetAiPhotoResponse
+import com.pizza.kkomdae.domain.model.GetPdfUrlResponse
 import com.pizza.kkomdae.domain.model.GetTotalResultResponse
 import com.pizza.kkomdae.domain.model.LoginResponse
 import com.pizza.kkomdae.domain.model.PostRePhotoResponse
@@ -408,14 +409,16 @@ class FinalViewModel @Inject constructor(
 
     }
 
-    fun getPdfUrl(name: String){
-        viewModelScope.launch {
+    suspend fun getPdfUrl(name: String):Result<GetPdfUrlResponse>{
+        return try {
             val result = finalUseCase.getPdfUrl(name)
             Log.d(TAG, "getPdfUrl: $result")
-            result.onSuccess {
-                _pdfUrl.postValue(it.url)
-            }
+            result
+        }catch (e:Exception){
+            Result.failure(e)
         }
+
+
     }
 
 

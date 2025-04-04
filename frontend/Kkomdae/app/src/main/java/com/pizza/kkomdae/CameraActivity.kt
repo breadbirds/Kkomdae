@@ -124,7 +124,7 @@ class CameraActivity : BaseActivity() {
                 .replace(R.id.fl_camera, KeypadGuideFragment())
                 .addToBackStack("sadfa")
                 .commit()
-        }7->{ // 키패드 촬영 가이드
+        }7->{ // 이전버튼
             val resultIntent = Intent().apply {
                 putExtra("PHOTO_URI", 1)  // ✅ URI 값을 전달
             }

@@ -110,6 +110,13 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
+
+        if(tokenManager.getAccessToken()!=null){
+            val intent = Intent(this@LoginActivity, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
         binding.wvLogin.settings.javaScriptEnabled = true
         binding.wvLogin.settings.domStorageEnabled = true // 로컬 스토리지 지원
         binding.wvLogin.settings.userAgentString = "Mozilla/5.0 (Android)" // 유저 에이전트 설정

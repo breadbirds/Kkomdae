@@ -72,6 +72,7 @@ class MainViewModel@Inject constructor(
 
     fun setReleasePicStage(stage: Int){
         _releasePicStage.postValue(stage)
+        savePhotoStage(stage)
     }
 
     fun setRelease(release:Boolean){
@@ -186,7 +187,9 @@ class MainViewModel@Inject constructor(
     fun saveTestId(testId: Long) {
         sharedPreferences.edit().putLong("test_id", testId).apply()
     }
-    private fun savePhotoStage(step: Int) {
+
+
+   fun savePhotoStage(step: Int) {
         sharedPreferences.edit().putInt("photoStage", step).apply()
     }
 
