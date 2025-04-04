@@ -32,7 +32,7 @@ public class CustomRentRepositoryImpl implements CustomRentRepository {
                         isRegion(studentWithRentCond.getRegion(), studentWithRentCond.getClassName())
                         , isStudent(studentWithRentCond.getStudent())
                 )
-                .orderBy(student.studentNum.asc(), QLaptopTestResult.laptopTestResult.laptopTestResultId.desc())
+                .orderBy(student.studentNum.asc(), QLaptopTestResult.laptopTestResult.laptopTestResultId.asc())
                 .fetch()
                 ;
     }
