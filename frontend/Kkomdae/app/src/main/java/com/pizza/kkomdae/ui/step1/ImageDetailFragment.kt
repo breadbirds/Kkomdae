@@ -14,6 +14,7 @@ import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentFontResultBinding
 import com.pizza.kkomdae.databinding.FragmentImageDetailBinding
+import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.ui.guide.AllStepOnboardingFragment.OnboardingStep
 import com.pizza.kkomdae.ui.guide.Step2GuideFragment
@@ -35,7 +36,7 @@ class ImageDetailFragment :  BaseFragment<FragmentImageDetailBinding>(
     // TODO: Rename and change types of parameters
     private var param1: Int? = null
     private var param2: String? = null
-    private val viewModel : MainViewModel by activityViewModels()
+    private val viewModel : FinalViewModel by activityViewModels()
 
     data class ImageDetailStep(
         val title: String,
@@ -55,35 +56,35 @@ class ImageDetailFragment :  BaseFragment<FragmentImageDetailBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val imageList = viewModel.resultImage.value
+
 
        val list = listOf(
             ImageDetailStep(
                 "전면부",
                 1,
-                imageList?.get(0),
+                viewModel.frontUri.value,
             ),
             ImageDetailStep(
                 "후면부",
                 2,
-                imageList?.get(1),
+                viewModel.backUri.value,
             ),
             ImageDetailStep(
                 "좌측면",
                 3,
-                imageList?.get(2),
+                viewModel.leftUri.value,
             ),ImageDetailStep(
                 "우측면",
                 4,
-                imageList?.get(3),
+               viewModel.rightUri.value,
             ),ImageDetailStep(
                 "모니터",
                 5,
-                imageList?.get(4),
+               viewModel.screenUri.value,
             ),ImageDetailStep(
                 "키보드",
                 6,
-                imageList?.get(5),
+               viewModel.keypadUri.value,
             ),
         )
 
