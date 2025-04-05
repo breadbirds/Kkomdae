@@ -3,14 +3,13 @@ package com.pizza.kkomdae.presenter.viewmodel
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pizza.kkomdae.domain.model.GetStep2ResultResponse
-import com.pizza.kkomdae.domain.model.PostSecondStageRequest
-import com.pizza.kkomdae.domain.model.PostResponse
+import com.pizza.kkomdae.domain.model.step2.GetStep2ResultResponse
+import com.pizza.kkomdae.domain.model.step2.PostSecondStageRequest
+import com.pizza.kkomdae.domain.model.step2.PostResponse
 import com.pizza.kkomdae.domain.usecase.Step2UseCase
 import com.pizza.kkomdae.presenter.model.BatteryReport
 import com.pizza.kkomdae.presenter.model.ComponentStatus
@@ -116,7 +115,8 @@ class Step2ViewModel@Inject constructor(
     suspend fun postSecondStage():Result<PostResponse>{
 
             return try {
-                step2UseCase.postSecondStage(PostSecondStageRequest(
+                step2UseCase.postSecondStage(
+                    PostSecondStageRequest(
                     testId = sharedPreferences.getLong("test_id",0),
                     keyboardStatus = keyboardStatus.value?.status == "pass",
                     failedKeys = keyboardStatus.value?.failed_keys?.joinToString("@")?:"",
@@ -126,7 +126,8 @@ class Step2ViewModel@Inject constructor(
                     chargerStatus = chargerStatus.value?.status == "pass",
                     batteryReport = batteryStatus.value?.status == "pass",
                     batteryReportUrl =batteryStatus.value?.reportName ?:""
-                ))
+                )
+                )
             }catch (e:Exception){
                 Result.failure(e)
             }

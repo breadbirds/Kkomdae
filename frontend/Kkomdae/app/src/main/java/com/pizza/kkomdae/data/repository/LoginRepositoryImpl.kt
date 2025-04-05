@@ -1,9 +1,9 @@
 package com.pizza.kkomdae.data.repository
 
 import android.util.Log
-import com.pizza.kkomdae.data.model.LoginMapper
+import com.pizza.kkomdae.data.model.mapper.LoginMapper
 import com.pizza.kkomdae.data.source.remote.LoginService
-import com.pizza.kkomdae.domain.model.LoginResponse
+import com.pizza.kkomdae.domain.model.login.LoginResponse
 import com.pizza.kkomdae.domain.repository.LoginRepository
 import javax.inject.Inject
 

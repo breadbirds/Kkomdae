@@ -1,10 +1,9 @@
 package com.pizza.kkomdae.data.source.remote
 
-import com.pizza.kkomdae.data.model.dto.LoginResponseDto
-import com.pizza.kkomdae.data.model.dto.RefreshTokenRequest
-import com.pizza.kkomdae.data.model.dto.RefreshTokenResponse
+import com.pizza.kkomdae.data.model.dto.login.LoginResponseDto
+import com.pizza.kkomdae.data.model.dto.login.RefreshTokenRequest
+import com.pizza.kkomdae.data.model.dto.login.RefreshTokenResponse
 import retrofit2.Call
-import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST

@@ -1,13 +1,11 @@
 package com.pizza.kkomdae.domain.usecase
 
-import com.pizza.kkomdae.domain.model.FourthStageRequest
-import com.pizza.kkomdae.domain.model.GetAiPhotoResponse
-import com.pizza.kkomdae.domain.model.GetPdfUrlResponse
-import com.pizza.kkomdae.domain.model.GetTotalResultResponse
-import com.pizza.kkomdae.domain.model.LoginResponse
-import com.pizza.kkomdae.domain.model.PostResponse
+import com.pizza.kkomdae.domain.model.step4.FourthStageRequest
+import com.pizza.kkomdae.domain.model.step4.GetAiPhotoResponse
+import com.pizza.kkomdae.domain.model.step4.GetPdfUrlResponse
+import com.pizza.kkomdae.domain.model.step4.GetTotalResultResponse
+import com.pizza.kkomdae.domain.model.step2.PostResponse
 import com.pizza.kkomdae.domain.repository.FinalRepository
-import com.pizza.kkomdae.domain.repository.InspectRepository
 import okhttp3.MultipartBody
 import javax.inject.Inject
 

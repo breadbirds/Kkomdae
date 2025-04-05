@@ -12,20 +12,16 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pizza.kkomdae.domain.model.AiPhotoData
-import com.pizza.kkomdae.domain.model.FourthStageRequest
-import com.pizza.kkomdae.domain.model.GetAiPhotoResponse
-import com.pizza.kkomdae.domain.model.GetPdfUrlResponse
-import com.pizza.kkomdae.domain.model.GetTotalResultResponse
-import com.pizza.kkomdae.domain.model.LoginResponse
-import com.pizza.kkomdae.domain.model.PostRePhotoResponse
-import com.pizza.kkomdae.domain.model.PostResponse
+import com.pizza.kkomdae.domain.model.step4.AiPhotoData
+import com.pizza.kkomdae.domain.model.step4.FourthStageRequest
+import com.pizza.kkomdae.domain.model.step4.GetAiPhotoResponse
+import com.pizza.kkomdae.domain.model.step4.GetPdfUrlResponse
+import com.pizza.kkomdae.domain.model.step4.GetTotalResultResponse
+import com.pizza.kkomdae.domain.model.step4.PostRePhotoResponse
+import com.pizza.kkomdae.domain.model.step2.PostResponse
 import com.pizza.kkomdae.domain.usecase.FinalUseCase
 
-import dagger.hilt.android.internal.Contexts.getApplication
-import com.pizza.kkomdae.domain.usecase.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

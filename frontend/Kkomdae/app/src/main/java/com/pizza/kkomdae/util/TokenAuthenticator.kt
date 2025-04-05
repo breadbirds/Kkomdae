@@ -8,7 +8,7 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import com.pizza.kkomdae.LoginActivity
-import com.pizza.kkomdae.data.model.dto.RefreshTokenRequest
+import com.pizza.kkomdae.data.model.dto.login.RefreshTokenRequest
 import com.pizza.kkomdae.data.source.local.SecureTokenManager
 import com.pizza.kkomdae.data.source.local.TokenManager
 import com.pizza.kkomdae.util.RetrofitUtil.Companion.loginService
@@ -16,7 +16,7 @@ import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
-import java.util.concurrent.atomic.AtomicInteger
+
 class TokenAuthenticator(private val context: Context) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? {

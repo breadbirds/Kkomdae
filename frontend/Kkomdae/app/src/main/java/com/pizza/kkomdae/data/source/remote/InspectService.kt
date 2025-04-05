@@ -1,8 +1,5 @@
 package com.pizza.kkomdae.data.source.remote
 
-import com.pizza.kkomdae.data.model.dto.LoginResponseDto
-import com.pizza.kkomdae.data.model.dto.TestResponseDto
-import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 

@@ -1,9 +1,9 @@
 package com.pizza.kkomdae.data.source.remote
 
-import com.pizza.kkomdae.data.model.dto.GetStep2ResultResponseDto
-import com.pizza.kkomdae.data.model.dto.PostRandomKeyResponseDto
-import com.pizza.kkomdae.data.model.dto.PostSecondStageRequestDto
-import com.pizza.kkomdae.data.model.dto.PostResponseDto
+import com.pizza.kkomdae.data.model.dto.step2.GetStep2ResultResponseDto
+import com.pizza.kkomdae.data.model.dto.step2.PostRandomKeyResponseDto
+import com.pizza.kkomdae.data.model.dto.step2.PostSecondStageRequestDto
+import com.pizza.kkomdae.data.model.dto.step2.PostResponseDto
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST

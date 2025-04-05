@@ -1,9 +1,6 @@
 package com.pizza.kkomdae.domain.usecase
 
-import com.pizza.kkomdae.domain.model.TestResponse
-import com.pizza.kkomdae.domain.model.UserResponse
 import com.pizza.kkomdae.domain.repository.InspectRepository
-import com.pizza.kkomdae.domain.repository.UserRepository
 import javax.inject.Inject
 
 class InspectUseCase@Inject constructor(

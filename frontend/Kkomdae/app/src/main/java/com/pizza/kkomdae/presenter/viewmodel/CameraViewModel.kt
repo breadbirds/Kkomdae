@@ -13,13 +13,10 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pizza.kkomdae.di.GoogleVisionApi
-import com.pizza.kkomdae.domain.model.PhotoResponse
-import com.pizza.kkomdae.domain.usecase.LoginUseCase
+import com.pizza.kkomdae.domain.model.step1.PhotoResponse
 import com.pizza.kkomdae.domain.usecase.Step1UseCase
-import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

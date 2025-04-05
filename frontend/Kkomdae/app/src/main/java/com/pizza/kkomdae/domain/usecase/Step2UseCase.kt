@@ -1,9 +1,9 @@
 package com.pizza.kkomdae.domain.usecase
 
-import com.pizza.kkomdae.domain.model.GetStep2ResultResponse
-import com.pizza.kkomdae.domain.model.PostRandomKeyResponse
-import com.pizza.kkomdae.domain.model.PostSecondStageRequest
-import com.pizza.kkomdae.domain.model.PostResponse
+import com.pizza.kkomdae.domain.model.step2.GetStep2ResultResponse
+import com.pizza.kkomdae.domain.model.step2.PostRandomKeyResponse
+import com.pizza.kkomdae.domain.model.step2.PostSecondStageRequest
+import com.pizza.kkomdae.domain.model.step2.PostResponse
 import com.pizza.kkomdae.domain.repository.Step2Repository
 import javax.inject.Inject
 
