@@ -83,6 +83,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        changeImage(0)
         if (count==0){
             lifecycleScope.launch {
                 val result = viewModel.getAiPhoto()

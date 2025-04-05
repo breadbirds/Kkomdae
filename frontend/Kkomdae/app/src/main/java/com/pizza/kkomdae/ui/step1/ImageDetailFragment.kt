@@ -89,7 +89,9 @@ class ImageDetailFragment :  BaseFragment<FragmentImageDetailBinding>(
         )
 
         binding.viewPager.adapter=ImageDetailAdapter(list)
-        binding.viewPager.setCurrentItem((param1?:1)-1,false)
+        binding.viewPager.post {
+            binding.viewPager.setCurrentItem((param1 ?: 1) , false)
+        }
 
         binding.btnCancel.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
