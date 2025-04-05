@@ -120,6 +120,7 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
 
         // 서버에서 받아온 유저 정보
         viewModel.userInfoResult.observe(viewLifecycleOwner){
+            Log.d("Post", "onViewCreated: ${it.userRentTestRes}")
             step=it.stage
             binding.tvWelcomeMessage.text="${it.name}님 안녕하세요!"
             adapter.submitList(it.userRentTestRes.filter { item ->
@@ -223,7 +224,6 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
         transaction.addToBackStack(null)
         transaction.commit()
     }
-
 
     // 개발 중 다이얼로그
     private fun showDevelopingDialog() {

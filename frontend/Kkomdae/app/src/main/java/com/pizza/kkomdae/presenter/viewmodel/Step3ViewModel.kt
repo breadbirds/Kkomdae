@@ -69,6 +69,9 @@ class Step3ViewModel@Inject constructor(
         get() = _postResponse
 
 
+    fun clearPostResponse(){
+        _postResponse.postValue(null)
+    }
 
     fun setModelCode(data: String) {
         _modelCode.value = data

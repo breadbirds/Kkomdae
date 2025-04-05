@@ -1,5 +1,6 @@
 package com.pizza.kkomdae.ui
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -25,8 +26,8 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
 
     inner class SubmissionViewHolder(val binding: ItemSubmissionBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(position: Int){
-
-            if(getItem(position).release){
+            Log.d("TAG", "bind: $position")
+            if(getItem(position).releasePdfName!=null){
                 binding.tvStateRelease.isVisible=true
                 binding.tvStateRant.isVisible=false
                 binding.btReturnDownload.isVisible=true
@@ -44,7 +45,7 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
                 binding.btnUp.isVisible=true
                 binding.btnDown.isVisible=false
 
-                if(getItem(position).release){
+                if(getItem(position).releasePdfName!=null){
                     binding.btReturnDownload.isVisible=true
                     binding.btReturn.isVisible=false
                     binding.tvDate.isVisible=false
@@ -57,7 +58,7 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
             }
 
             binding.btnUp.setOnClickListener {
-                if(getItem(position).release){
+                if(getItem(position).releasePdfName!=null){
                     binding.tvStateRelease.isVisible=true
                     binding.tvStateRant.isVisible=false
                 }else{
@@ -92,11 +93,18 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
 
             }
 
+            val regex = "\\(.*?\\)".toRegex()
+            val match = regex.find(getItem(position).modelCode)
+            val withParentheses = match?.value
 
-            binding.tvModelNumber.text= getItem(position).modelCode
+            binding.tvModelNumber.text= getItem(position).serialNum + withParentheses
             binding.tvInputDate.text = getItem(position).dateTime
 
         }
+    }
+
+    override fun getItemCount(): Int {
+        return currentList.size
     }
 
     override fun onBindViewHolder(holder: SubmissionViewHolder, position: Int) {

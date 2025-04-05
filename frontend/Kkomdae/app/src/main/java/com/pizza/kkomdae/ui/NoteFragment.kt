@@ -75,6 +75,7 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
 
         // 통신 결과 감시
         viewModel.postFourth.observe(viewLifecycleOwner){
+            it ?: return@observe
             if(it.success && it.status=="OK"){
                 navigateToFinalResult()
             }
@@ -102,6 +103,11 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
         transaction.replace(R.id.fl_main, FinalResultFragment())
         transaction.addToBackStack(null)
         transaction.commit()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.clearPostFourth()
     }
 
     private fun showQuitBottomSheet() {

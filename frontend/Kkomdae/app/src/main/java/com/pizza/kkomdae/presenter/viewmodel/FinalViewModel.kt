@@ -157,6 +157,7 @@ class FinalViewModel @Inject constructor(
         get() = _rePhoto6
 
 
+    // 재촬영 uri 초기화
     fun clearRePhoto(){
         _reCameraUri.value=null
         _rePhoto1.value=null
@@ -165,8 +166,24 @@ class FinalViewModel @Inject constructor(
         _rePhoto4.value=null
         _rePhoto5.value=null
         _rePhoto6.value=null
+    }
+
+    fun clearReCameraUri(){
+        _reCameraUri.value=null
+    }
+    fun clearPostFourth(){
+        _postFourth.value=null
+    }
+
+    fun clearPostPdfName(){
+        _pdfName.postValue(null)
 
     }
+
+    fun clearPostFinal(){
+        _getFinalResult.postValue(null)
+    }
+
 
 
 
@@ -377,7 +394,6 @@ class FinalViewModel @Inject constructor(
     suspend fun getAiPhoto():Result<GetAiPhotoResponse>{
 
        return try {
-
 
             val result = finalUseCase.getAiPhoto(sharedPreferences.getLong("test_id", 0))
 

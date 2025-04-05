@@ -1,6 +1,7 @@
 package com.pizza.kkomdae.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -56,6 +57,7 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
 
         // pdf 다운로드 버튼
         binding.btnDownloadPdf.setOnClickListener {
+            Log.d("TAG", "onViewCreated: ${finalViewModel.pdfName}")
             finalViewModel.pdfName.value?.let {
                 Toast.makeText(requireContext(),"파일이 다운로드 중입니다",Toast.LENGTH_SHORT).show()
                 lifecycleScope.launch {
@@ -96,6 +98,12 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
         binding.btnShare.setOnClickListener {
             // 공유 로직 구현
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        clearBinding()
+        finalViewModel.clearPostPdfName()
     }
 
 

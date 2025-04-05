@@ -51,6 +51,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private var count =0
     private var step = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,28 +83,30 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launch {
-            val result = viewModel.getAiPhoto()
-            result.onSuccess {
-                if (it.success ){
-                    binding.loadingAnimation.visibility = View.GONE
-                    binding.ivImage.visibility = View.VISIBLE
+        if (count==0){
+            lifecycleScope.launch {
+                val result = viewModel.getAiPhoto()
+                result.onSuccess {
+                    if (it.success ){
+                        binding.loadingAnimation.visibility = View.GONE
+                        binding.ivImage.visibility = View.VISIBLE
 
-                    Glide.with(binding.ivImage)
-                        .load(it.data.Picture1_ai_url)
-                        .into(binding.ivImage)
+                        Glide.with(binding.ivImage)
+                            .load(it.data.Picture1_ai_url)
+                            .into(binding.ivImage)
 
-                    viewModel.setAllPhoto(it.data)
-                }else{
-                    // todo 에러 뜰때 추가
+                        viewModel.setAllPhoto(it.data)
+                    }else{
+                        // todo 에러 뜰때 추가
+                    }
+
+                }.onFailure {
+                    Log.d(TAG, "onViewCreated: $it")
                 }
-
-
-
-            }.onFailure {
-                Log.d(TAG, "onViewCreated: $it")
             }
+            count++
         }
+
 
 
         val data = listOf(
@@ -134,6 +137,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
             Log.d(TAG, "onViewCreated: $it")
             viewModel.postRePhoto()
+            viewModel.clearReCameraUri()
         }
 
         viewModel.rePhoto1.observe(viewLifecycleOwner){
@@ -204,6 +208,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         }
         viewModel.rePhoto6.observe(viewLifecycleOwner){
             it ?: return@observe
+
             adapter.hideTextAt(5)
             // 로딩 애니메이션 숨기기
             binding.loadingAnimation.visibility = View.GONE
@@ -214,6 +219,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
             // 토스트 메시지 표시
             showToast("키보드 사진이 재분석되었습니다.")
+
         }
 
         binding.ivImage.setOnClickListener {

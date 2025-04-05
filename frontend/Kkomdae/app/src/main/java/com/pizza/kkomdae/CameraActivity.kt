@@ -32,13 +32,13 @@ class CameraActivity : BaseActivity() {
 
 
     private val binding by lazy { ActivityCameraBinding.inflate(layoutInflater) }
-    private val viewModel : CameraViewModel by viewModels()
+    private val viewModel: CameraViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val stage = intent.getIntExtra("stage",-1)+1
+        val stage = intent.getIntExtra("stage", -1) + 1
         viewModel.setReCameraStage(stage)
 
 
@@ -50,29 +50,28 @@ class CameraActivity : BaseActivity() {
                         View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 )
 
-        var step = type+1
+        var step = type + 1
 
 
         Log.d("Post", "onCreate: $step")
-        if (stage!=0){
+        if (stage != 0) {
             changeFragment(stage)
-        }else{
+        } else {
             changeFragment(step)
         }
 
 
-
-
-        // 상태바 뒤로가기 처리를 위한 콜백 등록 로직
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                showStopCameraDialog()
-            }
-        })
+//        // 상태바 뒤로가기 처리를 위한 콜백 등록 로직
+//        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+//            override fun handleOnBackPressed() {
+//                showStopCameraDialog()
+//            }
+//        })
 
     }
 
-    fun moveToBackReCamera(uri: Uri){
+    fun moveToBackReCamera(uri: Uri) {
+        Log.d("TAG", "moveToBackReCamera: ")
         val resultIntent = Intent().apply {
             putExtra("RE_PHOTO_URI", uri.toString())  // ✅ URI 값을 전달
         }
@@ -80,57 +79,68 @@ class CameraActivity : BaseActivity() {
         finish()
     }
 
-    fun moveToBack(){
+    fun moveToBack() {
         finish()
     }
 
-    fun changeFragment(type: Int){
-        when(type){
-            0->{ // 촬영 확인
+    fun changeFragment(type: Int) {
+        when (type) {
+            0 -> { // 촬영 확인
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fl_camera, ResultFragment())
                     .commit()
             }
-            1->{ // 전면부 촬영 가이드
+
+            1 -> { // 전면부 촬영 가이드
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fl_camera, FrontShotGuideFragment())
                     .addToBackStack("sadfa")
                     .commit()
             }
-            2->{ // 후면부 촬영 가이드
+
+            2 -> { // 후면부 촬영 가이드
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fl_camera, BackShotGuideFragment())
                     .addToBackStack("sadfa")
                     .commit()
             }
-            3->{ // 좌측 촬영 가이드
+
+            3 -> { // 좌측 촬영 가이드
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fl_camera, LeftGuideFragment())
                     .addToBackStack("sadfa")
                     .commit()
             }
-            4->{ // 우측 촬영 가이드
+
+            4 -> { // 우측 촬영 가이드
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fl_camera, RightGuideFragment())
                     .addToBackStack("sadfa")
                     .commit()
-            }5->{ // 화면 촬영 가이드
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fl_camera, ScreenShotGuideFragment())
-                .addToBackStack("sadfa")
-                .commit()
-            }6->{ // 키패드 촬영 가이드
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fl_camera, KeypadGuideFragment())
-                .addToBackStack("sadfa")
-                .commit()
-        }7->{ // 이전버튼
-            val resultIntent = Intent().apply {
-                putExtra("PHOTO_URI", 1)  // ✅ URI 값을 전달
             }
-            setResult(Activity.RESULT_OK, resultIntent)
-            finish()
-        }
+
+            5 -> { // 화면 촬영 가이드
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fl_camera, ScreenShotGuideFragment())
+                    .addToBackStack("sadfa")
+                    .commit()
+            }
+
+            6 -> { // 키패드 촬영 가이드
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fl_camera, KeypadGuideFragment())
+                    .addToBackStack("sadfa")
+                    .commit()
+            }
+
+            7 -> { // 이전버튼
+                Log.d("TAG", "changeFragment: ")
+                val resultIntent = Intent().apply {
+                    putExtra("PHOTO_URI", 1)  // ✅ URI 값을 전달
+                }
+                setResult(Activity.RESULT_OK, resultIntent)
+                finish()
+            }
 
         }
     }

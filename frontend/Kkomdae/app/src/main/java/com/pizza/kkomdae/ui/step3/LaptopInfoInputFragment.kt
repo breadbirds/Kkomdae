@@ -185,6 +185,7 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
 
         // post 통신 결과
         viewModel.postResponse.observe(viewLifecycleOwner){
+            it ?: return@observe
             if(it.success && it.status=="OK"){ // 통신 성공
                 showEndDialog()
             }else{ // todo 통신 실패시
@@ -672,6 +673,12 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         }
 
         dialog.show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        clearBinding()
+        viewModel.clearPostResponse()
     }
 
 
