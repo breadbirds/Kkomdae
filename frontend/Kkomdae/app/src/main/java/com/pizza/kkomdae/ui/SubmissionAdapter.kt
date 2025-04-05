@@ -27,6 +27,11 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
     inner class SubmissionViewHolder(val binding: ItemSubmissionBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(position: Int){
             Log.d("TAG", "bind: $position")
+            binding.btReturnDownload.isVisible=false
+            binding.btReturn.isVisible=false
+            binding.clMenu.isVisible=false
+            binding.btnUp.isVisible=false
+            binding.btnDown.isVisible=true
             if(getItem(position).releasePdfName!=null){
                 binding.tvStateRelease.isVisible=true
                 binding.tvStateRant.isVisible=false
