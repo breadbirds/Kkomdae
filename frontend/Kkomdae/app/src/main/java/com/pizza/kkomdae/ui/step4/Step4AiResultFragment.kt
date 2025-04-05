@@ -83,7 +83,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        changeImage(0)
+        changeImage(step)
         if (count==0){
             lifecycleScope.launch {
                 val result = viewModel.getAiPhoto()
@@ -122,6 +122,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             changeImage(it)
             adaterIndex = it
         })
+
+        adapter.selectItem(step)
 
         Log.d(TAG, "onViewCreated: reCameraUri")
         // 재촬영 이미지 uri 서버로 보내기

@@ -97,4 +97,12 @@ class Step4AiResultAdapter(val list: List<Step4AiResult>, val listen:(Int)->Unit
             notifyItemChanged(index) // 해당 아이템만 업데이트
         }
     }
+
+    fun selectItem(position: Int) {
+        val previousPosition = selectedPosition
+        selectedPosition = position
+        notifyItemChanged(previousPosition)
+        notifyItemChanged(selectedPosition)
+        listen(position) // 클릭 리스너도 같이 호출!
+    }
 }
