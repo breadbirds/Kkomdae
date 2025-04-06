@@ -21,11 +21,13 @@ import android.view.Window
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.CalendarView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -54,6 +56,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -559,24 +562,52 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
     // 날짜 설정
     private fun settingDate() {
         binding.btnDate.setOnClickListener {
-            val datePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("날짜 선택")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds()) // 기본 선택 날짜 (오늘)
-                .build()
 
-            // 날짜 선택 리스너
-            datePicker.addOnPositiveButtonClickListener { selection ->
-                val sdf = SimpleDateFormat("yyyy년 MM월 dd일", Locale.getDefault())
-                val selectedDate = sdf.format(Date(selection))
-                binding.tvDate.text = selectedDate
-                date = dateFormat.format(Date(selection))
-                checkNext()
-
-            }
-
-            // 다이얼로그 표시
-            datePicker.show(requireActivity().supportFragmentManager, "DATE_PICKER")
+            showCustomCalendarDialog()
+//            val datePicker = MaterialDatePicker.Builder.datePicker()
+//                .setTitleText("날짜 선택")
+//                .setSelection(MaterialDatePicker.todayInUtcMilliseconds()) // 기본 선택 날짜 (오늘)
+//                .build()
+//
+//            // 날짜 선택 리스너
+//            datePicker.addOnPositiveButtonClickListener { selection ->
+//                val sdf = SimpleDateFormat("yyyy년 MM월 dd일", Locale.getDefault())
+//                val selectedDate = sdf.format(Date(selection))
+//                binding.tvDate.text = selectedDate
+//                date = dateFormat.format(Date(selection))
+//                checkNext()
+//
+//            }
+//
+//            // 다이얼로그 표시
+//            datePicker.show(requireActivity().supportFragmentManager, "DATE_PICKER")
         }
+    }
+
+    private fun showCustomCalendarDialog() {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.custom_calendar_dialog, null)
+        val calendarView = dialogView.findViewById<CalendarView>(R.id.calendarView)
+        val btnSelectDate = dialogView.findViewById<Button>(R.id.btnSelectDate)
+
+        val alertDialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        var selectedDate: Long = System.currentTimeMillis()
+
+        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+            val calendar = Calendar.getInstance()
+            calendar.set(year, month, dayOfMonth)
+            selectedDate = calendar.timeInMillis
+        }
+
+        btnSelectDate.setOnClickListener {
+            // 선택된 날짜를 처리하는 코드 작성
+            // 예: 선택된 날짜를 TextView에 표시하거나 다른 로직 수행
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
     }
 
     // 모델명 드랍다운 설정

@@ -56,6 +56,7 @@ class TokenAuthenticator(private val context: Context) : Authenticator {
                 .build()
         } else {
             Log.d("Authenticator", "토큰 재발급 실패 → 로그아웃 처리")
+            tokenManager.clearAccessToken()
             forceLogout()
             null
         }
