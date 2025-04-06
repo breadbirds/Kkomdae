@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -593,6 +594,7 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             .setView(dialogView)
             .create()
 
+
         var selectedDate: Long = System.currentTimeMillis()
 
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
@@ -606,8 +608,16 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             // 예: 선택된 날짜를 TextView에 표시하거나 다른 로직 수행
             alertDialog.dismiss()
         }
+        alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
 
         alertDialog.show()
+
+
+// ✅ 가운데 정렬 및 너비 조절
+        val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+        alertDialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        alertDialog.window?.setGravity(Gravity.CENTER)
     }
 
     // 모델명 드랍다운 설정
