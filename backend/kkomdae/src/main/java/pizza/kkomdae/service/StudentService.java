@@ -59,7 +59,7 @@ public class StudentService {
         info.setName(student.getName());
         info.setUserRentTestRes(results);
         log.info("진행 중인 대여 절차 확인 쿼리");
-        LaptopTestResult testResult = lapTopTestResultRepository.findByStudentAndStageIsLessThan(student, 6);
+        LaptopTestResult testResult = lapTopTestResultRepository.findByStudentAndStageIsLessThanAndReleaseIsFalse(student, 6);
         if (testResult != null) {
             log.info("진행 중인 대여 절차 쿼리 정보 {} {}", testResult.getStage(), testResult.getLaptopTestResultId());
             info.setOnGoingTestId(testResult.getLaptopTestResultId());

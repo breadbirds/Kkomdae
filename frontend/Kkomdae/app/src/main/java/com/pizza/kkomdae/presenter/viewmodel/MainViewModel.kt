@@ -3,23 +3,15 @@ package com.pizza.kkomdae.presenter.viewmodel
 import android.app.Application
 import android.app.DownloadManager
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Environment
 import android.util.Log
-import android.widget.Toast
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pizza.kkomdae.MainActivity
-import com.pizza.kkomdae.domain.model.LoginResponse
-import com.pizza.kkomdae.domain.model.UserResponse
 import com.pizza.kkomdae.domain.usecase.InspectUseCase
-import com.pizza.kkomdae.domain.usecase.LoginUseCase
 import com.pizza.kkomdae.domain.usecase.MainUseCase
 import com.pizza.kkomdae.domain.usecase.Step1UseCase
 import com.pizza.kkomdae.presenter.model.UserInfoResponse
@@ -72,15 +64,16 @@ class MainViewModel@Inject constructor(
 
     fun setReleasePicStage(stage: Int){
         _releasePicStage.postValue(stage)
+        savePhotoStage(stage)
     }
 
     fun setRelease(release:Boolean){
         _release.postValue(release)
     }
 
-    suspend fun postTest(serialNum: String?): Result<Long>{
+    suspend fun postTest(rentId: Int?): Result<Long>{
       return try {
-            val result = inspectUseCase.postTest(serialNum = serialNum)
+            val result = inspectUseCase.postTest(rentId = rentId)
             Log.d(TAG, "getUserInfo: $result")
            result
         }catch (e:Exception){
@@ -88,11 +81,11 @@ class MainViewModel@Inject constructor(
         }
     }
 
-    suspend fun postReleaseTest(serialNum: String?):Result<Long>{
+    suspend fun postReleaseTest(rentId: Int):Result<Long>{
 
 
         return try {
-            val response = inspectUseCase.postTest(serialNum =serialNum )
+            val response = inspectUseCase.postTest(rentId =rentId )
             response // ✅ 성공 시 Result.success 반환
         } catch (e: Exception) {
             Result.failure(e)  // ✅ 실패 시 Result.failure 반환
@@ -160,7 +153,8 @@ class MainViewModel@Inject constructor(
                                 onGoingTestId = it.onGoingTestId,
                                 stage = it.stage,
                                 picStage = it.picStage,
-                                serialNum = it.serialNum
+                                serialNum = it.serialNum,
+                                rentId = it.rentId
                             )
                         }
                         )
@@ -185,7 +179,9 @@ class MainViewModel@Inject constructor(
     fun saveTestId(testId: Long) {
         sharedPreferences.edit().putLong("test_id", testId).apply()
     }
-    private fun savePhotoStage(step: Int) {
+
+
+   fun savePhotoStage(step: Int) {
         sharedPreferences.edit().putInt("photoStage", step).apply()
     }
 

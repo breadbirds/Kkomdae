@@ -7,7 +7,6 @@ import com.pizza.kkomdae.data.repository.Step1RepositoryImpl
 import com.pizza.kkomdae.data.repository.Step2RepositoryImpl
 import com.pizza.kkomdae.data.repository.Step3RepositoryImpl
 import com.pizza.kkomdae.data.repository.UserInfoRepositoryImpl
-import com.pizza.kkomdae.domain.model.TestResponse
 import com.pizza.kkomdae.domain.repository.FinalRepository
 import com.pizza.kkomdae.domain.repository.InspectRepository
 import com.pizza.kkomdae.domain.repository.LoginRepository

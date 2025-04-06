@@ -85,6 +85,7 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private var autoCaptureEnabled = true
 
     private val viewModel: CameraViewModel by activityViewModels()
 
@@ -141,7 +142,9 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
         
         // 카메라 초기화
         cameraExecutor = Executors.newSingleThreadExecutor()
-        startCamera()
+        binding.previewView?.post {
+            startCamera()
+        }
 
         // 가이드 닫기 버튼 눌렀을 때
         binding.btnCancel?.setOnClickListener {
@@ -166,10 +169,18 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             showStopCameraDialog()
         }
 
+
+
         binding.btnShot?.setOnClickListener {
+
+            if (isCapturing) return@setOnClickListener
+            autoCaptureEnabled = false // ✅ 자동 촬영 중지
+            isCapturing = true
             takePhoto()
         }
     }
+
+
 
     private fun showStopCameraDialog() {
         // 다이얼로그 생성
@@ -289,7 +300,9 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE
 
-                            cameraActivity.changeFragment(0)
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                cameraActivity.changeFragment(0)
+                            }, 100)
                         }
 
                     }.start()
@@ -382,7 +395,9 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE
 
-                            cameraActivity.changeFragment(0)
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                cameraActivity.changeFragment(0)
+                            }, 100)
                         }
 
                     }.start()
@@ -404,6 +419,11 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
 
     // 이미지를 분석하는 함수
     private fun analyzeImage(imageProxy: ImageProxy) {
+
+        if (!autoCaptureEnabled) {
+            imageProxy.close()
+            return
+        }
         // ImageProxy에서 가져온 카메라 프레임을 Bitmap으로 변환 (YOLO 입력용)
         val bitmap = imageProxyToBitmap(imageProxy)
         // YOLOv8 TFLite 모델에 넣기 위한 전처리 작업 (640x640 크기, float 정규화 등)
@@ -696,6 +716,24 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
         return if (unionArea == 0f) 0f else intersectionArea / unionArea
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        // 카메라 종료
+        shutdownCamera()
+
+//        // 자동 촬영 관련 상태 초기화
+//        isCapturing = false
+//        stableFrameCount = 0
+//        lastBox = null
+//        lastCapturedBox = null
+//        candidateBitmaps.forEach { it.recycle() }
+//        candidateBitmaps.clear()
+
+    }
+
+
+
     private fun shutdownCamera() {
         try {
             // 카메라 사용 중지
@@ -706,6 +744,7 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             cameraExecutor?.shutdown()
             cameraExecutor = null
             camera = null
+
         } catch (e: Exception) {
 
         }

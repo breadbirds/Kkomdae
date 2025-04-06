@@ -1,7 +1,7 @@
 package com.pizza.kkomdae.domain.usecase
 
-import com.pizza.kkomdae.domain.model.PostResponse
-import com.pizza.kkomdae.domain.model.PostThirdStageRequest
+import com.pizza.kkomdae.domain.model.step2.PostResponse
+import com.pizza.kkomdae.domain.model.step3.PostThirdStageRequest
 import com.pizza.kkomdae.domain.repository.Step3Repository
 import javax.inject.Inject
 

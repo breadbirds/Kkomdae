@@ -46,9 +46,9 @@ public class ApiController {
     @PostMapping("/test")
     @Operation(summary = "테스트 저장을 위한 테스트 생성", description = "테스트가 시작될 때 호출, 테스트 아이디를 반환합니다.<br>" +
             "테스트 아이디를 sharedPreference에 저장하고 사진 업로드할 때 사용 바랍니다.<br>" +
-            "반납일 경우 serialNum을 넣어주면 됩니다. 그냥 대여일 시 아무 것도 없이 그냥 전송")
-    public long initTest(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam(required = false) String serialNum) {
-        return testResultService.initTest(userDetails.getUserId(), serialNum);
+            "반납일 경우 rentId을 넣어주면 됩니다. 그냥 대여일 시 아무 것도 없이 그냥 전송")
+    public long initTest(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam(required = false) Long rentId) {
+        return testResultService.initTest(userDetails.getUserId(), rentId);
     }
 
 

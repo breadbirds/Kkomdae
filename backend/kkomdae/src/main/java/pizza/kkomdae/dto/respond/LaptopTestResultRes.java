@@ -47,10 +47,6 @@ public class LaptopTestResultRes {
             result.getBatteryReportUrl() : null);
         dto.setFailed_ports(result.getUsbStatus() != null && !result.getUsbStatus() ? 
             result.getFailedPorts() : null);
-
-        if (result.isAllTestCompleted()) {
-            result.setStage(10);
-        }
         
         return dto;
     }

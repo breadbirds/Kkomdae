@@ -1,12 +1,11 @@
 package com.pizza.kkomdae.data.source.remote
 
-import com.pizza.kkomdae.data.model.dto.FourthStageRequestDto
-import com.pizza.kkomdae.data.model.dto.GetAiPhotoResponseDto
-import com.pizza.kkomdae.data.model.dto.GetPdUrlResponseDto
-import com.pizza.kkomdae.data.model.dto.GetTotalResultResponseDto
-import com.pizza.kkomdae.data.model.dto.PostRePhotoResponseDto
-import com.pizza.kkomdae.data.model.dto.PostResponseDto
-import com.pizza.kkomdae.domain.model.GetPdfUrlResponse
+import com.pizza.kkomdae.data.model.dto.step4.FourthStageRequestDto
+import com.pizza.kkomdae.data.model.dto.step4.GetAiPhotoResponseDto
+import com.pizza.kkomdae.data.model.dto.step4.GetPdUrlResponseDto
+import com.pizza.kkomdae.data.model.dto.step4.GetTotalResultResponseDto
+import com.pizza.kkomdae.data.model.dto.step4.PostRePhotoResponseDto
+import com.pizza.kkomdae.data.model.dto.step2.PostResponseDto
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET

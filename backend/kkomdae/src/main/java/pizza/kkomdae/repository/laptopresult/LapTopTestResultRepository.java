@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import pizza.kkomdae.entity.Device;
 import pizza.kkomdae.entity.LaptopTestResult;
+import pizza.kkomdae.entity.Rent;
 import pizza.kkomdae.entity.Student;
 
 import java.util.List;
@@ -16,9 +17,6 @@ public interface LapTopTestResultRepository extends JpaRepository<LaptopTestResu
 
     LaptopTestResult findByStudentAndLaptopTestResultId(Student student, long laptopTestResultId);
 
-    LaptopTestResult findByStudentAndStageIsLessThanAndDeviceIsNull(Student student, int stepIsLessThan);
-
     Optional<LaptopTestResult> findByRandomKey(String randomKey);
-
 
 }

@@ -3,14 +3,13 @@ package com.pizza.kkomdae.presenter.viewmodel
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pizza.kkomdae.domain.model.GetStep2ResultResponse
-import com.pizza.kkomdae.domain.model.PostSecondStageRequest
-import com.pizza.kkomdae.domain.model.PostResponse
+import com.pizza.kkomdae.domain.model.step2.GetStep2ResultResponse
+import com.pizza.kkomdae.domain.model.step2.PostSecondStageRequest
+import com.pizza.kkomdae.domain.model.step2.PostResponse
 import com.pizza.kkomdae.domain.usecase.Step2UseCase
 import com.pizza.kkomdae.presenter.model.BatteryReport
 import com.pizza.kkomdae.presenter.model.ComponentStatus
@@ -95,44 +94,47 @@ class Step2ViewModel@Inject constructor(
         }
     }
 
-    fun getStep2Result(){
-        viewModelScope.launch {
-            val result= step2UseCase.getStep2Result(testId = sharedPreferences.getLong("test_id",0))
-            result.onSuccess {
-                _getStep2Result.postValue(it)
-            }
+    suspend fun getStep2Result(): Result<GetStep2ResultResponse>{
+
+          return try {
+              step2UseCase.getStep2Result(testId = sharedPreferences.getLong("test_id",0))
+          }catch (e: Exception){
+              Result.failure(e)
+          }
+
+    }
+
+    suspend fun postSecondToThird():Result<PostResponse>{
+        return try {
+            step2UseCase.postSecondToThird(testId = sharedPreferences.getLong("test_id",0))
+        }catch (e: Exception){
+            Result.failure(e)
         }
     }
 
-    fun postSecondStage(){
-        viewModelScope.launch {
-            val result = step2UseCase.postSecondStage(PostSecondStageRequest(
-                testId = sharedPreferences.getLong("test_id",0),
-                keyboardStatus = keyboardStatus.value?.status == "pass",
-                failedKeys = keyboardStatus.value?.failed_keys?.joinToString("@")?:"",
-                usbStatus = usbStatus.value?.status== "pass",
-                failedPorts = usbStatus.value?.failed_ports?.joinToString("@")?:"",
-                cameraStatus = cameraStatus.value?.status == "pass",
-                chargerStatus = chargerStatus.value?.status == "pass",
-                batteryReport = batteryStatus.value?.status == "pass",
-                batteryReportUrl =batteryStatus.value?.reportName ?:""
+    suspend fun postSecondStage():Result<PostResponse>{
 
-            ))
-            Log.d(TAG, "getUserInfo: $result")
-
-            result.onSuccess { response ->
-                // 로그인 성공 시 실제 데이터 처리
-                response?.let {
-                    _postResponse.postValue(it)
-                }
-
-
-            }.onFailure { exception ->
-                // 로그인 정보 불러오기 실패
-
+            return try {
+                step2UseCase.postSecondStage(
+                    PostSecondStageRequest(
+                    testId = sharedPreferences.getLong("test_id",0),
+                    keyboardStatus = keyboardStatus.value?.status == "pass",
+                    failedKeys = keyboardStatus.value?.failed_keys?.joinToString("@")?:"",
+                    usbStatus = usbStatus.value?.status== "pass",
+                    failedPorts = usbStatus.value?.failed_ports?.joinToString("@")?:"",
+                    cameraStatus = cameraStatus.value?.status == "pass",
+                    chargerStatus = chargerStatus.value?.status == "pass",
+                    batteryReport = batteryStatus.value?.status == "pass",
+                    batteryReportUrl =batteryStatus.value?.reportName ?:""
+                )
+                )
+            }catch (e:Exception){
+                Result.failure(e)
             }
 
-        }
+
+
+
     }
 
 }

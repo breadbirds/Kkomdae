@@ -1,8 +1,7 @@
 package com.pizza.kkomdae.domain.usecase
 
-import com.pizza.kkomdae.domain.model.GetPhotoResponse
-import com.pizza.kkomdae.domain.model.PhotoResponse
-import com.pizza.kkomdae.domain.repository.LoginRepository
+import com.pizza.kkomdae.domain.model.step1.GetPhotoResponse
+import com.pizza.kkomdae.domain.model.step1.PhotoResponse
 import com.pizza.kkomdae.domain.repository.Step1Repository
 import okhttp3.MultipartBody
 import javax.inject.Inject

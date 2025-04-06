@@ -46,7 +46,7 @@ object RetrofitModule {
     ) : OkHttpClient.Builder{
         val logging = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
             override fun log(message: String) {
-                Log.e("Post", "log: message ${message}")
+                Log.i("Post", "log: message ${message}")
             }
         })
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)

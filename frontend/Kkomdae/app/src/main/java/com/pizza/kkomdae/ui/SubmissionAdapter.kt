@@ -1,5 +1,6 @@
 package com.pizza.kkomdae.ui
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -22,17 +23,55 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
 }){
 
 
+
     inner class SubmissionViewHolder(val binding: ItemSubmissionBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(position: Int){
+            Log.d("TAG", "bind: $position")
+            binding.btReturnDownload.isVisible=false
+            binding.btReturn.isVisible=false
+            binding.clMenu.isVisible=false
+            binding.btnUp.isVisible=false
+            binding.btnDown.isVisible=true
+            if(getItem(position).releasePdfName!=null){
+                binding.tvStateRelease.isVisible=true
+                binding.tvStateRant.isVisible=false
+                binding.btReturnDownload.isVisible=true
+                binding.btReturn.isVisible=false
+            }else{
+                binding.tvStateRelease.isVisible=false
+                binding.tvStateRant.isVisible=true
+                binding.btReturnDownload.isVisible=false
+                binding.btReturn.isVisible=true
+            }
             binding.btnDown.setOnClickListener {
-                binding.tvState.isVisible = false
+                binding.tvStateRant.isVisible = false
+                binding.tvStateRelease.isVisible=false
                 binding.clMenu.isVisible=true
                 binding.btnUp.isVisible=true
                 binding.btnDown.isVisible=false
+
+                if(getItem(position).releasePdfName!=null){
+                    binding.btReturnDownload.isVisible=true
+                    binding.btReturn.isVisible=false
+                    binding.tvDate.isVisible=false
+                    binding.tvInputDate.isVisible=false
+
+                }else{
+                    binding.btReturnDownload.isVisible=false
+                    binding.btReturn.isVisible=true
+                }
             }
 
             binding.btnUp.setOnClickListener {
-                binding.tvState.isVisible = true
+                if(getItem(position).releasePdfName!=null){
+                    binding.tvStateRelease.isVisible=true
+                    binding.tvStateRant.isVisible=false
+                }else{
+                    binding.tvStateRelease.isVisible=false
+                    binding.tvStateRant.isVisible=true
+                }
+                binding.btReturnDownload.isVisible=false
+                binding.btReturn.isVisible=false
                 binding.clMenu.isVisible=false
                 binding.btnUp.isVisible=false
                 binding.btnDown.isVisible=true
@@ -47,17 +86,30 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
             }
 
             binding.btReturnDownload.setOnClickListener {
+                getItem(position).releasePdfName?.let {
+                    clickPdf(it)
+                }
+            }
+
+            binding.btReturn.setOnClickListener {
 
                     clickRelease(getItem(position))
 
 
             }
 
+            val regex = "\\(.*?\\)".toRegex()
+            val match = regex.find(getItem(position).modelCode)
+            val withParentheses = match?.value
 
-            binding.tvModelNumber.text= getItem(position).modelCode
+            binding.tvModelNumber.text= getItem(position).serialNum + withParentheses
             binding.tvInputDate.text = getItem(position).dateTime
 
         }
+    }
+
+    override fun getItemCount(): Int {
+        return currentList.size
     }
 
     override fun onBindViewHolder(holder: SubmissionViewHolder, position: Int) {

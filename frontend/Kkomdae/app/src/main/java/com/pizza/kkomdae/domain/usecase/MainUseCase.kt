@@ -1,8 +1,6 @@
 package com.pizza.kkomdae.domain.usecase
 
-import com.pizza.kkomdae.domain.model.LoginResponse
-import com.pizza.kkomdae.domain.model.UserResponse
-import com.pizza.kkomdae.domain.repository.LoginRepository
+import com.pizza.kkomdae.domain.model.user.UserResponse
 import com.pizza.kkomdae.domain.repository.UserRepository
 import javax.inject.Inject
 

@@ -12,17 +12,16 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pizza.kkomdae.domain.model.FourthStageRequest
-import com.pizza.kkomdae.domain.model.GetTotalResultResponse
-import com.pizza.kkomdae.domain.model.LoginResponse
-import com.pizza.kkomdae.domain.model.PostRePhotoResponse
-import com.pizza.kkomdae.domain.model.PostResponse
+import com.pizza.kkomdae.domain.model.step4.AiPhotoData
+import com.pizza.kkomdae.domain.model.step4.FourthStageRequest
+import com.pizza.kkomdae.domain.model.step4.GetAiPhotoResponse
+import com.pizza.kkomdae.domain.model.step4.GetPdfUrlResponse
+import com.pizza.kkomdae.domain.model.step4.GetTotalResultResponse
+import com.pizza.kkomdae.domain.model.step4.PostRePhotoResponse
+import com.pizza.kkomdae.domain.model.step2.PostResponse
 import com.pizza.kkomdae.domain.usecase.FinalUseCase
 
-import dagger.hilt.android.internal.Contexts.getApplication
-import com.pizza.kkomdae.domain.usecase.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -158,28 +157,44 @@ class FinalViewModel @Inject constructor(
         get() = _rePhoto6
 
 
+    // 재촬영 uri 초기화
+    fun clearRePhoto(){
+        _reCameraUri.value=null
+        _rePhoto1.value=null
+        _rePhoto2.value=null
+        _rePhoto3.value=null
+        _rePhoto4.value=null
+        _rePhoto5.value=null
+        _rePhoto6.value=null
+    }
+
+    fun clearReCameraUri(){
+        _reCameraUri.value=null
+    }
+    fun clearPostFourth(){
+        _postFourth.value=null
+    }
+
+    fun clearPostPdfName(){
+        _pdfName.postValue(null)
+
+    }
+
+    fun clearPostFinal(){
+        _getFinalResult.postValue(null)
+    }
 
 
-    fun clearPostResponse(){
-        _initFrontUri.postValue(null)
-    }
-    fun clearRePhoto1(){
-        _rePhoto1.postValue(null)
-    }
-    fun clearRePhoto2(){
-        _rePhoto2.postValue(null)
-    }
-    fun clearRePhoto3(){
-        _rePhoto3.postValue(null)
-    }
-    fun clearRePhoto4(){
-        _rePhoto4.postValue(null)
-    }
-    fun clearRePhoto5(){
-        _rePhoto5.postValue(null)
-    }
-    fun clearRePhoto6(){
-        _rePhoto6.postValue(null)
+
+
+    // 모든 사진 정보 저장
+    fun setAllPhoto(data: AiPhotoData){
+        _frontUri.postValue(data.Picture1_ai_url)
+        _backUri.postValue(data.Picture2_ai_url)
+        _leftUri.postValue(data.Picture3_ai_url)
+        _rightUri.postValue(data.Picture4_ai_url)
+        _screenUri.postValue(data.Picture5_ai_url)
+        _keypadUri.postValue(data.Picture6_ai_url)
     }
 
 
@@ -376,40 +391,46 @@ class FinalViewModel @Inject constructor(
     }
 
 
-    fun getAiPhoto(){
+    suspend fun getAiPhoto():Result<GetAiPhotoResponse>{
 
-        viewModelScope.launch {
+       return try {
+
             val result = finalUseCase.getAiPhoto(sharedPreferences.getLong("test_id", 0))
 
             Log.d(TAG, "getAiPhoto: $result")
-            result.onSuccess {
-                _initFrontUri.postValue(it.data.Picture1_ai_url)
-                _frontUri.postValue(it.data.Picture1_ai_url)
-                _backUri.postValue(it.data.Picture2_ai_url)
-                _leftUri.postValue(it.data.Picture3_ai_url)
-                _rightUri.postValue(it.data.Picture4_ai_url)
-                _screenUri.postValue(it.data.Picture5_ai_url)
-                _keypadUri.postValue(it.data.Picture6_ai_url)
-                _frontDamage.postValue(it.data.photo1_ai_damage)
-                _backDamage.postValue(it.data.photo2_ai_damage)
-                _leftDamage.postValue(it.data.photo3_ai_damage)
-                _rightDamage.postValue(it.data.photo4_ai_damage)
-                _screenDamage.postValue(it.data.photo5_ai_damage)
-                _keyboardDamage.postValue(it.data.photo6_ai_damage)
-            }
+//            result.onSuccess {
+//                _initFrontUri.postValue(it.data.Picture1_ai_url)
+//                _frontUri.postValue(it.data.Picture1_ai_url)
+//                _backUri.postValue(it.data.Picture2_ai_url)
+//                _leftUri.postValue(it.data.Picture3_ai_url)
+//                _rightUri.postValue(it.data.Picture4_ai_url)
+//                _screenUri.postValue(it.data.Picture5_ai_url)
+//                _keypadUri.postValue(it.data.Picture6_ai_url)
+//                _frontDamage.postValue(it.data.photo1_ai_damage)
+//                _backDamage.postValue(it.data.photo2_ai_damage)
+//                _leftDamage.postValue(it.data.photo3_ai_damage)
+//                _rightDamage.postValue(it.data.photo4_ai_damage)
+//                _screenDamage.postValue(it.data.photo5_ai_damage)
+//                _keyboardDamage.postValue(it.data.photo6_ai_damage)
+//            }
+           result
 
-
+        }catch (e: Exception){
+           Result.failure(e)
         }
+
     }
 
-    fun getPdfUrl(name: String){
-        viewModelScope.launch {
+    suspend fun getPdfUrl(name: String):Result<GetPdfUrlResponse>{
+        return try {
             val result = finalUseCase.getPdfUrl(name)
             Log.d(TAG, "getPdfUrl: $result")
-            result.onSuccess {
-                _pdfUrl.postValue(it.url)
-            }
+            result
+        }catch (e:Exception){
+            Result.failure(e)
         }
+
+
     }
 
 

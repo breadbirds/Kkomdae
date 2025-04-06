@@ -8,8 +8,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pizza.kkomdae.domain.model.PostResponse
-import com.pizza.kkomdae.domain.model.PostThirdStageRequest
+import com.pizza.kkomdae.domain.model.step2.PostResponse
+import com.pizza.kkomdae.domain.model.step3.PostThirdStageRequest
 import com.pizza.kkomdae.domain.usecase.Step3UseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -69,6 +69,9 @@ class Step3ViewModel@Inject constructor(
         get() = _postResponse
 
 
+    fun clearPostResponse(){
+        _postResponse.postValue(null)
+    }
 
     fun setModelCode(data: String) {
         _modelCode.value = data

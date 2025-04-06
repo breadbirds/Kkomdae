@@ -1,77 +1,185 @@
-import os
-import cv2
-import torch
-import numpy as np
-from PIL import Image
-from torchvision.transforms import functional as F
-import torchvision
-import supervision as sv
-from ultralytics import YOLO
-import openai
+# fastapi_app.py
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from dotenv import load_dotenv
 from io import BytesIO
-import base64
+from PIL import Image, ImageDraw
+import os
+import boto3
+import tempfile
+import torch
+from torchvision.models.detection import fasterrcnn_resnet50_fpn
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+from ultralytics import YOLO
+import numpy as np
+from torchvision.transforms import functional as F
+import supervision as sv
+from loguru import logger
+from starlette.middleware.cors import CORSMiddleware
 
-# ------------------------------
-# ✅ 설정
-image_path = "C:/S12P21D101/ai/pipelinev2/photo.jpg"
-yolo_model_path = "model/yolo_laptop.pt"
+# 환경변수 로딩
+load_dotenv()
+
+# AWS 설정
+aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+region_name = os.getenv('AWS_REGION')
+bucket_name = os.getenv('BUCKET_NAME')
+folder = os.getenv('S3_PREFIX')
+
+# AI 모델 설정
 faster_model_path = "model/faster_damage.pth"
-
+yolo_model_path = "model/yolov8_laptop.pt"
+faster_threshold = 0.1
 yolo_threshold = 0.7
-faster_threshold = 0.7
-
-image_save_path = "filtered_result_vis.jpg"
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class_names = ["background", "damage_bbox"]
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+num_classes = 2
 
-client = openai.OpenAI(api_key="")
-# ------------------------------
+# FastAPI 인스턴스 생성
+app = FastAPI()
 
-# ✅ 1, Faster R-CNN 모델 로드
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# S3 클라이언트 생성
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=aws_access_key_id,
+    aws_secret_access_key=aws_secret_access_key,
+    region_name=region_name
+)
+
+class AnalyzeRequest(BaseModel):
+    s3Key: str
+
+@app.post("/analyze")
+async def analyze(data: AnalyzeRequest):
+    s3_key = data.s3Key
+    logger.debug(f"s3_key: {s3_key}")
+
+    temp_dir = tempfile.gettempdir()
+    local_download_path = os.path.join(temp_dir, s3_key)
+    logger.debug(f"local_download_path: {local_download_path}")
+
+    try:
+        logger.debug(f"Bucket: {bucket_name}, Key: {folder + s3_key}")
+        s3_client.download_file(
+            Bucket=bucket_name,
+            Key=folder + s3_key,
+            Filename=local_download_path
+        )
+        logger.debug(f"File downloaded successfully to {local_download_path}")
+    except Exception as e:
+        logger.error(f"S3 file download failed: {e}")
+        raise HTTPException(status_code=400, detail="S3 파일 다운로드 실패")
+
+    try:
+        original_image = Image.open(local_download_path)
+        logger.debug("Image opened successfully.")
+    except Exception as e:
+        logger.error(f"Failed to open image: {e}")
+        raise HTTPException(status_code=400, detail="이미지를 열 수 없습니다.")
+
+    faster_model = load_faster_model()
+    yolo_model = load_yolo_model()
+
+    faster_detections = run_supervision_slicer(faster_model, original_image)
+    laptop_bboxes = detect_laptop_bbox(yolo_model, original_image)
+    filtered_detections = filter_by_yolo(faster_detections, laptop_bboxes)
+    new_image = save_annotated_image(original_image, filtered_detections)
+
+    new_key = f"{folder}analyzed_{s3_key}"
+    logger.debug(f"New S3 key: {new_key}")
+
+    new_image_bytes = BytesIO()
+    new_image.save(new_image_bytes, format="PNG")
+    new_image_bytes.seek(0)
+
+    try:
+        s3_client.upload_fileobj(
+            Fileobj=new_image_bytes,
+            Bucket=bucket_name,
+            Key=new_key,
+            ExtraArgs={'ContentType': 'image/png'}
+        )
+        logger.debug(f"File uploaded successfully to S3: {new_key}")
+    except Exception as e:
+        logger.error(f"S3 upload failed: {e}")
+        raise HTTPException(status_code=500, detail="S3 업로드 실패")
+
+    try:
+        os.remove(local_download_path)
+        logger.debug(f"Temporary file removed: {local_download_path}")
+    except Exception as e:
+        logger.warning(f"Failed to remove temporary file: {e}")
+
+    try:
+        new_image_url = s3_client.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': bucket_name, 'Key': new_key},
+            ExpiresIn=3600
+        )
+        logger.debug(f"Presigned URL generated: {new_image_url}")
+    except Exception as e:
+        logger.error(f"Failed to generate presigned URL: {e}")
+        raise HTTPException(status_code=500, detail="사전 서명 URL 생성 실패")
+
+    result = {
+        "damage": len(filtered_detections),
+        "uploadName": f"analyzed_{s3_key}"
+    }
+    logger.debug(f"Response: {result}")
+    return result
+
 def load_faster_model():
-    model = torchvision.models.detection.fasterrcnn_resnet50_fpn(weights=None, num_classes=2)
-    model.load_state_dict(torch.load(faster_model_path, map_location=device))
+    model = fasterrcnn_resnet50_fpn(weights=None)
+    in_features = model.roi_heads.box_predictor.cls_score.in_features
+    model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+    state_dict = torch.load(faster_model_path, map_location=device)
+    model.load_state_dict(state_dict)
     model.to(device)
     model.eval()
     print("✅ Faster R-CNN 모델 로드 완료")
     return model
 
-# ✅ 2. YOLO 모델 로드
 def load_yolo_model():
     model = YOLO(yolo_model_path)
     print("✅ YOLO 모델 로드 완료")
     return model
 
-# ✅ 3. Faster R-CNN 전체 이미지 Slicer
-def run_supervision_slicer(faster_model, image):
-    def callback(image_slice: np.ndarray) -> sv.Detections:
-        image_pil = Image.fromarray(cv2.cvtColor(image_slice, cv2.COLOR_BGR2RGB))
-        image_tensor = F.to_tensor(image_pil).unsqueeze(0).to(device)
-
+def run_supervision_slicer(faster_model, pil_image):
+    def callback(pil_slice: Image.Image) -> sv.Detections:
+        image_tensor = F.to_tensor(pil_image.convert("RGB")).unsqueeze(0).to(device)
         with torch.no_grad():
             output = faster_model(image_tensor)[0]
-
         boxes = output['boxes']
         scores = output['scores']
         labels = output['labels']
-
         keep = scores > faster_threshold
-
         boxes = boxes[keep].cpu().numpy()
         scores = scores[keep].cpu().numpy()
         labels = labels[keep].cpu().numpy()
-
         return sv.Detections(
             xyxy=boxes,
             confidence=scores,
             class_id=labels
         )
 
-    slicer = sv.InferenceSlicer(callback=callback)
-    # slicer = sv.InferenceSlicer(callback=callback, overlap_wh=(100, 100)) # 얘는 겹치는 거
-    detections = slicer(image)
-
+    slicer = sv.InferenceSlicer(
+        callback=callback,
+        slice_wh=(640, 640),
+        overlap_wh=(64, 64),
+        overlap_ratio_wh=None
+    )
+    detections = slicer(np.array(pil_image))
     all_detections = []
     for box, score, cls_id in zip(detections.xyxy, detections.confidence, detections.class_id):
         all_detections.append({
@@ -79,15 +187,13 @@ def run_supervision_slicer(faster_model, image):
             "score": float(score),
             "label": class_names[cls_id]
         })
-
     print(f"✅ Faster 전체 detection 개수: {len(all_detections)}")
     return all_detections
 
-# ✅ 4. YOLO로 ssafy_laptop bbox 가져오기
-def detect_laptop_bbox(yolo_model, image_path):
-    results = yolo_model(image_path, conf=yolo_threshold)
+def detect_laptop_bbox(yolo_model, pil_image):
+    img = np.array(pil_image.convert("RGB"))
+    results = yolo_model.predict(img, conf=yolo_threshold)
     laptop_bboxes = []
-
     for box in results[0].boxes:
         cls_id = int(box.cls)
         label = yolo_model.names[cls_id]
@@ -95,122 +201,30 @@ def detect_laptop_bbox(yolo_model, image_path):
         xyxy = box.xyxy.cpu().tolist()[0]
         if label == "ssafy_laptop":
             laptop_bboxes.append([int(x) for x in xyxy])
-
-    print(f"✅ YOLO ssafy_laptop bbox 개수: {len(laptop_bboxes)}")
+    print(f"✅ YOLO 결과 추론 완료: {len(laptop_bboxes)}개 bbox")
     return laptop_bboxes
 
-# # ✅ 5-1. Faster 결과를 YOLO bbox 내부만 필터링 & GPT 분석
-# def filter_and_classify(faster_detections, laptop_bboxes, image):
-#     if not laptop_bboxes:
-#         print("⚠ ssafy_laptop bbox가 없습니다.")
-#         return []
-
-#     X1, Y1, X2, Y2 = laptop_bboxes[0]
-
-#     results = []
-
-#     for det in faster_detections:
-#         box = det['bbox']
-#         x1, y1, x2, y2 = map(int, box)
-
-#         if x1 >= X1 and y1 >= Y1 and x2 <= X2 and y2 <= Y2:
-#             crop = image[y1:y2, x1:x2]
-#             crop_pil = Image.fromarray(cv2.cvtColor(crop, cv2.COLOR_BGR2RGB))
-
-#             gpt_result = classify_damage_with_gpt(crop_pil)
-#             print(f"🤖GPT 분석 결과: {gpt_result}")
-
-#             det['gpt_result'] = gpt_result
-#             results.append(det)
-
-#     print(f"✨ GPT 분석 bbox 개수: {len(results)}")
-#     return results
-
-# # ✅ 5-2. GPT 분석
-# def classify_damage_with_gpt(crop_image):
-#     buffer = BytesIO()
-#     crop_image.save(buffer, format="JPEG")
-#     buffer.seek(0)
-
-#     # ✅ base64로 이미지 encode
-#     base64_image = base64.b64encode(buffer.read()).decode('utf-8')
-
-#     # ✅ 최신 GPT Vision API 호출
-#     response = client.chat.completions.create(
-#         model="gpt-4o",
-#         messages=[
-#             {
-#                 "role": "user",
-#                 "content": [
-#                     {"type": "text", "text": "이미지는 분석해서 다음 클래스를 구분해줘.\n 1. 스크래치야 아님 흠집이야?\n2. 각 손상에 대해서 손상도를 판단해줘.(상, 중, 하)"},
-#                     {
-#                         "type": "image_url",
-#                         "image_url": {
-#                             "url": f"data:image/jpeg;base64,{base64_image}"
-#                         }
-#                     }
-#                 ]
-#             }
-#         ],
-#         max_tokens=300
-#     )
-
-#     result = response.choices[0].message.content
-#     return result
-
-# ✅ 5. Faster 결과를 YOLO bbox 내부만 필터링
 def filter_by_yolo(faster_detections, laptop_bboxes):
     if not laptop_bboxes:
         print("⚠ ssafy_laptop bbox가 없습니다.")
         return []
-
-    X1, Y1, X2, Y2 = laptop_bboxes[0]  # laptop이 1개라고 가정
-
+    X1, Y1, X2, Y2 = laptop_bboxes[0]
     def is_inside(box):
         x1, y1, x2, y2 = box
         return (x1 >= X1) and (y1 >= Y1) and (x2 <= X2) and (y2 <= Y2)
-
     filtered = [det for det in faster_detections if is_inside(det['bbox'])]
     print(f"✨ 필터링된 bbox 개수: {len(filtered)}")
     return filtered
 
-# ✅ 6. bbox 이미지 저장
-def save_annotated_image(image, detections, save_path):
-    box_annotator = sv.BoxAnnotator()
-    label_annotator = sv.LabelAnnotator()
-
-    sv_detections = sv.Detections(
-        xyxy=np.array([det["bbox"] for det in detections]),
-        confidence=np.array([det["score"] for det in detections]),
-        class_id=np.zeros(len(detections), dtype=int)
-    )
-
-    labels = [det["label"] for det in detections]
-
-    annotated_image = box_annotator.annotate(scene=image.copy(), detections=sv_detections)
-    annotated_image = label_annotator.annotate(scene=annotated_image, detections=sv_detections, labels=labels)
-
-    cv2.imwrite(save_path, annotated_image)
-    print(f"✅ bbox 이미지 저장 완료: {save_path}")
-
-# ------------------------------
-# ▶ 파이프라인 실행
-if __name__ == "__main__":
-    faster_model = load_faster_model()
-    yolo_model = load_yolo_model()
-
-    image = cv2.imread(image_path)
-
-    # 1. supervision으로 전체 이미지에서 Faster R-CNN detection
-    faster_detections = run_supervision_slicer(faster_model, image)
-
-    # 2. YOLO로 ssafy_laptop bbox 탐지
-    laptop_bboxes = detect_laptop_bbox(yolo_model, image_path)
-
-    # 3. Faster detection 중 laptop bbox 내부 결과만 필터링
-    filtered_detections = filter_by_yolo(faster_detections, laptop_bboxes)
-    # filtered_detections = filter_and_classify(faster_detections, laptop_bboxes, image)
-
-    # 4. 이미지 시각화만 저장
-    save_annotated_image(image, filtered_detections, image_save_path)
-# ------------------------------
+def save_annotated_image(pil_image, detections):
+    draw = ImageDraw.Draw(pil_image)
+    for det in detections:
+        box = det['bbox']
+        score = det['score']
+        label = det['label']
+        x1, y1, x2, y2 = map(int, box)
+        draw.rectangle([x1, y1, x2, y2], outline=(0, 0, 255), width=3)
+        text = f"{label} {score:.2f}"
+        draw.text((x1, y1 - 10), text, fill=(0, 0, 255))
+    print(f"✅ bbox 이미지(PIL) 변환 완료 (리턴 형태)")
+    return pil_image

@@ -1,7 +1,7 @@
 package com.pizza.kkomdae.data.source.remote
 
-import com.pizza.kkomdae.data.model.dto.PostResponseDto
-import com.pizza.kkomdae.data.model.dto.PostThirdStageRequestDto
+import com.pizza.kkomdae.data.model.dto.step2.PostResponseDto
+import com.pizza.kkomdae.data.model.dto.step3.PostThirdStageRequestDto
 import retrofit2.http.Body
 import retrofit2.http.POST
 

@@ -1,8 +1,7 @@
 package com.pizza.kkomdae.data.source.remote
 
-import com.pizza.kkomdae.data.model.dto.UserResponseDto
+import com.pizza.kkomdae.data.model.dto.user.UserResponseDto
 import retrofit2.http.GET
-import retrofit2.http.Query
 
 interface UserService {
 

@@ -83,7 +83,15 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
 
         val adapter = SubmissionAdapter(clickPdf = {
             Toast.makeText(requireContext(),"pdf 파일이 다운로드 중입니다.",Toast.LENGTH_SHORT).show()
-            finalViewModel.getPdfUrl(it)
+            lifecycleScope.launch {
+                val result = finalViewModel.getPdfUrl(it)
+                result.onSuccess {
+                    viewModel.downloadPdf(it.url)
+                }.onFailure {
+                    // todo 에러 다이얼 로그 띄우기
+                }
+            }
+
         }, clickRelease = {
 
             if(it.stage!=0 || it.picStage !=0){
@@ -91,18 +99,17 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
                 viewModel.saveTestId(it.onGoingTestId.toLong()) // 테스트 아이디
                 viewModel.setRelease(true) // 반납인지 체크
                 viewModel.setReleasePicStage(it.picStage) // 1단계 스테이지 저장
+
                 step=it.stage
                 Log.d("Post", "onViewCreated: $step")
             }else{
-                newRelease(it.serialNum)
+                newRelease(it.rentId)
+                viewModel.savePhotoStage(0)
             }
 
 
         })
-        // 파일명 -> url 변환 통신 결과
-        finalViewModel.pdfUrl.observe(viewLifecycleOwner){
-            viewModel.downloadPdf(it)
-        }
+
         binding.rvSubmission.adapter =adapter
         binding.rvSubmission.layoutManager = LinearLayoutManager(mainActivity)
 
@@ -113,9 +120,12 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
 
         // 서버에서 받아온 유저 정보
         viewModel.userInfoResult.observe(viewLifecycleOwner){
+            Log.d("Post", "onViewCreated: ${it.userRentTestRes}")
             step=it.stage
             binding.tvWelcomeMessage.text="${it.name}님 안녕하세요!"
-            adapter.submitList(it.userRentTestRes)
+            adapter.submitList(it.userRentTestRes.filter { item ->
+                item.rentPdfName != null
+            }.reversed())
 
             // 진행중인 과정이 있는지 확인하고 표시
             updateInProgressIndicator()
@@ -129,7 +139,6 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
             if (step == 0) {
                 navigateToFragment(OathFragment())
             } else {
-                viewModel.saveTestId(viewModel.testId.value?:0)
                 showContinueDialog()
             }
         }
@@ -146,7 +155,7 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
     }
 
     // 반납 처음 시작할때 testId 생성
-    private fun newRelease(it: String) {
+    private fun newRelease(it: Int) {
         lifecycleScope.launch {
             val response = viewModel.postReleaseTest(it)
             response.onSuccess {
@@ -215,7 +224,6 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
         transaction.addToBackStack(null)
         transaction.commit()
     }
-
 
     // 개발 중 다이얼로그
     private fun showDevelopingDialog() {

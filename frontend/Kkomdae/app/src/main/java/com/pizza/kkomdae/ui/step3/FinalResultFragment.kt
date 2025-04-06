@@ -4,11 +4,10 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -18,91 +17,48 @@ import androidx.viewpager2.widget.ViewPager2
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentFinalResultBinding
-import com.pizza.kkomdae.databinding.FragmentOathBinding
 import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.ui.SubmitCompleteFragment
-import com.pizza.kkomdae.ui.guide.AllStepOnboardingFragment
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [FinalResultFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
     FragmentFinalResultBinding::bind,
     R.layout.fragment_final_result
 ) {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    // ViewModel 연결
     private val viewModel : FinalViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.topBar.tvTitle.text = "제출 내용 확인"
-
+        // 안내 다이얼로그 표시
         showIntroDialog()
 
+        // 상단 타이틀 설정
+        binding.topBar.tvTitle.text = "제출 내용 확인"
+
+        // 각 step layout 애니메이션 순차 적용
+        binding.clStep1.slideInFromLeft(0L)
+        binding.clStep2.slideInFromLeft(100L)
+        binding.clStep3.slideInFromLeft(200L)
+        binding.clStep4.slideInFromLeft(350L)
+
+        // 이미지 ViewPager 어댑터 설정
         val adapter = FinalResultAdapter(requireContext())
         binding.viewPager.adapter = adapter
 
+        // 서버에서 최종 결과 요청
         viewModel.getLaptopTotalResult()
 
 
-        viewModel.getFinalResult.observe(viewLifecycleOwner){
-            binding.apply {
-                if(!it.keyboardStatus){ // 키보드
-                    ivKeyboard.setImageResource(R.drawable.ic_fail)
-                }
-
-                if(!it.useStatus){ // usb
-                    ivUsb.setImageResource(R.drawable.ic_fail)
-                }
-
-                if(!it.cameraStatus){ // 카메라
-                    ivCamera.setImageResource(R.drawable.ic_fail)
-                }
-                if(!it.batteryStatus){ // 배터리 성능
-                    ivBattery.setImageResource(R.drawable.ic_fail)
-                }
-                if(!it.chargerStatus){ // 충전기
-                    ivCharger.setImageResource(R.drawable.ic_fail)
-                }
-
-                tvInputModelName.text=it.modelCode
-                tvInputSerial.text=it.serialNum
-                tvInputBarcode.text=it.barcodeNum
-                tvInputDate.text=it.date
-
-                tvInputLaptopCount.text = it.laptopCount.toString()
-                tvInputMouseCount.text = it.mouseCount.toString()
-                tvInputAdapterCount.text= it.adapterCount.toString()
-                tvInputPowerCount.text=it.powerCableCount.toString()
-                tvInputBagCount.text = it.bagCount.toString()
-                tvInputPadCount.text = it.mousepadCount.toString()
-
-                tvFrontTitle.text = it.description
-
-                adapter.submitList(it.imageUrls)
-
-                // 데이터가 로드되고 어댑터에 설정된 후 인디케이터를 초기화
-                setupIndicators(0)
-            }
-        }
+        // 결과 수신 후 UI 세팅
+        setData(adapter)
 
         // 페이지 변경 감지
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -113,13 +69,22 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
             }
         })
 
-        // 제출하기 클릭 이벤트
+        // 제출하기 버튼 클릭 시 다이얼로그 표시
         binding.btnSubmit.setOnClickListener {
             showSubmitDialog()
         }
 
-        viewModel.pdfName.observe(viewLifecycleOwner){
 
+
+        // PDF 제출 성공 시 제출 완료 페이지로 이동
+        goToNext()
+
+    }
+
+    // PDF 제출 완료 신호 수신 시 제출완료 화면으로 이동
+    private fun goToNext() {
+        viewModel.pdfName.observe(viewLifecycleOwner) {
+            it ?: return@observe
             // 제출완료 화면으로 전환
             val submitCompleteFragment = SubmitCompleteFragment.newInstance("", "")
 
@@ -128,10 +93,69 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
                 .addToBackStack(null)
                 .commit()
         }
+    }
 
+    // 서버에서 전달된 최종 결과 데이터를 UI에 반영
+    private fun setData(adapter: FinalResultAdapter) {
+
+        viewModel.getFinalResult.observe(viewLifecycleOwner) {
+            it ?: return@observe
+            binding.apply {
+
+                // 외관 ai 분석 결과
+                adapter.submitList(it.imageUrls)
+
+                // 자가 진단 결과
+                // 키보드
+                if (!it.keyboardStatus) {
+                    ivKeyboard.setImageResource(R.drawable.ic_fail)
+                }
+
+                // usb
+                if (!it.useStatus) {
+                    ivUsb.setImageResource(R.drawable.ic_fail)
+                }
+
+                // 카메라
+                if (!it.cameraStatus) {
+                    ivCamera.setImageResource(R.drawable.ic_fail)
+                }
+
+                // 배터리 성능
+                if (!it.batteryStatus) {
+                    ivBattery.setImageResource(R.drawable.ic_fail)
+                }
+
+                // 충전기
+                if (!it.chargerStatus) {
+                    ivCharger.setImageResource(R.drawable.ic_fail)
+                }
+
+                // 노트북 정보
+                tvInputModelName.text = it.modelCode  // 모델명
+                tvInputSerial.text = it.serialNum     // 시리얼 번호
+                tvInputBarcode.text = it.barcodeNum   // 바코드 번호
+                tvInputDate.text = it.date            // 수령일자
+
+                // 구성품 수량
+                tvInputLaptopCount.text = it.laptopCount.toString()     // 노트북
+                tvInputMouseCount.text = it.mouseCount.toString()       // 마우스
+                tvInputAdapterCount.text = it.adapterCount.toString()    // 어댑터
+                tvInputPowerCount.text = it.powerCableCount.toString()    // 전원선
+                tvInputBagCount.text = it.bagCount.toString()           // 가방
+                tvInputPadCount.text = it.mousepadCount.toString()      // 마우스 패드
+
+                // 비고 사항
+                tvFrontTitle.text = it.description
+
+                // 데이터가 로드되고 어댑터에 설정된 후 인디케이터를 초기화
+                setupIndicators(0)
+            }
+        }
     }
 
 
+    // 이미지 인디케이터를 설정
     private fun setupIndicators(position: Int) {
         // 인디케이터 컨테이너 초기화
         binding.indicatorContainer.removeAllViews()
@@ -162,7 +186,7 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
         }
     }
 
-    // 제출하기 다이얼로그
+    // 제출하기 버튼 클릭 시 표시되는 다이얼로그
     private fun showSubmitDialog() {
         // 다이얼로그 생성
         val dialog = Dialog(requireContext())
@@ -196,7 +220,7 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
     }
 
 
-    // 인트로 다이얼로그
+    // 화면 진입 시 처음 보여주는 안내 다이얼로그
     private fun showIntroDialog() {
         // 다이얼로그 생성
         val dialog = Dialog(requireContext())
@@ -216,27 +240,30 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
             dialog.dismiss()
         }
 
-
         dialog.show()
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FinalResultFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FinalResultFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+
+    // step별 왼쪽에서 부드럽게 등장하는 애니메이션
+    fun View.slideInFromLeft(delay: Long = 0L, duration: Long = 700L) {
+        translationX = 800f // 왼쪽 바깥에서 시작
+        alpha = 0f
+        postDelayed({
+            animate()
+                .translationX(0f)
+                .alpha(1f)
+                .setInterpolator(AccelerateDecelerateInterpolator())
+                .setDuration(duration)
+                .start()
+        }, delay)
     }
+
+    // View 소멸 시 ViewModel 값 초기화 및 바인딩 해제
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.clearPostFinal()
+        clearBinding()
+    }
+
+
 }

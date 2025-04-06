@@ -1,6 +1,7 @@
 package com.pizza.kkomdae.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,12 +9,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentOathBinding
 import com.pizza.kkomdae.databinding.FragmentSubmitCompleteBinding
 import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -54,9 +57,18 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
 
         // pdf 다운로드 버튼
         binding.btnDownloadPdf.setOnClickListener {
+            Log.d("TAG", "onViewCreated: ${finalViewModel.pdfName}")
             finalViewModel.pdfName.value?.let {
                 Toast.makeText(requireContext(),"파일이 다운로드 중입니다",Toast.LENGTH_SHORT).show()
-                finalViewModel.getPdfUrl(it)
+                lifecycleScope.launch {
+                    val result = finalViewModel.getPdfUrl(it)
+                    result.onSuccess {
+                        viewModel.downloadPdf(it.url)
+                    }.onFailure {
+                        // todo 에러 다이얼 로그 띄우기
+                    }
+                }
+
             }
 
         }
@@ -86,6 +98,12 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
         binding.btnShare.setOnClickListener {
             // 공유 로직 구현
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        clearBinding()
+        finalViewModel.clearPostPdfName()
     }
 
 

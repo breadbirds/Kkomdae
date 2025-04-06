@@ -306,9 +306,9 @@ class TestApp(ttkb.Window):
         """
         try:
             # 테스트환경
-            url = "http://localhost:8080/api/verify-key"
+            # url = "http://localhost:8080/api/verify-key"
             # 운영환경
-            # url = "https://j12d101.p.ssafy.io/api/verify-key"
+            url = "https://j12d101.p.ssafy.io/api/verify-key"
 
             response = requests.get(url, params={"key": key})
             # 서버 응답 확인
@@ -1764,8 +1764,8 @@ class TestApp(ttkb.Window):
             bool: 전송 성공 여부
         """
         try:
-            url = "http://localhost:8080/api/test-result"  # 테스트 서버 URL
-            # url = "https://j12d101.p.ssafy.io/api/test-result"  # 운영 서버 URL
+            # url = "http://localhost:8080/api/test-result"  # 테스트 서버 URL
+            url = "https://j12d101.p.ssafy.io/api/test-result"  # 운영 서버 URL
             
             if test_type == '배터리':
                 data = {

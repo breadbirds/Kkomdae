@@ -1,17 +1,14 @@
 package com.pizza.kkomdae.data.repository
 
-import android.util.Log
-import com.pizza.kkomdae.data.model.FinalMapper
-import com.pizza.kkomdae.data.model.LoginMapper
-import com.pizza.kkomdae.data.model.Step2Mapper
+import com.pizza.kkomdae.data.model.mapper.FinalMapper
+import com.pizza.kkomdae.data.model.mapper.Step2Mapper
 import com.pizza.kkomdae.data.source.remote.FinalService
-import com.pizza.kkomdae.data.source.remote.LoginService
-import com.pizza.kkomdae.domain.model.FourthStageRequest
-import com.pizza.kkomdae.domain.model.GetAiPhotoResponse
-import com.pizza.kkomdae.domain.model.GetPdfUrlResponse
-import com.pizza.kkomdae.domain.model.GetTotalResultResponse
-import com.pizza.kkomdae.domain.model.PostRePhotoResponse
-import com.pizza.kkomdae.domain.model.PostResponse
+import com.pizza.kkomdae.domain.model.step4.FourthStageRequest
+import com.pizza.kkomdae.domain.model.step4.GetAiPhotoResponse
+import com.pizza.kkomdae.domain.model.step4.GetPdfUrlResponse
+import com.pizza.kkomdae.domain.model.step4.GetTotalResultResponse
+import com.pizza.kkomdae.domain.model.step4.PostRePhotoResponse
+import com.pizza.kkomdae.domain.model.step2.PostResponse
 import com.pizza.kkomdae.domain.repository.FinalRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

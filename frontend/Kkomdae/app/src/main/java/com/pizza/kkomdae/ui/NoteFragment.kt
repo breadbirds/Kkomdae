@@ -52,7 +52,9 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
 
         // 건너뛰기 버튼 클릭 이벤트
         binding.btnSkip.setOnClickListener {
-            navigateToFinalResult()
+
+            viewModel.postFourthStage("")
+//            navigateToFinalResult()
         }
 
         // 저장하기 버튼 클릭 이벤트
@@ -73,6 +75,7 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
 
         // 통신 결과 감시
         viewModel.postFourth.observe(viewLifecycleOwner){
+            it ?: return@observe
             if(it.success && it.status=="OK"){
                 navigateToFinalResult()
             }
@@ -100,6 +103,11 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
         transaction.replace(R.id.fl_main, FinalResultFragment())
         transaction.addToBackStack(null)
         transaction.commit()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.clearPostFourth()
     }
 
     private fun showQuitBottomSheet() {
