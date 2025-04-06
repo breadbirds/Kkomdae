@@ -151,4 +151,7 @@ dependencies {
     //OCR
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation ("org.json:json:20210307")
+
+    // ShimmerLayout
+    implementation ("com.facebook.shimmer:shimmer:0.5.0")
 }

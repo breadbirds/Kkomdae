@@ -227,7 +227,7 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             // ✅ 1. Preview <- 미리 보기 구성. (Preview 화면 연결하여 미리보기 영상 출력)
             preview = Preview.Builder()
                 .setTargetResolution(my_preview_resolution) // 원하는 해상도 요청 <- 최대한 높은 걸로 달라고 요청
-//                .setTargetAspectRatio(AspectRatio.RATIO_4_3) // 📌 비율 설정
+//                .setTargetAspectRatio(AspectRatio.RATIO_16_9) // 📌 비율 설정
                 .build().also {
                     it.setSurfaceProvider(binding.previewView?.surfaceProvider) // preview와 연결
                 }
@@ -235,7 +235,8 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             // ✅ 2. ImageCapture
             // 사진을 캡처(저장)할 수 있도록 ImageCapture 객체 생성
             imageCapture = ImageCapture.Builder()
-                .setTargetAspectRatio(AspectRatio.RATIO_4_3) // 📌 비율 설정
+                .setTargetResolution(my_preview_resolution)
+//                .setTargetAspectRatio(AspectRatio.RATIO_DEFAULT) // 📌 비율 설정
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY) // 고화질 우선
 //                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY) // 빠른 캡처 모드
                 .build()
@@ -243,14 +244,14 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             // ✅ 3. ImageAnalysis
             // 카메라에서 들어오는 실시간 프레임(영상)을 분석
             val imageAnalyzer = ImageAnalysis.Builder()
-                .setTargetAspectRatio(AspectRatio.RATIO_16_9) // 📌 비율 설정
+                .setTargetAspectRatio(AspectRatio.RATIO_4_3) // 📌 비율 설정
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST) // 분석이 끝날 때까지 기다리지 말고, 가장 최근 프레임만 분석
                 .build().also {
                     // 프레임이 들어올 때마다 이미지 분석 함수 실행
-                    it.setAnalyzer(ContextCompat.getMainExecutor(requireContext()), { imageProxy ->
-                        // YOLO 모델로 감지
-                        analyzeImage(imageProxy)
-                    })
+//                    it.setAnalyzer(ContextCompat.getMainExecutor(requireContext()), { imageProxy ->
+//                        // YOLO 모델로 감지
+//                        analyzeImage(imageProxy)
+//                    })
                 }
 
             try {
@@ -291,9 +292,58 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
                         val savedUri = Uri.fromFile(photoFile)
                         Log.d("CameraFragment", "사진 저장됨: $savedUri")
 
-                        // ✅ 4️⃣ UI Thread 복귀
+                        val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+
+                        // 📌 PreviewView의 실제 크기 (화면에 보이는 뷰 크기)
+                        val previewWidth = binding.previewView?.width ?:0
+                        val previewHeight = binding.previewView?.height ?:0
+
+                        // 📌 실제 캡처된 이미지 크기
+                        val imageWidth = bitmap.width
+                        val imageHeight = bitmap.height
+
+                        // PreviewView → 이미지 해상도 비율 (스케일 변환)
+                        val scaleX = imageWidth.toFloat() / previewWidth
+                        val scaleY = imageHeight.toFloat() / previewHeight
+
+                        // 중앙에서 4:3 비율 사각형 계산 (PreviewView 기준)
+                        val previewAspectRatio = 4f / 3f
+                        val cropPreviewRect: Rect = if (previewWidth.toFloat() / previewHeight > previewAspectRatio) {
+                            // 화면이 가로로 더 넓으면, 좌우 잘라냄
+                            val targetWidth = (previewHeight * previewAspectRatio).toInt()
+                            val left = (previewWidth - targetWidth) / 2
+                            Rect(left, 0, left + targetWidth, previewHeight)
+                        } else {
+                            // 화면이 세로로 더 크면, 위아래 잘라냄
+                            val targetHeight = (previewWidth / previewAspectRatio).toInt()
+                            val top = (previewHeight - targetHeight) / 2
+                            Rect(0, top, previewWidth, top + targetHeight)
+                        }
+
+                        // 위에서 계산한 rect를 이미지 크기 비율에 맞게 변환
+                        val cropImageRect = Rect(
+                            (cropPreviewRect.left * scaleX).toInt(),
+                            (cropPreviewRect.top * scaleY).toInt(),
+                            (cropPreviewRect.right * scaleX).toInt(),
+                            (cropPreviewRect.bottom * scaleY).toInt()
+                        )
+
+                        // 크롭 실행
+                        val cropped = Bitmap.createBitmap(
+                            bitmap,
+                            cropImageRect.left,
+                            cropImageRect.top,
+                            cropImageRect.width(),
+                            cropImageRect.height()
+                        )
+
+                        // 파일 덮어쓰기
+                        FileOutputStream(photoFile).use { out ->
+                            cropped.compress(Bitmap.CompressFormat.PNG, 100, out)
+                        }
+
                         Handler(Looper.getMainLooper()).post {
-                            Log.d("CameraFragment", "사진 저장됨: $savedUri")
+                            Log.d("CameraFragment", "크롭된 사진 저장됨: $savedUri")
                             viewModel.setFront(savedUri)
                             viewModel.setStep(1)
 
@@ -304,8 +354,8 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
                                 cameraActivity.changeFragment(0)
                             }, 100)
                         }
-
                     }.start()
+
                 }
 
                 override fun onError(exception: ImageCaptureException) {
@@ -716,21 +766,21 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
         return if (unionArea == 0f) 0f else intersectionArea / unionArea
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        // 카메라 종료
-        shutdownCamera()
-
-//        // 자동 촬영 관련 상태 초기화
-//        isCapturing = false
-//        stableFrameCount = 0
-//        lastBox = null
-//        lastCapturedBox = null
-//        candidateBitmaps.forEach { it.recycle() }
-//        candidateBitmaps.clear()
-
-    }
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//
+//        // 카메라 종료
+////        shutdownCamera()
+//
+////        // 자동 촬영 관련 상태 초기화
+////        isCapturing = false
+////        stableFrameCount = 0
+////        lastBox = null
+////        lastCapturedBox = null
+////        candidateBitmaps.forEach { it.recycle() }
+////        candidateBitmaps.clear()
+//
+//    }
 
 
 

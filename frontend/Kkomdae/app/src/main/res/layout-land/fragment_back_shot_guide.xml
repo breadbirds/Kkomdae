@@ -9,18 +9,20 @@
 
     <!-- 📸 카메라 미리보기 뷰 -->
     <androidx.camera.view.PreviewView
-        app:layout_constraintDimensionRatio="16:9"
         android:id="@+id/previewView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="0dp"
         android:layout_height="match_parent" />
 
     <!-- 📌 오버레이: 네모 틀과 반투명 검은색 배경 -->
     <com.pizza.kkomdae.ui.CameraOverlayView
-        app:layout_constraintDimensionRatio="16:9"
         android:id="@+id/overlayView"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="0dp"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_height="match_parent"

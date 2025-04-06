@@ -214,7 +214,8 @@ class LeftGuideFragment : BaseFragment<FragmentLeftGuideBinding>(
             // ✅ 2. ImageCapture
             // 사진을 캡처(저장)할 수 있도록 ImageCapture 객체 생성
             imageCapture = ImageCapture.Builder()
-                .setTargetAspectRatio(AspectRatio.RATIO_4_3) // 📌 비율 설정
+                .setTargetResolution(my_preview_resolution)
+//                .setTargetAspectRatio(AspectRatio.RATIO_4_3) // 📌 비율 설정
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY) // 고화질 우선
 //                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY) // 빠른 캡처 모드
                 .build()
@@ -270,18 +271,68 @@ class LeftGuideFragment : BaseFragment<FragmentLeftGuideBinding>(
                         val savedUri = Uri.fromFile(photoFile)
                         Log.d("CameraFragment", "사진 저장됨: $savedUri")
 
-                        // ✅ 4️⃣ UI Thread 복귀
+                        val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+
+                        // 📌 PreviewView의 실제 크기 (화면에 보이는 뷰 크기)
+                        val previewWidth = binding.previewView?.width ?:0
+                        val previewHeight = binding.previewView?.height ?:0
+
+                        // 📌 실제 캡처된 이미지 크기
+                        val imageWidth = bitmap.width
+                        val imageHeight = bitmap.height
+
+                        // PreviewView → 이미지 해상도 비율 (스케일 변환)
+                        val scaleX = imageWidth.toFloat() / previewWidth
+                        val scaleY = imageHeight.toFloat() / previewHeight
+
+                        // 중앙에서 4:3 비율 사각형 계산 (PreviewView 기준)
+                        val previewAspectRatio = 4f / 3f
+                        val cropPreviewRect: Rect = if (previewWidth.toFloat() / previewHeight > previewAspectRatio) {
+                            // 화면이 가로로 더 넓으면, 좌우 잘라냄
+                            val targetWidth = (previewHeight * previewAspectRatio).toInt()
+                            val left = (previewWidth - targetWidth) / 2
+                            Rect(left, 0, left + targetWidth, previewHeight)
+                        } else {
+                            // 화면이 세로로 더 크면, 위아래 잘라냄
+                            val targetHeight = (previewWidth / previewAspectRatio).toInt()
+                            val top = (previewHeight - targetHeight) / 2
+                            Rect(0, top, previewWidth, top + targetHeight)
+                        }
+
+                        // 위에서 계산한 rect를 이미지 크기 비율에 맞게 변환
+                        val cropImageRect = Rect(
+                            (cropPreviewRect.left * scaleX).toInt(),
+                            (cropPreviewRect.top * scaleY).toInt(),
+                            (cropPreviewRect.right * scaleX).toInt(),
+                            (cropPreviewRect.bottom * scaleY).toInt()
+                        )
+
+                        // 크롭 실행
+                        val cropped = Bitmap.createBitmap(
+                            bitmap,
+                            cropImageRect.left,
+                            cropImageRect.top,
+                            cropImageRect.width(),
+                            cropImageRect.height()
+                        )
+
+                        // 파일 덮어쓰기
+                        FileOutputStream(photoFile).use { out ->
+                            cropped.compress(Bitmap.CompressFormat.PNG, 100, out)
+                        }
+
                         Handler(Looper.getMainLooper()).post {
-                            Log.d("CameraFragment", "사진 저장됨: $savedUri")
+                            Log.d("CameraFragment", "크롭된 사진 저장됨: $savedUri")
                             viewModel.setLeft(savedUri)
                             viewModel.setStep(3)
 
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE
 
-                            cameraActivity.changeFragment(0)
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                cameraActivity.changeFragment(0)
+                            }, 100)
                         }
-
                     }.start()
                 }
 

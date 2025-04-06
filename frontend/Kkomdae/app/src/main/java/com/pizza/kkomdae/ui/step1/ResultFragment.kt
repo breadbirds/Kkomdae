@@ -88,7 +88,7 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
         }
 
         binding.btnBack?.setOnClickListener {
-            cameraActivity.changeFragment(7)
+            cameraActivity.changeFragment((viewModel.step.value?:-1))
         }
 
         // 체크 버튼
@@ -106,7 +106,7 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
                 }
             }
 
-            binding.btnBack
+
 
             viewModel.postPhoto()
         }

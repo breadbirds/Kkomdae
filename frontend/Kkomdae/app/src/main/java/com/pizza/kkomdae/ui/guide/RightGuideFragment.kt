@@ -317,67 +317,71 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
 
                     // ✅ 3️⃣ Heavy 작업 백그라운드 처리
                     Thread {
-                        val highResBitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+                        val savedUri = Uri.fromFile(photoFile)
+                        Log.d("CameraFragment", "사진 저장됨: $savedUri")
 
-                        val analyzedWidth = 1280f
-                        val analyzedHeight = 720f
+                        val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
 
-                        val scaleX = highResBitmap.width / analyzedWidth
-                        val scaleY = highResBitmap.height / analyzedHeight
+                        // 📌 PreviewView의 실제 크기 (화면에 보이는 뷰 크기)
+                        val previewWidth = binding.previewView?.width ?:0
+                        val previewHeight = binding.previewView?.height ?:0
 
-                        val rectF = RectF(
-                            box.rect.left * scaleX,
-                            box.rect.top * scaleY,
-                            box.rect.right * scaleX,
-                            box.rect.bottom * scaleY
-                        )
+                        // 📌 실제 캡처된 이미지 크기
+                        val imageWidth = bitmap.width
+                        val imageHeight = bitmap.height
 
-                        val paddingScale = 1.1f
-                        val centerX = rectF.centerX()
-                        val centerY = rectF.centerY()
-                        val halfWidth = rectF.width() / 2 * paddingScale
-                        val halfHeight = rectF.height() / 2 * paddingScale
+                        // PreviewView → 이미지 해상도 비율 (스케일 변환)
+                        val scaleX = imageWidth.toFloat() / previewWidth
+                        val scaleY = imageHeight.toFloat() / previewHeight
 
-                        val expandedRect = RectF(
-                            centerX - halfWidth,
-                            centerY - halfHeight,
-                            centerX + halfWidth,
-                            centerY + halfHeight
-                        )
-
-                        val cropRect = Rect(
-                            expandedRect.left.toInt().coerceAtLeast(0),
-                            expandedRect.top.toInt().coerceAtLeast(0),
-                            expandedRect.right.toInt().coerceAtMost(highResBitmap.width),
-                            expandedRect.bottom.toInt().coerceAtMost(highResBitmap.height)
-                        )
-
-                        val croppedBitmap = Bitmap.createBitmap(
-                            highResBitmap,
-                            cropRect.left,
-                            cropRect.top,
-                            cropRect.width(),
-                            cropRect.height()
-                        )
-
-                        FileOutputStream(photoFile).use { out ->
-                            croppedBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+                        // 중앙에서 4:3 비율 사각형 계산 (PreviewView 기준)
+                        val previewAspectRatio = 4f / 3f
+                        val cropPreviewRect: Rect = if (previewWidth.toFloat() / previewHeight > previewAspectRatio) {
+                            // 화면이 가로로 더 넓으면, 좌우 잘라냄
+                            val targetWidth = (previewHeight * previewAspectRatio).toInt()
+                            val left = (previewWidth - targetWidth) / 2
+                            Rect(left, 0, left + targetWidth, previewHeight)
+                        } else {
+                            // 화면이 세로로 더 크면, 위아래 잘라냄
+                            val targetHeight = (previewWidth / previewAspectRatio).toInt()
+                            val top = (previewHeight - targetHeight) / 2
+                            Rect(0, top, previewWidth, top + targetHeight)
                         }
 
-                        val savedUri = Uri.fromFile(photoFile)
+                        // 위에서 계산한 rect를 이미지 크기 비율에 맞게 변환
+                        val cropImageRect = Rect(
+                            (cropPreviewRect.left * scaleX).toInt(),
+                            (cropPreviewRect.top * scaleY).toInt(),
+                            (cropPreviewRect.right * scaleX).toInt(),
+                            (cropPreviewRect.bottom * scaleY).toInt()
+                        )
 
-                        // ✅ 4️⃣ UI Thread 복귀
+                        // 크롭 실행
+                        val cropped = Bitmap.createBitmap(
+                            bitmap,
+                            cropImageRect.left,
+                            cropImageRect.top,
+                            cropImageRect.width(),
+                            cropImageRect.height()
+                        )
+
+                        // 파일 덮어쓰기
+                        FileOutputStream(photoFile).use { out ->
+                            cropped.compress(Bitmap.CompressFormat.PNG, 100, out)
+                        }
+
                         Handler(Looper.getMainLooper()).post {
-                            Log.d("CameraFragment", "사진 저장됨: $savedUri")
+                            Log.d("CameraFragment", "크롭된 사진 저장됨: $savedUri")
                             viewModel.setRight(savedUri)
                             viewModel.setStep(4)
 
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE
 
-                            cameraActivity.changeFragment(0)
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                cameraActivity.changeFragment(0)
+                            }, 100)
                         }
-
                     }.start()
                 }
 
