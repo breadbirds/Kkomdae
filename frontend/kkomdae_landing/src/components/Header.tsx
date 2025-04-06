@@ -26,12 +26,6 @@ const Header: React.FC = () => {
                 이용 방법
               </a>
             </li>
-
-            <li className="nav-item">
-              <a href="#faq" className="nav-link">
-                자주 묻는 질문
-              </a>
-            </li>
           </ul>
         </nav>
 

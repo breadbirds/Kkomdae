@@ -2,8 +2,30 @@ import "../styles/HowItWorks.css";
 import step1 from "../assets/step1.png";
 import step2 from "../assets/step2.png";
 import step3 from "../assets/step3.png";
+import { useEffect } from "react";
 
 const HowItWorks: React.FC = () => {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+      }
+    );
+
+    document.querySelectorAll(".step-item").forEach((item) => {
+      observer.observe(item);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <section id="how-it-works" className="how-it-works">
       <div className="container">
