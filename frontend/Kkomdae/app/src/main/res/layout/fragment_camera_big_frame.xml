@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+
     <!-- 📌 오버레이: 네모 틀과 반투명 검은색 배경 -->
     <com.pizza.kkomdae.ui.CameraOverlayView
         android:id="@+id/overlayView"

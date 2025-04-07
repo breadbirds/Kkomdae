@@ -67,6 +67,7 @@ private var imageCapture: ImageCapture? = null
 private var cameraProvider: ProcessCameraProvider? = null
 private var camera: Camera? = null
 private var cameraExecutor: ExecutorService? = null
+private var autoCamera = true
 
 
 private lateinit var cameraActivity: CameraActivity
@@ -147,7 +148,9 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
             binding.overlayView?.isVisible=true
             binding.btnBack?.isVisible = true
             binding.btnShot?.isVisible = true
-            binding?.btnGuide?.isVisible = true
+            binding.btnGuide?.isVisible = true
+            binding.swAuto?.isVisible=true
+            binding.tvSwAuto?.isVisible=true
         }
 
         // 가이드 보기 버튼 눌렀을 떄
@@ -157,6 +160,8 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
             binding.btnBack?.isVisible = false
             binding.btnShot?.isVisible = false
             binding?.btnGuide?.isVisible = false
+            binding.swAuto?.isVisible=false
+            binding.tvSwAuto?.isVisible=false
         }
         // 뒤로 가기 버튼 눌렀을 때
         binding.btnBack?.setOnClickListener {
@@ -165,6 +170,18 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
 
         binding.btnShot?.setOnClickListener {
             takePhoto()
+        }
+
+        // 자동촬영 on/off 스위치 버튼
+        binding.swAuto?.setOnCheckedChangeListener { _, isChecked ->
+            autoCamera = isChecked
+            if (!isChecked) {
+                // 상태 초기화
+                stableFrameCount = 0
+                lastBox = null
+                candidateBitmaps.forEach { it.recycle() }
+                candidateBitmaps.clear()
+            }
         }
 
     }
@@ -213,8 +230,8 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
 
             // ✅ 1. Preview <- 미리 보기 구성. (Preview 화면 연결하여 미리보기 영상 출력)
             preview = Preview.Builder()
-//                .setTargetResolution(my_preview_resolution) // 원하는 해상도 요청 <- 최대한 높은 걸로 달라고 요청
-                .setTargetAspectRatio(AspectRatio.RATIO_DEFAULT) // 📌 비율 설정
+                .setTargetResolution(my_preview_resolution) // 원하는 해상도 요청 <- 최대한 높은 걸로 달라고 요청
+//                .setTargetAspectRatio(AspectRatio.RATIO_DEFAULT) // 📌 비율 설정
                 .build().also {
                     it.setSurfaceProvider(binding.previewView?.surfaceProvider) // preview와 연결
                 }
@@ -222,8 +239,8 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
             // ✅ 2. ImageCapture
             // 사진을 캡처(저장)할 수 있도록 ImageCapture 객체 생성
             imageCapture = ImageCapture.Builder()
-//                .setTargetResolution(my_preview_resolution)
-                .setTargetAspectRatio(AspectRatio.RATIO_DEFAULT) // 📌 비율 설정
+                .setTargetResolution(my_preview_resolution)
+//                .setTargetAspectRatio(AspectRatio.RATIO_DEFAULT) // 📌 비율 설정
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY) // 고화질 우선
 //                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY) // 빠른 캡처 모드
                 .build()
@@ -463,6 +480,10 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
 
     // 이미지를 분석하는 함수
     private fun analyzeImage(imageProxy: ImageProxy) {
+        if (!autoCamera) {
+            imageProxy.close()
+            return
+        }
         // ImageProxy에서 가져온 카메라 프레임을 Bitmap으로 변환 (YOLO 입력용)
         val bitmap = imageProxyToBitmap(imageProxy)
         // YOLOv8 TFLite 모델에 넣기 위한 전처리 작업 (640x640 크기, float 정규화 등)
