@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.ImageDecoder
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -20,6 +21,8 @@ import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.pizza.kkomdae.CameraActivity
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
@@ -64,6 +67,14 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.ivLoading?.let {
+            Glide.with(this)
+                .asGif()
+                .load(R.drawable.skeleton_ui) // 🔁 로딩용 GIF 리소스
+                .into(it)
+        }
+
+
         Log.d(TAG, "onViewCreated: ${viewModel.frontUri.value}")
         Log.d(TAG, "onViewCreated stage: ${viewModel.step.value}")
         var url :Uri? = null
@@ -84,7 +95,15 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
             Log.d(TAG, "CameraFragment uri: $it")
             Glide.with(it)
                 .load(url)
-                .into(it)
+                .into(object : CustomTarget<Drawable>() {
+                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                        binding.ivProduct?.setImageDrawable(resource)
+                        binding.ivProduct?.visibility = View.VISIBLE
+                        binding.ivLoading?.visibility = View.GONE
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
         }
 
         binding.btnBack?.setOnClickListener {

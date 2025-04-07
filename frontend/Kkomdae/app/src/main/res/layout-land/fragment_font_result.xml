@@ -40,6 +40,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop" />
+
+        <ImageView
+            android:id="@+id/iv_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@color/blue100" />
     </androidx.cardview.widget.CardView>
 
     <!-- 가이드라인: 화면을 좌우로 분할 -->

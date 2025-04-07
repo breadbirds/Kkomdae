@@ -19,6 +19,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
@@ -638,6 +639,17 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         val adapter =
             ArrayAdapter(requireContext(), R.layout.item_spinner_dropdown, items)
         binding.atvModelName.setAdapter(adapter)
+
+        binding.etSerial.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                binding.etBarcode.requestFocus() // 다음 EditText로 이동
+                true // 이벤트 소비 (키보드 기본 동작 막음)
+            } else {
+                false
+            }
+        }
+
+
 
 
         binding.atvModelName.setOnItemClickListener { _, _, _, _ ->
