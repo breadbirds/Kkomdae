@@ -1,7 +1,19 @@
 import "../styles/Footer.css";
 import axios from "axios";
+import { useState } from "react";
+import qrCodeImage from "../assets/qr-code.png";
 
 const Footer: React.FC = () => {
+  const [showQRModal, setShowQRModal] = useState(false);
+
+  const handleAppDownload = () => {
+    setShowQRModal(true);
+  };
+
+  const closeQRModal = () => {
+    setShowQRModal(false);
+  };
+
   const handleDownload = async () => {
     try {
       // 배포
@@ -27,7 +39,11 @@ const Footer: React.FC = () => {
         <div className="footer-content">
           <div className="footer-logo">
             <span className="logo-text-footer">꼼대</span>
-            <p className="footer-description">노트북 관리의 새로운 기준, 꼼대가 SSAFY 교육생 여러분의 노트북을 안전하게 지켜드립니다.</p>
+            <p className="footer-description">
+              노트북 관리의 새로운 기준,
+              <br />
+              꼼대가 SSAFY 교육생 여러분의 노트북을 안전하게 지켜드립니다.
+            </p>
           </div>
 
           <div className="footer-links">
@@ -47,7 +63,9 @@ const Footer: React.FC = () => {
               <h4 className="footer-links-title">다운로드</h4>
               <ul className="footer-links-list">
                 <li>
-                  <a href="#">꼼대</a>
+                  <button onClick={handleAppDownload} className="footer-modal-link">
+                    꼼대
+                  </button>
                 </li>
                 <li>
                   <button onClick={handleDownload} className="footer-modal-link">
@@ -63,6 +81,25 @@ const Footer: React.FC = () => {
           <p className="copyright">© 2025 꼼대(KKOMDAE). All rights reserved.</p>
         </div>
       </div>
+
+      {/* QR 코드 모달 */}
+      {showQRModal && (
+        <div className="qr-modal-overlay" onClick={closeQRModal}>
+          <div className="qr-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="qr-modal-header">
+              <h3>꼼대 앱 설치하기</h3>
+              <button className="close-button" onClick={closeQRModal}>
+                ×
+              </button>
+            </div>
+            <div className="qr-modal-content">
+              <img src={qrCodeImage} alt="꼼대 앱 QR 코드" className="qr-code-image" />
+              <p>QR 코드를 스캔하여 꼼대 앱을 설치하세요.</p>
+              <p className="modal-note">* 모바일 기기에서만 이용 가능합니다.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </footer>
   );
 };
