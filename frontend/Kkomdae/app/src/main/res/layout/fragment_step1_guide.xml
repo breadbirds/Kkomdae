@@ -30,28 +30,31 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cl_step"
+        app:layout_constraintBottom_toTopOf="@id/btn_next"
         android:layout_marginTop="24dp"
         >
         <ImageView
             android:id="@+id/iv_frame_icon"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:src="@drawable/ic_shot_guide1"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/cl_desrc"
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:paddingTop="12dp"
+            android:id="@+id/cl_desrc"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_frame_icon">
+            app:layout_constraintStart_toStartOf="parent">
 
             <ImageView
                 android:id="@+id/iv_icon1"
@@ -64,7 +67,7 @@
 
             <TextView
                 android:id="@+id/tv_description1"
-                style="@style/Title4"
+                style="@style/Label2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -88,7 +91,7 @@
 
             <TextView
                 android:id="@+id/tv_description2"
-                style="@style/Title4"
+                style="@style/Label2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -110,7 +113,7 @@
 
             <TextView
                 android:id="@+id/tv_description3"
-                style="@style/Title4"
+                style="@style/Label2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -136,12 +139,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:text="복사본이나 사진은 사용할 수 없습니다."
                 android:textColor="@color/gray300"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/iv_bullet1"
-                app:layout_constraintTop_toBottomOf="@id/tv_description2"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/tv_description2" />
 
             <TextView
                 android:id="@+id/tv_description5"
@@ -150,9 +153,9 @@
                 android:layout_height="wrap_content"
                 android:text="자신의 노트북으로 촬영하세요."
                 android:textColor="@color/blue300"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/tv_description4"
-                app:layout_constraintTop_toBottomOf="@id/tv_description4"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/tv_description4" />
 
             <ImageView
                 android:id="@+id/iv_bullet2"
@@ -173,9 +176,9 @@
                 android:lineSpacingExtra="-10dp"
                 android:text="노트북의 상태를 정확히 확인할 수 없는 경우"
                 android:textColor="@color/gray300"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/iv_bullet2"
-                app:layout_constraintTop_toBottomOf="@id/tv_description5"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/tv_description5" />
 
             <TextView
                 android:id="@+id/tv_description7"
@@ -185,9 +188,9 @@
                 android:lineSpacingExtra="-10dp"
                 android:text="대여 심사에 영향을 미칠 수 있습니다."
                 android:textColor="@color/gray300"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/tv_description6"
-                app:layout_constraintTop_toBottomOf="@id/tv_description6"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/tv_description6" />
 
             <TextView
                 android:id="@+id/tv_description8"
@@ -196,9 +199,9 @@
                 android:layout_height="wrap_content"
                 android:text="불이익이 없도록 선명하게 촬영해 주세요."
                 android:textColor="@color/blue300"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/tv_description6"
-                app:layout_constraintTop_toBottomOf="@id/tv_description7"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/tv_description7" />
 
             <ImageView
                 android:id="@+id/iv_bullet3"
@@ -219,9 +222,11 @@
                 android:lineSpacingExtra="-10dp"
                 android:text="상단 아이콘으로 촬영 진행 상황을 확인하세요."
                 android:textColor="@color/gray300"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/iv_bullet3"
-                app:layout_constraintTop_toBottomOf="@id/tv_description8"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/tv_description8" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
