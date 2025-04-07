@@ -53,8 +53,6 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
                 if(getItem(position).releasePdfName!=null){
                     binding.btReturnDownload.isVisible=true
                     binding.btReturn.isVisible=false
-                    binding.tvDate.isVisible=false
-                    binding.tvInputDate.isVisible=false
 
                 }else{
                     binding.btReturnDownload.isVisible=false
