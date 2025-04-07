@@ -274,7 +274,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="진단 완료 후 결과 보기 버튼을 눌러주세요"
+                android:text="진단 완료 후 결과 보기 버튼을 눌러주세요."
                 android:textColor="@color/gray300"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/tv_step3_title"
@@ -286,7 +286,6 @@
     <Button
         android:id="@+id/btn_pass"
         android:layout_width="0dp"
-        android:visibility="gone"
         android:layout_height="60dp"
         android:backgroundTint="@color/gray500"
         android:textColor="@color/white"

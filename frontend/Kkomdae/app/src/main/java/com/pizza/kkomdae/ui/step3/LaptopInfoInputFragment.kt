@@ -258,7 +258,7 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         }
 
 
-        binding.btnOcrSerial.setOnClickListener {
+        binding.clBtnOcr.setOnClickListener {
             imageFile = File(requireContext().cacheDir, "ocr_image_${System.currentTimeMillis()}.jpg")
             imageUri = FileProvider.getUriForFile(
                 requireContext(),
@@ -563,7 +563,7 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
 
     // 날짜 설정
     private fun settingDate() {
-        binding.btnDate.setOnClickListener {
+        binding.clReceiveDate.setOnClickListener {
 
             showCustomCalendarDialog()
 //            val datePicker = MaterialDatePicker.Builder.datePicker()
