@@ -27,7 +27,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:text="AI 분석 완료!"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="50dp"
         style="@style/Display2"
         android:textColor="@color/gray700"
         android:textSize="28sp"
