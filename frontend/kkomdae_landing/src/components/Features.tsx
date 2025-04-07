@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { initScrollAnimations } from "../utils/animations";
 import "../styles/Features.css";
+import connection from "../assets/connection.svg";
+import calendar_reminder from "../assets/calendar_reminder.svg";
 
 const Features: React.FC = () => {
   useEffect(() => {
@@ -44,7 +46,7 @@ const Features: React.FC = () => {
 
           <div className="feature-card fade-in">
             <div className="feature-icon">
-              <img src="/src/assets/connection.svg" alt="노트북 연동 자가진단" />
+              <img src={connection} alt="노트북 연동 자가진단" />
             </div>
             <h3 className="feature-title">노트북 연동 자가진단</h3>
             <p className="feature-description">자가진단 프로그램을 실행하고, 앱과 연동하여 모바일에서 결과를 확인할 수 있습니다.</p>
@@ -77,7 +79,7 @@ const Features: React.FC = () => {
 
           <div className="feature-card fade-in">
             <div className="feature-icon">
-              <img src="/src/assets/calendar_reminder.svg" alt="반납 일정 관리" />
+              <img src={calendar_reminder} alt="반납 일정 관리" />
             </div>
             <h3 className="feature-title">반납 일정 관리</h3>
             <p className="feature-description">반납 기한이 가까워지면 알림을 제공하여 원활한 반납 절차를 도와줍니다.</p>
