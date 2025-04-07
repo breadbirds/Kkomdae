@@ -213,8 +213,8 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
 
             // ✅ 1. Preview <- 미리 보기 구성. (Preview 화면 연결하여 미리보기 영상 출력)
             preview = Preview.Builder()
-                .setTargetResolution(my_preview_resolution) // 원하는 해상도 요청 <- 최대한 높은 걸로 달라고 요청
-//                .setTargetAspectRatio(AspectRatio.RATIO_4_3) // 📌 비율 설정
+//                .setTargetResolution(my_preview_resolution) // 원하는 해상도 요청 <- 최대한 높은 걸로 달라고 요청
+                .setTargetAspectRatio(AspectRatio.RATIO_DEFAULT) // 📌 비율 설정
                 .build().also {
                     it.setSurfaceProvider(binding.previewView?.surfaceProvider) // preview와 연결
                 }
@@ -222,8 +222,8 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
             // ✅ 2. ImageCapture
             // 사진을 캡처(저장)할 수 있도록 ImageCapture 객체 생성
             imageCapture = ImageCapture.Builder()
-                .setTargetResolution(my_preview_resolution)
-//                .setTargetAspectRatio(AspectRatio.RATIO_4_3) // 📌 비율 설정
+//                .setTargetResolution(my_preview_resolution)
+                .setTargetAspectRatio(AspectRatio.RATIO_DEFAULT) // 📌 비율 설정
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY) // 고화질 우선
 //                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY) // 빠른 캡처 모드
                 .build()
@@ -281,56 +281,66 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
 
                         val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
 
-                        // 📌 PreviewView의 실제 크기 (화면에 보이는 뷰 크기)
-                        val previewWidth = binding.previewView?.width ?:0
-                        val previewHeight = binding.previewView?.height ?:0
+                        // 1. PreviewView 크기
+                        val previewWidth = binding.previewView?.width ?: 0
+                        val previewHeight = binding.previewView?.height ?: 0
 
-                        // 📌 실제 캡처된 이미지 크기
+                        // 2. 실제 이미지 크기
                         val imageWidth = bitmap.width
                         val imageHeight = bitmap.height
 
-                        // PreviewView → 이미지 해상도 비율 (스케일 변환)
+                        // 3. 스케일 계산 (이미지에서 previewView 영역 추출용)
                         val scaleX = imageWidth.toFloat() / previewWidth
                         val scaleY = imageHeight.toFloat() / previewHeight
 
-                        // 중앙에서 4:3 비율 사각형 계산 (PreviewView 기준)
-                        val previewAspectRatio = 4f / 3f
-                        val cropPreviewRect: Rect = if (previewWidth.toFloat() / previewHeight > previewAspectRatio) {
-                            // 화면이 가로로 더 넓으면, 좌우 잘라냄
-                            val targetWidth = (previewHeight * previewAspectRatio).toInt()
-                            val left = (previewWidth - targetWidth) / 2
-                            Rect(left, 0, left + targetWidth, previewHeight)
+                        // 4. PreviewView에 해당하는 영역을 이미지 상에서 크롭
+                        val previewRectInImage = Rect(
+                            (0 * scaleX).toInt(),
+                            (0 * scaleY).toInt(),
+                            (previewWidth * scaleX).toInt(),
+                            (previewHeight * scaleY).toInt()
+                        )
+
+                        val previewCropped = Bitmap.createBitmap(
+                            bitmap,
+                            previewRectInImage.left,
+                            previewRectInImage.top,
+                            previewRectInImage.width(),
+                            previewRectInImage.height()
+                        )
+
+                        // 5. previewCropped에서 다시 4:3 중앙 크롭
+                        val pw = previewCropped.width
+                        val ph = previewCropped.height
+                        val targetAspectRatio = 4f / 3f
+
+                        val finalCropRect = if (pw.toFloat() / ph > targetAspectRatio) {
+                            // 가로가 더 넓을 경우, 좌우 잘라냄
+                            val targetWidth = (ph * targetAspectRatio).toInt()
+                            val left = (pw - targetWidth) / 2
+                            Rect(left, 0, left + targetWidth, ph)
                         } else {
-                            // 화면이 세로로 더 크면, 위아래 잘라냄
-                            val targetHeight = (previewWidth / previewAspectRatio).toInt()
-                            val top = (previewHeight - targetHeight) / 2
-                            Rect(0, top, previewWidth, top + targetHeight)
+                            // 세로가 더 클 경우, 위아래 잘라냄
+                            val targetHeight = (pw / targetAspectRatio).toInt()
+                            val top = (ph - targetHeight) / 2
+                            Rect(0, top, pw, top + targetHeight)
                         }
 
-                        // 위에서 계산한 rect를 이미지 크기 비율에 맞게 변환
-                        val cropImageRect = Rect(
-                            (cropPreviewRect.left * scaleX).toInt(),
-                            (cropPreviewRect.top * scaleY).toInt(),
-                            (cropPreviewRect.right * scaleX).toInt(),
-                            (cropPreviewRect.bottom * scaleY).toInt()
+                        val finalCropped = Bitmap.createBitmap(
+                            previewCropped,
+                            finalCropRect.left,
+                            finalCropRect.top,
+                            finalCropRect.width(),
+                            finalCropRect.height()
                         )
 
-                        // 크롭 실행
-                        val cropped = Bitmap.createBitmap(
-                            bitmap,
-                            cropImageRect.left,
-                            cropImageRect.top,
-                            cropImageRect.width(),
-                            cropImageRect.height()
-                        )
-
-                        // 파일 덮어쓰기
+                        // 저장
                         FileOutputStream(photoFile).use { out ->
-                            cropped.compress(Bitmap.CompressFormat.PNG, 100, out)
+                            finalCropped.compress(Bitmap.CompressFormat.PNG, 100, out)
                         }
 
                         Handler(Looper.getMainLooper()).post {
-                            Log.d("CameraFragment", "크롭된 사진 저장됨: $savedUri")
+                            Log.d("CameraFragment", "최종 크롭된 사진 저장됨: $savedUri")
                             viewModel.setBack(savedUri)
                             viewModel.setStep(2)
 

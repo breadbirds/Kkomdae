@@ -217,7 +217,7 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
             // ✅ 2. ImageCapture
             // 사진을 캡처(저장)할 수 있도록 ImageCapture 객체 생성
             imageCapture = ImageCapture.Builder()
-                .setTargetAspectRatio(AspectRatio.RATIO_4_3) // 📌 비율 설정
+                .setTargetResolution(my_preview_resolution)  // 📌 비율 설정
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY) // 고화질 우선
 //                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY) // 빠른 캡처 모드
                 .build()
@@ -273,18 +273,78 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
                         val savedUri = Uri.fromFile(photoFile)
                         Log.d("CameraFragment", "사진 저장됨: $savedUri")
 
-                        // ✅ 4️⃣ UI Thread 복귀
+                        val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+
+                        // 1. PreviewView 크기
+                        val previewWidth = binding.previewView?.width ?: 0
+                        val previewHeight = binding.previewView?.height ?: 0
+
+                        // 2. 실제 이미지 크기
+                        val imageWidth = bitmap.width
+                        val imageHeight = bitmap.height
+
+                        // 3. 스케일 계산 (이미지에서 previewView 영역 추출용)
+                        val scaleX = imageWidth.toFloat() / previewWidth
+                        val scaleY = imageHeight.toFloat() / previewHeight
+
+                        // 4. PreviewView에 해당하는 영역을 이미지 상에서 크롭
+                        val previewRectInImage = Rect(
+                            (0 * scaleX).toInt(),
+                            (0 * scaleY).toInt(),
+                            (previewWidth * scaleX).toInt(),
+                            (previewHeight * scaleY).toInt()
+                        )
+
+                        val previewCropped = Bitmap.createBitmap(
+                            bitmap,
+                            previewRectInImage.left,
+                            previewRectInImage.top,
+                            previewRectInImage.width(),
+                            previewRectInImage.height()
+                        )
+
+                        // 5. previewCropped에서 다시 4:3 중앙 크롭
+                        val pw = previewCropped.width
+                        val ph = previewCropped.height
+                        val targetAspectRatio = 4f / 3f
+
+                        val finalCropRect = if (pw.toFloat() / ph > targetAspectRatio) {
+                            // 가로가 더 넓을 경우, 좌우 잘라냄
+                            val targetWidth = (ph * targetAspectRatio).toInt()
+                            val left = (pw - targetWidth) / 2
+                            Rect(left, 0, left + targetWidth, ph)
+                        } else {
+                            // 세로가 더 클 경우, 위아래 잘라냄
+                            val targetHeight = (pw / targetAspectRatio).toInt()
+                            val top = (ph - targetHeight) / 2
+                            Rect(0, top, pw, top + targetHeight)
+                        }
+
+                        val finalCropped = Bitmap.createBitmap(
+                            previewCropped,
+                            finalCropRect.left,
+                            finalCropRect.top,
+                            finalCropRect.width(),
+                            finalCropRect.height()
+                        )
+
+                        // 저장
+                        FileOutputStream(photoFile).use { out ->
+                            finalCropped.compress(Bitmap.CompressFormat.PNG, 100, out)
+                        }
+
                         Handler(Looper.getMainLooper()).post {
-                            Log.d("CameraFragment", "사진 저장됨: $savedUri")
+                            Log.d("CameraFragment", "최종 크롭된 사진 저장됨: $savedUri")
                             viewModel.setRight(savedUri)
                             viewModel.setStep(4)
 
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE
 
-                            cameraActivity.changeFragment(0)
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                cameraActivity.changeFragment(0)
+                            }, 100)
                         }
-
                     }.start()
                 }
 

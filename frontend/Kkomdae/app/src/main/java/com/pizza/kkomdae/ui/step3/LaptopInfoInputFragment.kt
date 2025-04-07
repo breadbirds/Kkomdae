@@ -60,6 +60,7 @@ import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.math.log
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -595,17 +596,27 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             .create()
 
 
-        var selectedDate: Long = System.currentTimeMillis()
+        var selectedDate: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
 
         calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            val calendar = Calendar.getInstance()
-            calendar.set(year, month, dayOfMonth)
-            selectedDate = calendar.timeInMillis
+
+            val fixedMonth = month + 1
+            selectedDate = String.format("%04d-%02d-%02d", year, fixedMonth, dayOfMonth)
+            Log.d("Post", "showCustomCalendarDialog:$selectedDate ")
+
+
         }
 
         btnSelectDate.setOnClickListener {
             // 선택된 날짜를 처리하는 코드 작성
             // 예: 선택된 날짜를 TextView에 표시하거나 다른 로직 수행
+
+            binding.tvDate.text = selectedDate.toString()
+            val parser = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val parsedDate = parser.parse(selectedDate)!!
+            date = dateFormat.format(parsedDate)
+            checkNext()
             alertDialog.dismiss()
         }
         alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

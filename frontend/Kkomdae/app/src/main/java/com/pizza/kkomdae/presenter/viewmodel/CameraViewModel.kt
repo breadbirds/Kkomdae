@@ -251,7 +251,7 @@ class CameraViewModel @Inject constructor(
             }
 
             // 원하는 크기로 리사이징 (선택 사항)
-            val resizedBitmap = resizeBitmap(bitmap, maxWidth = 1024, maxHeight = 1024)
+            val resizedBitmap = resizeBitmap(bitmap, maxWidth = 1024, maxHeight = 768)
 
             // 압축을 위한 파일 생성
             val compressedFile = File(
