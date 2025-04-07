@@ -80,6 +80,8 @@
             android:layout_height="match_parent">
 
 
+
+
             <ImageView
                 android:id="@+id/iv_image"
                 android:layout_width="match_parent"
@@ -87,6 +89,12 @@
                 android:scaleType="centerCrop"
                 android:src="@color/blue100" />
 
+            <ImageView
+                android:id="@+id/iv_loading"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@color/blue100" />
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/loading_animation"
                 android:layout_width="100dp"

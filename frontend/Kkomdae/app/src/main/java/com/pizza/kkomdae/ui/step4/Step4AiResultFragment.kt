@@ -2,6 +2,7 @@ package com.pizza.kkomdae.ui.step4
 
 import android.content.Context
 import android.graphics.Rect
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -22,6 +23,8 @@ import com.pizza.kkomdae.ui.step1.ImageDetailFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.ui.NoteFragment
 import kotlinx.coroutines.launch
@@ -92,6 +95,11 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        Glide.with(this)
+            .asGif()
+            .load(R.drawable.skeleton_ui) // 🔁 로딩용 GIF 리소스
+            .into(binding.ivLoading)
+
         val adapter =Step4AiResultAdapter(data, listen = {
             changeImage(it)
             adaterIndex = it
@@ -111,7 +119,15 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
                         Glide.with(binding.ivImage)
                             .load(it.data.Picture1_ai_url)
-                            .into(binding.ivImage)
+                            .into(object : CustomTarget<Drawable>() {
+                                override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                                    binding.ivImage.setImageDrawable(resource)
+                                    binding.ivImage.visibility = View.VISIBLE
+                                    binding.ivLoading.visibility = View.GONE
+                                }
+
+                                override fun onLoadCleared(placeholder: Drawable?) {}
+                            })
 
                         // 결함 여부
                         it.data.apply {
@@ -373,13 +389,29 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             binding.ivImage.visibility = View.INVISIBLE
             Glide.with(this)
                 .load("")
-                .into(binding.ivImage)
+                .into(object : CustomTarget<Drawable>() {
+                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                        binding.ivImage.setImageDrawable(resource)
+                        binding.ivImage.visibility = View.VISIBLE
+                        binding.ivLoading.visibility = View.GONE
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
         }else{
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
             Glide.with(binding.ivImage)
                 .load(url)
-                .into(binding.ivImage)
+                .into(object : CustomTarget<Drawable>() {
+                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                        binding.ivImage.setImageDrawable(resource)
+                        binding.ivImage.visibility = View.VISIBLE
+                        binding.ivLoading.visibility = View.GONE
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
         }
 
     }
