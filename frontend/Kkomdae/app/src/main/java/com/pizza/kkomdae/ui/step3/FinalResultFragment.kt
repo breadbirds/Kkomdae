@@ -60,6 +60,8 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
         // 결과 수신 후 UI 세팅
         setData(adapter)
 
+
+
         // 페이지 변경 감지
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -102,8 +104,17 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
             it ?: return@observe
             binding.apply {
 
+
+
                 // 외관 ai 분석 결과
                 adapter.submitList(it.imageUrls)
+
+                viewPager.post {
+                    if (adapter.itemCount > 0) {
+                        setupIndicators(0) // 처음은 보통 0으로 초기화
+                    }
+                }
+
 
                 // 자가 진단 결과
                 // 키보드
@@ -149,7 +160,7 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
                 tvFrontTitle.text = it.description
 
                 // 데이터가 로드되고 어댑터에 설정된 후 인디케이터를 초기화
-                setupIndicators(0)
+
             }
         }
     }
@@ -161,8 +172,7 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
         binding.indicatorContainer.removeAllViews()
 
         // 이미지 개수만큼 인디케이터 추가
-        val imageCount = (binding.viewPager.adapter as FinalResultAdapter).itemCount
-        if (imageCount <= 1) return // 이미지가 1개 이하면 인디케이터 필요 없음
+        val imageCount = 6
 
         // 인디케이터 점들 추가
         val params = LinearLayout.LayoutParams(
