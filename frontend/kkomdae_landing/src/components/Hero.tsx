@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { typeWriter } from "../utils/animations";
 import "../styles/Hero.css";
 import axios from "axios";
@@ -11,9 +11,11 @@ import icon6 from "../assets/icon6.png";
 import icon7 from "../assets/icon7.png";
 import icon8 from "../assets/icon8.png";
 import icon9 from "../assets/icon9.png";
+import qrCodeImage from "../assets/qr-code.png";
 
 const Hero: React.FC = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
+  const [showQRModal, setShowQRModal] = useState(false);
 
   useEffect(() => {
     // 타이틀 타이핑 애니메이션 시작
@@ -42,7 +44,12 @@ const Hero: React.FC = () => {
   };
 
   const handleAppDownload = () => {
-    window.location.href = "https://drive.usercontent.google.com/download?id=12UrM-tJEcpOQhEA5i8ou_QmuQEkXagLH&export=download&authuser=0";
+    // QR 코드 모달을 표시합니다
+    setShowQRModal(true);
+  };
+
+  const closeQRModal = () => {
+    setShowQRModal(false);
   };
 
   return (
@@ -121,6 +128,25 @@ const Hero: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* QR 코드 모달 */}
+      {showQRModal && (
+        <div className="qr-modal-overlay" onClick={closeQRModal}>
+          <div className="qr-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="qr-modal-header">
+              <h3>꼼대 앱 설치하기</h3>
+              <button className="close-button" onClick={closeQRModal}>
+                ×
+              </button>
+            </div>
+            <div className="qr-modal-content">
+              <img src={qrCodeImage} alt="꼼대 앱 QR 코드" className="qr-code-image" />
+              <p>QR 코드를 스캔하여 꼼대 앱을 설치하세요.</p>
+              <p className="modal-note">* 모바일 기기에서만 이용 가능합니다.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

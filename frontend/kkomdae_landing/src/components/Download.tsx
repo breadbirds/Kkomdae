@@ -1,16 +1,23 @@
 import kkomdae_logo from "../assets/kkomdae_logo.svg";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { initScrollAnimations } from "../utils/animations";
 import "../styles/Download.css";
 import axios from "axios";
+import qrCodeImage from "../assets/qr-code.png";
 
 const Download: React.FC = () => {
+  const [showQRModal, setShowQRModal] = useState(false);
+
   useEffect(() => {
     initScrollAnimations();
   }, []);
 
   const handleAppDownload = () => {
-    window.location.href = "https://drive.usercontent.google.com/download?id=12UrM-tJEcpOQhEA5i8ou_QmuQEkXagLH&export=download&authuser=0";
+    setShowQRModal(true);
+  };
+
+  const closeQRModal = () => {
+    setShowQRModal(false);
   };
 
   const handleDownload = async () => {
@@ -69,6 +76,25 @@ const Download: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* QR 코드 모달 */}
+      {showQRModal && (
+        <div className="qr-modal-overlay" onClick={closeQRModal}>
+          <div className="qr-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="qr-modal-header">
+              <h3>꼼대 앱 설치하기</h3>
+              <button className="close-button" onClick={closeQRModal}>
+                ×
+              </button>
+            </div>
+            <div className="qr-modal-content">
+              <img src={qrCodeImage} alt="꼼대 앱 QR 코드" className="qr-code-image" />
+              <p>QR 코드를 스캔하여 꼼대 앱을 설치하세요.</p>
+              <p className="modal-note">* 모바일 기기에서만 이용 가능합니다.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

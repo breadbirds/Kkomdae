@@ -645,3 +645,78 @@
     height: 45px;
   }
 }
+
+/* QR 코드 모달 스타일 */
+.qr-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.qr-modal {
+  background-color: white;
+  border-radius: 12px;
+  width: 340px;
+  max-width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.qr-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.qr-modal-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
+
+.qr-modal-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.qr-code-image {
+  width: 220px;
+  height: 220px;
+  margin-bottom: 16px;
+}
+
+.qr-modal-content p {
+  margin: 6px 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.modal-note {
+  color: #666;
+  font-size: 14px;
+  margin-top: 16px;
+}
