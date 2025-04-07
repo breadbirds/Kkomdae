@@ -199,7 +199,12 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
                 tvInputPadCount.text = it.mousepadCount.toString()      // 마우스 패드
 
                 // 비고 사항
-                tvFrontTitle.text = it.description
+                if (it.description==""){
+                    tvFrontTitle.text = "특이사항이 없습니다."
+                }else{
+                    tvFrontTitle.text = it.description
+                }
+
 
                 // 데이터가 로드되고 어댑터에 설정된 후 인디케이터를 초기화
 
