@@ -112,7 +112,7 @@ class LoadingFragment : Fragment() {
         btn_next = view.findViewById(R.id.btn_next)
 
         // 버튼 초기에는 비활성화
-        btn_next.visibility = View.GONE
+        btn_next.visibility = View.INVISIBLE
 
         // 버튼 클릭 리스너 설정
         btn_next.setOnClickListener {
