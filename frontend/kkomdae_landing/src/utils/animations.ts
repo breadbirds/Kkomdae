@@ -23,10 +23,26 @@ export const initScrollAnimations = (): void => {
 // 타이핑 애니메이션 효과
 export const typeWriter = (element: HTMLElement, text: string, speed: number = 50, callback?: () => void): void => {
   let i = 0;
+  let isInsideTag = false;
+  let currentTag = "";
 
   function typing() {
     if (i < text.length) {
-      element.innerHTML += text.charAt(i) === "," ? text.charAt(i) + "<br/>" : text.charAt(i);
+      // HTML 태그 처리
+      if (text.charAt(i) === "<") {
+        isInsideTag = true;
+        currentTag += text.charAt(i);
+      } else if (isInsideTag && text.charAt(i) === ">") {
+        currentTag += text.charAt(i);
+        element.innerHTML += currentTag;
+        currentTag = "";
+        isInsideTag = false;
+      } else if (isInsideTag) {
+        currentTag += text.charAt(i);
+      } else {
+        element.innerHTML += text.charAt(i);
+      }
+
       i++;
       setTimeout(typing, speed);
     } else if (callback) {
