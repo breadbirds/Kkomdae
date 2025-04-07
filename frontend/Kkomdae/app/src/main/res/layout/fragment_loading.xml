@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FCFCFC"
-    android:padding="36dp"
+    android:paddingHorizontal="36dp"
+    android:paddingTop="36dp"
+    android:paddingBottom="24dp"
     tools:context=".ui.LoadingFragment">
 
     <TextView
@@ -225,7 +227,7 @@
         android:paddingBottom="16dp"
         android:backgroundTint="#4285F4"
         tools:visibility="visible"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
