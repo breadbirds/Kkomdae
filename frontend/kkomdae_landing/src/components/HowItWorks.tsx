@@ -31,7 +31,7 @@ const HowItWorks: React.FC = () => {
       <div className="container">
         <div className="section-header">
           <h2 className="section-title">이용 방법</h2>
-          <p className="section-subtitle">꼼대 앱으로 노트북 관리하는 방법을 알려드려요</p>
+          <p className="section-subtitle">꼼대로 SSAFY 노트북 상태를 기록하고 관리하는 방법을 알려드립니다.</p>
         </div>
 
         <div className="steps-container">
@@ -42,7 +42,7 @@ const HowItWorks: React.FC = () => {
                 <h3 className="step-title">노트북 외관 촬영</h3>
               </div>
               <div className="step-content">
-                <p className="step-description">노트북의 상태를 정확하게 진단하기 위해 앱에서 안내하는 각도와 방법에 따라 노트북의 상판, 하판, 측면, 화면, 키보드 등을 꼼꼼하게 촬영해주세요.</p>
+                <p className="step-description">노트북의 상태를 정확하게 진단하기 위해 꼼대 앱에서 안내하는 각도와 방법에 따라 노트북의 상판, 하판, 측면, 모니터, 키보드 등을 꼼꼼하게 촬영해주세요.</p>
               </div>
             </div>
             <div className="step-image-wrapper">
@@ -59,7 +59,9 @@ const HowItWorks: React.FC = () => {
                 <h3 className="step-title">자가진단 프로그램 실행</h3>
               </div>
               <div className="step-content">
-                <p className="step-description">꼼대의 자가진단 프로그램을 노트북에서 실행하여 하드웨어 상태를 체크하고, QR 코드를 통해 진단 결과를 모바일로 간편하게 전송해요.</p>
+                <p className="step-description">
+                  모바일 앱에 표시되는 랜덤키를 노트북의 자가진단 프로그램에 입력하여 두 기기를 손쉽게 연결하세요. 기기 연동 후에는 모바일에서 편리하게 진단 결과를 확인할 수 있습니다.
+                </p>
               </div>
             </div>
             <div className="step-image-wrapper">
