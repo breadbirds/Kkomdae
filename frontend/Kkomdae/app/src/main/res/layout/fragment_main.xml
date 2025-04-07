@@ -114,7 +114,7 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_marginStart="12dp"
-                    android:layout_marginEnd="24dp"
+                    android:layout_marginEnd="20dp"
                     android:src="@drawable/ic_kkomi_main"
                     android:scaleType="fitEnd"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -152,8 +152,8 @@
                         android:id="@+id/cv_laptop"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        android:layout_width="320dp"
-                        android:layout_height="200dp"
+                        android:layout_width="280dp"
+                        android:layout_height="190dp"
                         app:cardCornerRadius="16dp"
                         android:layout_marginStart="24dp"
                         app:cardElevation="6dp"
@@ -221,8 +221,8 @@
                                 android:text="안전하게 사용하세요."/>
 
                             <ImageView
-                                android:layout_width="120dp"
-                                android:layout_height="110dp"
+                                android:layout_width="110dp"
+                                android:layout_height="100dp"
                                 android:src="@drawable/ic_laptap_big"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -252,8 +252,8 @@
 
                     <androidx.cardview.widget.CardView
                         android:id="@+id/cv_mobile"
-                        android:layout_width="320dp"
-                        android:layout_height="200dp"
+                        android:layout_width="280dp"
+                        android:layout_height="190dp"
                         android:layout_marginStart="16dp"
                         android:backgroundTint="#C9F7D5"
                         app:cardBackgroundColor="@color/white"
@@ -305,8 +305,8 @@
                                 android:text="안전하게 관리하세요."/>
 
                             <ImageView
-                                android:layout_width="110dp"
-                                android:layout_height="130dp"
+                                android:layout_width="100dp"
+                                android:layout_height="120dp"
                                 android:src="@drawable/ic_mobile_hand"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -336,8 +336,8 @@
                         android:id="@+id/cv_iot"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        android:layout_width="320dp"
-                        android:layout_height="200dp"
+                        android:layout_width="280dp"
+                        android:layout_height="190dp"
                         app:cardCornerRadius="16dp"
                         android:layout_marginStart="16dp"
                         app:cardElevation="6dp"
@@ -387,13 +387,13 @@
                                 android:text="효율적으로 활용하세요."/>
 
                             <ImageView
-                                android:layout_width="110dp"
-                                android:layout_height="110dp"
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
                                 android:src="@drawable/ic_wifi"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 android:layout_marginEnd="12dp"
-                                android:layout_marginBottom="12dp" />
+                                android:layout_marginBottom="10dp" />
 
                             <TextView
                                 android:layout_width="wrap_content"

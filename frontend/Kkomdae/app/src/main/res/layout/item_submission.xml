@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="NT761XDA-X07/C(11세대)"
-        style="@style/Title4"
+        style="@style/Label2"
         app:layout_constraintBottom_toBottomOf="@id/iv_icon"
         app:layout_constraintTop_toTopOf="@id/iv_icon"
         android:layout_marginStart="16dp"
@@ -32,21 +32,21 @@
 
     <TextView
         android:id="@+id/tv_state_rant"
+        style="@style/Label4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="대여중"
-        style="@style/Label4"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp"
-        android:textColor="@color/blue300"
-
+        android:layout_marginEnd="20dp"
         android:background="@drawable/status_border_rounded"
-        app:layout_constraintTop_toTopOf="@id/tv_model_number"
+        android:paddingStart="4dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="4dp"
+        android:paddingBottom="2dp"
+
+        android:text="대여중"
+        android:textColor="@color/blue300"
         app:layout_constraintBottom_toBottomOf="@id/tv_model_number"
-       app:layout_constraintEnd_toStartOf="@id/btn_down"
-        android:layout_marginEnd="20dp"/>
+        app:layout_constraintEnd_toStartOf="@id/btn_down"
+        app:layout_constraintTop_toTopOf="@id/tv_model_number" />
 
     <TextView
         android:id="@+id/tv_state_release"
@@ -135,7 +135,7 @@
 
         <TextView
             android:id="@+id/bt_file_download"
-            style="@style/Label3"
+            style="@style/Label4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -176,11 +176,11 @@
                 android:paddingBottom="8dp"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                style="@style/Label3"
+                style="@style/Label4"
                 android:gravity="center"
                 android:layout_marginEnd="28dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/bt_file_download" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/bt_return_download"
