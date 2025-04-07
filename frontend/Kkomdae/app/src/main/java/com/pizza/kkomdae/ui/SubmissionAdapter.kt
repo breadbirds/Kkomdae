@@ -103,7 +103,7 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
             val withParentheses = match?.value
 
             binding.tvModelNumber.text= getItem(position).serialNum + withParentheses
-            binding.tvInputDate.text = getItem(position).dateTime
+            binding.tvInputDate.text = getItem(position).dateTime?.substring(2)?.replace("-", "/")
 
         }
     }

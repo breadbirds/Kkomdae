@@ -26,7 +26,6 @@ import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
 import com.pizza.kkomdae.ui.guide.Step2GuideFragment
 import com.pizza.kkomdae.ui.guide.Step1GuideFragment
-import com.pizza.kkomdae.ui.step3.LaptopInfoInputFragment
 import dagger.hilt.android.AndroidEntryPoint
 private const val TAG = "MainActivity"
 
@@ -43,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         val transaction = supportFragmentManager.beginTransaction()
         supportFragmentManager.popBackStack()
-        transaction.replace(R.id.fl_main, LaptopInfoInputFragment())
+        transaction.replace(R.id.fl_main, MainFragment())
 
         transaction.commit()
         checkCameraPermission()
