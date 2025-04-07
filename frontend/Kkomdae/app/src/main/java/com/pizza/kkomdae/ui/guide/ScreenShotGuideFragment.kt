@@ -599,7 +599,7 @@ class ScreenShotGuideFragment :  BaseFragment<FragmentScreenShotGuideBinding>(
             // ✅ UI thread에는 오버레이만 넘김 (초경량)
             requireActivity().runOnUiThread {
 //                화면에 탐지한 bbox를 그림
-                binding.overlayView?.setBoxes(listOf(bestBox), bitmap.width, bitmap.height)
+//                binding.overlayView?.setBoxes(listOf(bestBox), bitmap.width, bitmap.height)
             }
         }
 
