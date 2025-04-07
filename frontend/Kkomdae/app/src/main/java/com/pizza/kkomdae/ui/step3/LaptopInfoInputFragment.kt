@@ -636,8 +636,9 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             " NT961XGL-COM(14세대)"
         )
         val adapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, items)
+            ArrayAdapter(requireContext(), R.layout.item_spinner_dropdown, items)
         binding.atvModelName.setAdapter(adapter)
+
 
         binding.atvModelName.setOnItemClickListener { _, _, _, _ ->
             checkNext()

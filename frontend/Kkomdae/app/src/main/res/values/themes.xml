@@ -3,11 +3,24 @@
     <style name="Base.Theme.Kkomdae" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
          <item name="colorPrimary">@color/blue500</item>
+        <item name="colorPrimaryContainer">@color/blue100</item>
+        <item name="colorSecondaryContainer">@color/blue100</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorSurfaceVariant">@color/gray100</item>
+        <item name="colorOnSurface">@color/gray700</item>
+        <item name="colorOutline">@color/gray300</item>
+
 
         <item name="android:windowBackground">#FCFCFC</item>
         <item name="android:statusBarColor">#FCFCFC</item> <!-- ✅ 상태바 흰색 -->
         <item name="android:windowLightStatusBar">true</item>
+
+
+
+
     </style>
+
+
 
     <style name="Theme.Kkomdae" parent="Base.Theme.Kkomdae" />
 </resources>
