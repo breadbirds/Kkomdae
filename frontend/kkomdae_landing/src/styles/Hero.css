@@ -78,13 +78,27 @@
 }
 
 .hero-title {
+  position: relative;
   font-size: 3rem;
   font-weight: 800;
   color: white;
   margin-bottom: 24px;
   line-height: 1.1;
-  min-height: 70px;
+  min-height: 100px;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.title-placeholder {
+  visibility: hidden;
+  height: 0;
+  position: absolute;
+}
+
+.typing-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 
 .hero-tagline {
@@ -160,18 +174,26 @@
 
 .btn-action {
   display: inline-block;
-  padding: 14px 24px;
+  padding: 16px 28px;
   border-radius: 12px;
   font-weight: 600;
   font-size: 1rem;
   text-align: center;
   transition: all 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  min-height: 54px;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-diagnostic {
   background: #fff;
   color: #8b5cf6;
+  min-width: 180px;
+  white-space: nowrap;
 }
 
 .btn-diagnostic:hover {
@@ -202,7 +224,6 @@
   color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
   transition: all 0.2s ease;
-  padding: 6px 12px;
   border-radius: 20px;
 }
 
@@ -248,6 +269,17 @@
   }
 }
 
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* 떠다니는 아이콘 관련 스타일 */
 .floating-icons {
   position: absolute;
@@ -265,97 +297,130 @@
   height: 100px;
   object-fit: contain;
   filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15));
-  animation-name: floating;
-  animation-duration: 10s;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-fill-mode: forwards;
+  opacity: 0;
+  animation-name: fadeIn, floating;
+  animation-duration: 0.8s, 10s;
+  animation-timing-function: ease-out, ease-in-out;
+  animation-fill-mode: forwards, forwards;
+  animation-iteration-count: 1, infinite;
+  animation-delay: calc(0.1s * var(--icon-order)), calc(0.1s * var(--icon-order) + 0.8s);
   transform-origin: center center;
-  animation-play-state: running !important;
 }
 
+/* 아이콘 페이드인 애니메이션 */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 모든 아이콘에 페이드인 효과 적용 */
+.floating-icon {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15));
+
+  /* 페이드인 애니메이션 추가 */
+  opacity: 0;
+  animation-name: fadeIn, floating;
+  animation-duration: 0.8s, 10s;
+  animation-timing-function: ease-out, ease-in-out;
+  animation-fill-mode: forwards, forwards;
+  animation-iteration-count: 1, infinite;
+  animation-delay: calc(0.1s * var(--icon-order)), calc(0.1s * var(--icon-order) + 0.8s);
+  transform-origin: center center;
+}
+
+/* 각 아이콘별 순서 지정 */
 .icon-1 {
+  --icon-order: 1;
   top: 15%;
   left: 60%;
   width: 150px;
   height: 150px;
-  animation-delay: 0s;
   z-index: 11;
 }
 
 .icon-3 {
+  --icon-order: 2;
   top: 50%;
   left: 5%;
   width: 130px;
   height: 130px;
-  animation-delay: 0.2s;
   z-index: 8;
 }
 
 .icon-4 {
+  --icon-order: 3;
   bottom: 30%;
   right: 20%;
   width: 85px;
   height: 85px;
-  animation-delay: 0.3s;
   z-index: 12;
 }
 
 .icon-5 {
+  --icon-order: 4;
   top: 15%;
   left: 20%;
   width: 130px;
   height: 130px;
-  animation-delay: 0.4s;
   z-index: 7;
 }
 
 .icon-6 {
+  --icon-order: 5;
   top: 35%;
   left: 65%;
   transform: translate(-50%, -50%);
   width: 180px;
   height: 180px;
-  animation-delay: 0s;
   z-index: 30;
   position: absolute;
 }
 
 .icon-7 {
+  --icon-order: 6;
   bottom: 23%;
   left: 45%;
   width: 120px;
   height: 120px;
-  animation-delay: 4.4s;
   z-index: 13;
 }
 
 .icon-8 {
+  --icon-order: 7;
   top: 40%;
   left: 20%;
   width: 80px;
   height: 80px;
-  animation-delay: 5.1s;
   z-index: 8;
 }
 
 .icon-9 {
+  --icon-order: 8;
   top: 55%;
   left: 35%;
   transform: translate(-50%, -50%);
   width: 100px;
   height: 100px;
-  animation-delay: 0s;
   z-index: 30;
   position: absolute;
 }
 
 .icon-10 {
+  --icon-order: 9;
   bottom: 15%;
   right: 15%;
   width: 80px;
   height: 80px;
-  animation-delay: 6.5s;
   z-index: 12;
 }
 
@@ -381,21 +446,21 @@
 .icon-1,
 .icon-5,
 .icon-9 {
-  animation-name: floating-alt-1;
-  animation-duration: 7s;
+  animation-name: fadeIn, floating-alt-1;
+  animation-duration: 0.8s, 7s;
 }
 
 .icon-3,
 .icon-7,
 .icon-10 {
-  animation-name: floating-alt-2;
-  animation-duration: 9s;
+  animation-name: fadeIn, floating-alt-2;
+  animation-duration: 0.8s, 9s;
 }
 
 .icon-4,
 .icon-8 {
-  animation-name: floating-alt-3;
-  animation-duration: 10s;
+  animation-name: fadeIn, floating-alt-3;
+  animation-duration: 0.8s, 10s;
 }
 
 @keyframes floating-alt-1 {
@@ -541,6 +606,16 @@
 
   .hero-title {
     font-size: 2.5rem;
+    min-height: 110px;
+    text-align: center; /* 중앙 정렬 추가 */
+  }
+
+  .typing-text {
+    /* 중앙 정렬을 위한 설정 */
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    white-space: nowrap;
   }
 
   .hero-tagline {
@@ -596,6 +671,7 @@
 
   .hero-title {
     font-size: 2rem;
+    min-height: 90px;
   }
 
   .hero-actions {

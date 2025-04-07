@@ -19,8 +19,22 @@ const Hero: React.FC = () => {
 
   useEffect(() => {
     // 타이틀 타이핑 애니메이션 시작
-    if (titleRef.current && titleRef.current.innerHTML === "") {
-      typeWriter(titleRef.current, "꼼대와 함께하는<br>스마트한 노트북 관리", 100);
+    if (titleRef.current) {
+      // 화면 크기를 확인하여 반응형인지 체크
+      const isResponsive = window.innerWidth <= 992;
+
+      // 플레이스홀더와 타이핑 요소 설정
+      const placeholderHTML = isResponsive
+        ? '<div class="title-placeholder" style="text-align:center">꼼대와 함께하는<br>스마트한 노트북 관리</div>'
+        : '<div class="title-placeholder">꼼대와 함께하는<br>스마트한 노트북 관리</div>';
+
+      titleRef.current.innerHTML = placeholderHTML + '<span class="typing-text"></span>';
+
+      // 타이핑 애니메이션 적용
+      const typingElement = titleRef.current.querySelector(".typing-text");
+      if (typingElement) {
+        typeWriter(typingElement as HTMLElement, "꼼대와 함께하는<br>스마트한 노트북 관리", 100);
+      }
     }
   }, []);
 
