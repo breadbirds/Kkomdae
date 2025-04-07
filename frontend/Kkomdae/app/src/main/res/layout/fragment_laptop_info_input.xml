@@ -81,8 +81,10 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_serial"
                     style="@style/Body2"
+                    android:imeOptions="actionNext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:inputType="text"
                     android:hint="시리얼 번호를 입력해주세요"
                     android:paddingStart="16dp" />
 
@@ -157,6 +159,8 @@
                     style="@style/Body2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:imeOptions="actionDone"
+                    android:inputType="text"
                     android:hint="바코드 번호를 입력해주세요"
                     android:paddingStart="16dp" />
 

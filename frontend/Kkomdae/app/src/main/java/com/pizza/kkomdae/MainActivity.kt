@@ -7,10 +7,12 @@ import androidx.core.content.ContextCompat
 import com.pizza.kkomdae.databinding.ActivityMainBinding
 import com.pizza.kkomdae.ui.MainFragment
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
@@ -18,6 +20,7 @@ import com.pizza.kkomdae.data.source.local.SecureTokenManager
 import com.pizza.kkomdae.data.source.local.TokenManager
 import com.pizza.kkomdae.databinding.LayoutLogoutDialogBinding
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
@@ -184,6 +187,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (currentFocus != null) {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+            currentFocus?.clearFocus()
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
 
