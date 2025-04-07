@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -14,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentFinalResultBinding
@@ -41,13 +43,17 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
         showIntroDialog()
 
         // 상단 타이틀 설정
-        binding.topBar.tvTitle.text = "제출 내용 확인"
+        binding.tvTitle.text = "제출 내용 확인"
 
         // 각 step layout 애니메이션 순차 적용
         binding.clStep1.slideInFromLeft(0L)
         binding.clStep2.slideInFromLeft(100L)
         binding.clStep3.slideInFromLeft(200L)
         binding.clStep4.slideInFromLeft(350L)
+
+        binding.btnCancel.setOnClickListener {
+            showQuitBottomSheet()
+        }
 
         // 이미지 ViewPager 어댑터 설정
         val adapter = FinalResultAdapter(requireContext())
@@ -81,6 +87,42 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
         // PDF 제출 성공 시 제출 완료 페이지로 이동
         goToNext()
 
+    }
+
+    private fun showQuitBottomSheet() {
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        val bottomSheetView = layoutInflater.inflate(R.layout.layout_bottom_sheet, null)
+
+        // 계속하기 버튼 클릭 시 바텀시트 닫기
+        val btnContinue = bottomSheetView.findViewById<View>(R.id.btn_continue)
+        btnContinue.setOnClickListener {
+            bottomSheetDialog.dismiss()
+        }
+
+        // 그만두기 버튼 클릭 시 메인 화면으로 이동
+        val btnQuit = bottomSheetView.findViewById<View>(R.id.btn_quit)
+        btnQuit.setOnClickListener {
+            bottomSheetDialog.dismiss()
+
+            // UI 스레드에서 약간의 지연 후 화면 전환
+            view?.post {
+                try {
+                    // 메인 화면으로 이동
+                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    transaction.setReorderingAllowed(true)
+                    transaction.replace(R.id.fl_main, com.pizza.kkomdae.ui.MainFragment())
+                    transaction.commit()
+
+                    // 백스택 즉시 비우기
+                    requireActivity().supportFragmentManager.popBackStackImmediate(null, 1)
+                } catch (e: Exception) {
+                    Log.e("Step1GuideFragment", "MainFragment로 이동 중 오류: ${e.message}", e)
+                }
+            }
+        }
+
+        bottomSheetDialog.setContentView(bottomSheetView)
+        bottomSheetDialog.show()
     }
 
     // PDF 제출 완료 신호 수신 시 제출완료 화면으로 이동
