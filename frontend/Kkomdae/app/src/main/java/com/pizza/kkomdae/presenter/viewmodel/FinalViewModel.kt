@@ -177,6 +177,7 @@ class FinalViewModel @Inject constructor(
 
     fun clearPostPdfName(){
         _pdfName.postValue(null)
+        _pdfUrl.postValue("")
 
     }
 
