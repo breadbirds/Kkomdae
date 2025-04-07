@@ -45,6 +45,10 @@ class MainViewModel@Inject constructor(
     val stage: LiveData<Int>
         get() = _stage
 
+    private val _pdfUrl = MutableLiveData<String>()
+    val pdfUrl: LiveData<String>
+        get() = _pdfUrl
+
     private val _releasePicStage = MutableLiveData<Int>()
     val releasePicStage: LiveData<Int>
         get() = _releasePicStage
@@ -61,6 +65,14 @@ class MainViewModel@Inject constructor(
     val release: LiveData<Boolean>
         get() = _release
 
+
+    fun setPdfUrl(url: String){
+        _pdfUrl.postValue(url)
+    }
+
+    fun getPdfUrl():String{
+        return pdfUrl.value?:""
+    }
 
     fun setReleasePicStage(stage: Int){
         _releasePicStage.postValue(stage)

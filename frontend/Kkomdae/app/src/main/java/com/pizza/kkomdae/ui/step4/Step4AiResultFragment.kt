@@ -43,6 +43,15 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
     private lateinit var backPressedCallback: OnBackPressedCallback
 
+    val data = listOf(
+        Step4AiResult(R.drawable.ic_front_laptop, "전면부",0),
+        Step4AiResult(R.drawable.ic_guide_back, "후면부",0),
+        Step4AiResult(R.drawable.ic_camera_left, "좌측면",0),
+        Step4AiResult(R.drawable.ic_camera_right, "우측면",0),
+        Step4AiResult(R.drawable.ic_guide_screen, "모니터",0),
+        Step4AiResult(R.drawable.ic_guide_keypad, "키보드",0),
+    )
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mainActivity = context as MainActivity
@@ -83,6 +92,14 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val adapter =Step4AiResultAdapter(data, listen = {
+            changeImage(it)
+            adaterIndex = it
+
+        }, viewModel = viewModel)
+
+        adapter.selectItem(step)
+
         changeImage(step)
         if (count==0){
             lifecycleScope.launch {
@@ -95,6 +112,20 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
                         Glide.with(binding.ivImage)
                             .load(it.data.Picture1_ai_url)
                             .into(binding.ivImage)
+
+                        // 결함 여부
+                        it.data.apply {
+                            data[0].damage= photo1_ai_damage?:0
+                            data[1].damage= photo2_ai_damage?:0
+                            data[2].damage= photo3_ai_damage?:0
+                            data[3].damage= photo4_ai_damage?:0
+                            data[4].damage= photo5_ai_damage?:0
+                            data[5].damage= photo6_ai_damage?:0
+                            adapter.notifyDataSetChanged()
+
+                        }
+
+
 
                         viewModel.setAllPhoto(it.data)
                     }else{
@@ -110,21 +141,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
 
 
-        val data = listOf(
-            Step4AiResult(R.drawable.ic_front_laptop, "전면부"),
-            Step4AiResult(R.drawable.ic_guide_back, "후면부"),
-            Step4AiResult(R.drawable.ic_camera_left, "좌측면"),
-            Step4AiResult(R.drawable.ic_camera_right, "우측면"),
-            Step4AiResult(R.drawable.ic_guide_screen, "모니터"),
-            Step4AiResult(R.drawable.ic_guide_keypad, "키보드"),
-        )
-        val adapter =Step4AiResultAdapter(data, listen = {
-            changeImage(it)
-            adaterIndex = it
 
-        }, viewModel = viewModel)
 
-        adapter.selectItem(step)
 
         Log.d(TAG, "onViewCreated: reCameraUri")
         // 재촬영 이미지 uri 서버로 보내기
@@ -340,8 +358,9 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         }
 
         // 결함 상태 텍스트
-        if (damageCount > 0) {
-            binding.tvResultStatus.text = "${damageCount}개의 결함이 발견되었습니다."
+        if (data[it].damage > 0) {
+//            binding.tvResultStatus.text = "${data[it].damage}개의 결함이 발견되었습니다."
+            binding.tvResultStatus.text = "결함이 발견되었습니다."
             binding.tvResultStatus.setTextColor(resources.getColor(R.color.error, null))
         } else {
             binding.tvResultStatus.text = "발견된 결함이 없습니다."

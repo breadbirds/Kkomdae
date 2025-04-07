@@ -79,7 +79,6 @@
         android:background="@drawable/bg_rounded_btn_pdf_download"
         android:clickable="true"
         android:focusable="true"
-        android:foreground="?attr/selectableItemBackground"
         android:gravity="center"
         android:text="PDF 다운 받기"
         android:textColor="@color/orange500"
@@ -97,7 +96,6 @@
         android:background="@drawable/bg_rounded_btn_gray"
         android:clickable="true"
         android:focusable="true"
-        android:foreground="?attr/selectableItemBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">

@@ -186,10 +186,12 @@
                 app:boxCornerRadiusTopEnd="10dp"
                 app:boxCornerRadiusTopStart="10dp"
                 app:boxStrokeColor="@color/gray400"
+
                 app:layout_constraintTop_toBottomOf="@id/tv_model_name">
 
                 <AutoCompleteTextView
                     android:id="@+id/atv_model_name"
+                    android:popupBackground="@color/white"
                     style="@style/Body2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

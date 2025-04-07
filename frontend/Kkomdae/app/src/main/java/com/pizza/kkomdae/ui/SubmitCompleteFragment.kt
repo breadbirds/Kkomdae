@@ -1,5 +1,7 @@
 package com.pizza.kkomdae.ui
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -7,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -16,7 +19,11 @@ import com.pizza.kkomdae.databinding.FragmentOathBinding
 import com.pizza.kkomdae.databinding.FragmentSubmitCompleteBinding
 import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.net.URL
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -43,6 +50,17 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
+
+            finalViewModel.pdfName.value?.let {
+            lifecycleScope.launch {
+                val result = finalViewModel.getPdfUrl(it)
+                result.onSuccess {
+                    viewModel.setPdfUrl(it.url)
+                }.onFailure {
+                    // todo 에러 다이얼 로그 띄우기
+                }
+            }
+                }
         }
     }
 
@@ -57,26 +75,71 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
 
         // pdf 다운로드 버튼
         binding.btnDownloadPdf.setOnClickListener {
-            Log.d("TAG", "onViewCreated: ${finalViewModel.pdfName}")
-            finalViewModel.pdfName.value?.let {
+            val url = viewModel.getPdfUrl()
+            if(url!="") {
                 Toast.makeText(requireContext(),"파일이 다운로드 중입니다",Toast.LENGTH_SHORT).show()
-                lifecycleScope.launch {
-                    val result = finalViewModel.getPdfUrl(it)
-                    result.onSuccess {
-                        viewModel.downloadPdf(it.url)
-                    }.onFailure {
-                        // todo 에러 다이얼 로그 띄우기
-                    }
-                }
-
+                        viewModel.downloadPdf(url)
+            }else{
+                Toast.makeText(requireContext(),"pdf 생성 중",Toast.LENGTH_SHORT).show()
             }
 
         }
+
+        binding.btnShare.setOnClickListener {
+            val url = viewModel.getPdfUrl()
+
+            if (url != "") {
+                lifecycleScope.launch {
+                    try {
+                        val pdfFile = downloadPdf(
+                            requireContext(),
+                            url.substringBefore("?")
+                        )
+
+                        val uri = FileProvider.getUriForFile(
+                            requireContext(),
+                            "${requireContext().packageName}.fileprovider",
+                            pdfFile
+                        )
+
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "application/pdf"
+                            putExtra(Intent.EXTRA_STREAM, uri)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+
+                        startActivity(Intent.createChooser(shareIntent, "PDF 공유하기"))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Toast.makeText(requireContext(), "PDF 공유 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } else {
+                Toast.makeText(requireContext(), "PDF 생성 중입니다. 잠시만 기다려주세요.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+
 
         finalViewModel.pdfUrl.observe(viewLifecycleOwner){
             viewModel.downloadPdf(it)
         }
     }
+
+    suspend fun downloadPdf(context: Context, url: String): File = withContext(Dispatchers.IO) {
+        val fileName = "shared_pdf.pdf"
+        val file = File(context.cacheDir, fileName)
+
+        val urlConnection = URL(url).openConnection()
+        urlConnection.getInputStream().use { input ->
+            file.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+        return@withContext file
+    }
+
 
     private fun setupAnimation() {
         binding.animationView.setAnimation(R.raw.final_confetti)

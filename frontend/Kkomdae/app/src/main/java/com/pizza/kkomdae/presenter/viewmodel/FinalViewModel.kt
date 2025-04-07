@@ -44,8 +44,8 @@ class FinalViewModel @Inject constructor(
     val initFrontUri: LiveData<String?>
         get() = _initFrontUri
 
-    private val _pdfName = MutableLiveData<String>()
-    val pdfName: LiveData<String>
+    private val _pdfName = MutableLiveData<String?>()
+    val pdfName: LiveData<String?>
         get() = _pdfName
 
     private val _pdfUrl = MutableLiveData<String>()
@@ -76,12 +76,12 @@ class FinalViewModel @Inject constructor(
     val keypadUri: LiveData<String?>
         get() = _keypadUri
 
-    private val _getFinalResult = MutableLiveData<GetTotalResultResponse>()
-    val getFinalResult: LiveData<GetTotalResultResponse>
+    private val _getFinalResult = MutableLiveData<GetTotalResultResponse?>()
+    val getFinalResult: LiveData<GetTotalResultResponse?>
         get() = _getFinalResult
 
-    private val _postFourth = MutableLiveData<PostResponse>()
-    val postFourth: LiveData<PostResponse>
+    private val _postFourth = MutableLiveData<PostResponse?>()
+    val postFourth: LiveData<PostResponse?>
         get() = _postFourth
 
     private val sharedPreferences: SharedPreferences =
@@ -177,6 +177,7 @@ class FinalViewModel @Inject constructor(
 
     fun clearPostPdfName(){
         _pdfName.postValue(null)
+        _pdfUrl.postValue("")
 
     }
 
@@ -246,31 +247,38 @@ class FinalViewModel @Inject constructor(
 
                         when(stage){
                             1->{
+                                _frontDamage.postValue(response.data.photo_ai_damage)
                                 _frontUri.postValue(response.data.photo_ai_url)
                                 _rePhoto1.postValue(response)
 
+
                             }
                             2->{
+                                _backDamage.postValue(response.data.photo_ai_damage)
                                 _backUri.postValue(response.data.photo_ai_url)
                                 _rePhoto2.postValue(response)
 
                             }
                             3->{
+                                _leftDamage.postValue(response.data.photo_ai_damage)
                                 _leftUri.postValue(response.data.photo_ai_url)
                                 _rePhoto3.postValue(response)
 
                             }
                             4->{
+                                _rightDamage.postValue(response.data.photo_ai_damage)
                                 _rightUri.postValue(response.data.photo_ai_url)
                                 _rePhoto4.postValue(response)
 
                             }
                             5->{
+                                _screenDamage.postValue(response.data.photo_ai_damage)
                                 _screenUri.postValue(response.data.photo_ai_url)
 
                                 _rePhoto5.postValue(response)
                             }
                             6->{
+                                _keyboardDamage.postValue(response.data.photo_ai_damage)
                                 _keypadUri.postValue(response.data.photo_ai_url)
                                 _rePhoto6.postValue(response)
 
