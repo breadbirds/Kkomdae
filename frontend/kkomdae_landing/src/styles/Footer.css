@@ -1,19 +1,18 @@
 .footer {
   background-color: #1a1a2e;
   color: #ffffff;
-  padding: 80px 0 40px;
+  padding: 40px 0 40px;
 }
 
 .footer-content {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin-bottom: 60px;
 }
 
 .footer-logo {
   flex: 0 0 100%;
-  max-width: 350px;
+  max-width: 600px;
   margin-bottom: 30px;
 }
 
@@ -28,8 +27,11 @@
 
 .footer-description {
   color: rgba(255, 255, 255, 0.7);
-  font-size: 0.95rem;
-  line-height: 1.6;
+  font-size: 1rem;
+  line-height: 1.7;
+  max-width: 550px;
+  word-break: keep-all;
+  white-space: pre-line;
 }
 
 .footer-links {
@@ -42,22 +44,6 @@
 
 .footer-links-column {
   min-width: 160px;
-}
-
-/* 추가된 스타일 */
-.footer-modal-link {
-  color: var(--white);
-  text-decoration: none;
-  opacity: 0.8;
-  transition: opacity 0.2s ease;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-}
-
-.footer-modal-link:hover {
-  opacity: 1;
 }
 
 .footer-links-title {
@@ -76,13 +62,21 @@
   margin-bottom: 12px;
 }
 
-.footer-links-list a {
+/* 공통 링크 스타일 */
+.footer-links-list a,
+.footer-modal-link {
   color: rgba(255, 255, 255, 0.7);
   font-size: 0.95rem;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
-.footer-links-list a:hover {
+.footer-links-list a:hover,
+.footer-modal-link:hover {
   color: var(--white);
   text-decoration: underline;
 }

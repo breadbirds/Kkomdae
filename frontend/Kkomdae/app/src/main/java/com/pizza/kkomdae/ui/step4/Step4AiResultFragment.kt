@@ -121,7 +121,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         val adapter =Step4AiResultAdapter(data, listen = {
             changeImage(it)
             adaterIndex = it
-        })
+
+        }, viewModel = viewModel)
 
         adapter.selectItem(step)
 

@@ -515,7 +515,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_margin="24dp"
-        android:text="위 내용을 모두 동의합니다."
+        android:text="위 내용을 동의합니다."
         android:backgroundTint="@color/blue200"
         style="@style/Title1"/>
 

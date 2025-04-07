@@ -231,7 +231,7 @@
     <Button
         android:id="@+id/btn_next"
         android:layout_width="0dp"
-        android:layout_height="56dp"
+        android:layout_height="60dp"
         android:backgroundTint="@color/gray500"
         android:textColor="@color/white"
         android:text="촬영하기"

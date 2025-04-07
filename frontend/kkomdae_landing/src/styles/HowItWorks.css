@@ -33,6 +33,7 @@
   align-items: center;
   margin-bottom: 80px;
   gap: 60px;
+  opacity: 0;
 }
 
 .step-item:nth-child(even) {
@@ -41,6 +42,9 @@
 
 .step-content-wrapper {
   flex: 1;
+  transform: translateX(-50px);
+  opacity: 0;
+  transition: all 0.8s ease;
 }
 
 .step-header {
@@ -85,6 +89,11 @@
   flex: 1;
   position: relative;
   max-width: 400px;
+  display: flex;
+  justify-content: center;
+  transform: translateX(50px);
+  opacity: 0;
+  transition: all 0.8s ease;
 }
 
 .step-image-container {
@@ -106,6 +115,26 @@
   width: 90%;
   height: auto;
   object-fit: contain;
+}
+
+/* 짝수 번째 아이템은 반대 방향에서 등장 */
+.step-item:nth-child(even) .step-content-wrapper {
+  transform: translateX(50px);
+}
+
+.step-item:nth-child(even) .step-image-wrapper {
+  transform: translateX(-50px);
+}
+
+/* 화면에 보일 때 적용되는 클래스 */
+.step-item.visible {
+  opacity: 1;
+}
+
+.step-item.visible .step-content-wrapper,
+.step-item.visible .step-image-wrapper {
+  transform: translateX(0);
+  opacity: 1;
 }
 
 .action-container {

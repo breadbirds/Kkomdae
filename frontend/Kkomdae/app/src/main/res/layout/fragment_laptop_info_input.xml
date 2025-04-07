@@ -17,7 +17,7 @@
         android:id="@+id/scrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@id/btn_confirm"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/top_bar">
@@ -233,6 +233,7 @@
                 app:layout_constraintTop_toBottomOf="@id/cl_receive_date" />
 
             <LinearLayout
+                android:id="@+id/layout_components"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -599,22 +600,22 @@
 
             </LinearLayout>
 
+            <Button
+                android:id="@+id/btn_confirm"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="@color/blue200"
+                android:clickable="false"
+                style="@style/Title1"
+                android:text="완료"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/layout_components"
+                app:layout_constraintStart_toStartOf="@id/layout_components"
+                app:layout_constraintTop_toBottomOf="@id/layout_components"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-
-    <Button
-        android:id="@+id/btn_confirm"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:layout_margin="24dp"
-        android:backgroundTint="@color/blue200"
-        android:clickable="false"
-        style="@style/Title1"
-        android:text="완료"
-        android:elevation="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

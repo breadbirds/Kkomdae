@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { initScrollAnimations } from "../utils/animations";
 import "../styles/Features.css";
+import connection from "../assets/connection.svg";
+import calendar_reminder from "../assets/calendar_reminder.svg";
 
 const Features: React.FC = () => {
   useEffect(() => {
@@ -12,7 +14,7 @@ const Features: React.FC = () => {
       <div className="container">
         <div className="section-header-feature fade-in">
           <h2 className="section-title-feature">주요 기능</h2>
-          <p className="section-subtitle-feature">꼼대의 핵심 기능들을 통해 노트북 관리를 더 스마트하게</p>
+          <p className="section-subtitle-feature">꼼대의 핵심 기능으로 노트북의 대여부터 반납까지 모든 과정을 스마트하게 관리해보세요.</p>
         </div>
 
         <div className="features-grid">
@@ -25,7 +27,7 @@ const Features: React.FC = () => {
               </svg>
             </div>
             <h3 className="feature-title">AI 기반 노트북 상태 분석</h3>
-            <p className="feature-description">AI가 온전한 새 노트북의 상태와 비교하여 스크래치, 흠집, 파손이 있는 부분을 자동으로 찾아내고 리스트화합니다.</p>
+            <p className="feature-description">AI를 통해 대여받은 SSAFY 노트북의 스크래치, 흠집 등 노트북의 결함을 자동으로 찾아냅니다.</p>
           </div>
 
           <div className="feature-card fade-in">
@@ -39,21 +41,15 @@ const Features: React.FC = () => {
               </svg>
             </div>
             <h3 className="feature-title">자동화된 문서화 시스템</h3>
-            <p className="feature-description">분실 및 파손을 방지하기 위해 PDF 형태의 자동화된 문서화 시스템을 제공하여 기기 상태를 쉽게 기록하고 관리합니다.</p>
+            <p className="feature-description">PDF 형태의 자동화된 문서화 시스템을 제공하여 기기 상태를 쉽게 기록하고 관리합니다.</p>
           </div>
 
           <div className="feature-card fade-in">
             <div className="feature-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="4" y="4" width="16" height="16"></rect>
-                <rect x="7" y="7" width="4" height="4"></rect>
-                <rect x="13" y="7" width="4" height="4"></rect>
-                <rect x="7" y="13" width="4" height="4"></rect>
-                <rect x="14" y="14" width="3" height="3"></rect>
-              </svg>
+              <img src={connection} alt="노트북 연동 자가진단" />
             </div>
-            <h3 className="feature-title">QR 코드 연동 자가진단</h3>
-            <p className="feature-description">꼼대 자체의 자가진단 프로그램을 노트북에서 실행하고 QR 코드를 통해 결과를 모바일로 간편하게 전송합니다.</p>
+            <h3 className="feature-title">노트북 연동 자가진단</h3>
+            <p className="feature-description">자가진단 프로그램을 실행하고, 앱과 연동하여 모바일에서 결과를 확인할 수 있습니다.</p>
           </div>
 
           <div className="feature-card fade-in">
@@ -65,7 +61,7 @@ const Features: React.FC = () => {
               </svg>
             </div>
             <h3 className="feature-title">상세한 사진 촬영 가이드</h3>
-            <p className="feature-description">상판, 하판, 측면, 화면, 키보드 등 노트북의 모든 부분을 정확하게 촬영할 수 있도록 상세한 가이드를 제공합니다.</p>
+            <p className="feature-description">상판, 하판, 측면, 화면, 키보드 등 노트북 외관 촬영 시 필요한 상세 가이드를 제공합니다.</p>
           </div>
 
           <div className="feature-card fade-in">
@@ -78,17 +74,15 @@ const Features: React.FC = () => {
               </svg>
             </div>
             <h3 className="feature-title">관리자 웹 대시보드</h3>
-            <p className="feature-description">대여와 반납 시 생성된 노트북 기기 상태 문서를 관리자 웹에서 편리하게 확인하고 관리할 수 있습니다.</p>
+            <p className="feature-description">대여와 반납에 대한 기록들을 관리자 웹에서 편리하게 확인하고 관리할 수 있습니다.</p>
           </div>
 
           <div className="feature-card fade-in">
             <div className="feature-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              </svg>
+              <img src={calendar_reminder} alt="반납 일정 관리" />
             </div>
-            <h3 className="feature-title">보안 강화 시스템</h3>
-            <p className="feature-description">노트북 정보와 상태 기록에 대한 철저한 보안 관리로 데이터 유출 위험을 최소화하고 안전하게 보호합니다.</p>
+            <h3 className="feature-title">반납 일정 관리</h3>
+            <p className="feature-description">반납 기한이 가까워지면 알림을 제공하여 원활한 반납 절차를 도와줍니다.</p>
           </div>
         </div>
       </div>
