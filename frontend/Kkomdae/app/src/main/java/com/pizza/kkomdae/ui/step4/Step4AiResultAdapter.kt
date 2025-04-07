@@ -44,16 +44,16 @@ class Step4AiResultAdapter(
                 // 선택된 아이템은 결함 유무에 따라 다른 색상 적용하고, 배지는 숨김
                 binding.tvDamageBadge.visibility = View.GONE
 
-                if (damageCount > 0) {
+                if (list[position].damage > 0) {
                     // 선택됨 + 결함 있음 = 빨간색
-                    binding.root.strokeColor =
+                    binding.cardView.strokeColor =
                         ContextCompat.getColor(binding.root.context, R.color.error)
                     binding.tvPosition.setTextColor(
                         ContextCompat.getColor(binding.root.context, R.color.error)
                     )
                 } else {
                     // 선택됨 + 결함 없음 = 파란색
-                    binding.root.strokeColor =
+                    binding.cardView.strokeColor =
                         ContextCompat.getColor(binding.root.context, R.color.blue500)
                     binding.tvPosition.setTextColor(
                         ContextCompat.getColor(binding.root.context, R.color.blue500)
@@ -61,11 +61,12 @@ class Step4AiResultAdapter(
                 }
             } else {
                 // 선택되지 않은 아이템
-                if (damageCount > 0) {
+                if (list[position].damage > 0) {
                     // 선택 안됨 + 결함 있음 = 회색 + 배지 표시
                     binding.tvDamageBadge.visibility = View.VISIBLE
-                    binding.tvDamageBadge.text = damageCount.toString()
-                    binding.root.strokeColor =
+//                    binding.tvDamageBadge.text = list[position].damage.toString()
+                    binding.tvDamageBadge.text = ""
+                    binding.cardView.strokeColor =
                         ContextCompat.getColor(binding.root.context, R.color.gray200)
                     binding.tvPosition.setTextColor(
                         ContextCompat.getColor(binding.root.context, R.color.gray500)
@@ -73,7 +74,7 @@ class Step4AiResultAdapter(
                 } else {
                     // 선택 안됨 + 결함 없음 = 회색
                     binding.tvDamageBadge.visibility = View.GONE
-                    binding.root.strokeColor =
+                    binding.cardView.strokeColor =
                         ContextCompat.getColor(binding.root.context, R.color.gray200)
                     binding.tvPosition.setTextColor(
                         ContextCompat.getColor(binding.root.context, R.color.gray500)
