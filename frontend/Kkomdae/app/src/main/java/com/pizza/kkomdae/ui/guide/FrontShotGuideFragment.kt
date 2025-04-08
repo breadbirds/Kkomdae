@@ -72,6 +72,7 @@ private var cameraProvider: ProcessCameraProvider? = null
 private var camera: Camera? = null
 private var cameraExecutor: ExecutorService? = null
 private lateinit var cameraActivity: CameraActivity
+private var autoCamera = true
 
 /**
  * A simple [Fragment] subclass.
@@ -153,6 +154,8 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             binding.btnBack?.isVisible = true
             binding.btnShot?.isVisible = true
             binding?.btnGuide?.isVisible = true
+            binding.swAuto?.isVisible=true
+            binding.tvSwAuto?.isVisible=true
         }
 
         // 가이드 보기 버튼 눌렀을 떄
@@ -162,6 +165,8 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             binding.btnBack?.isVisible = false
             binding.btnShot?.isVisible = false
             binding?.btnGuide?.isVisible = false
+            binding.swAuto?.isVisible=false
+            binding.tvSwAuto?.isVisible=false
         }
 
         // X 버튼 눌렀을 때
@@ -177,6 +182,18 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             autoCaptureEnabled = false // ✅ 자동 촬영 중지
             isCapturing = true
             takePhoto()
+        }
+
+        // 자동촬영 on/off 스위치 버튼
+        binding.swAuto?.setOnCheckedChangeListener { _, isChecked ->
+            autoCamera = isChecked
+            if (!isChecked) {
+                // 상태 초기화
+                stableFrameCount = 0
+                lastBox = null
+                candidateBitmaps.forEach { it.recycle() }
+                candidateBitmaps.clear()
+            }
         }
     }
 
@@ -399,8 +416,8 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
                     Thread {
                         val highResBitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
 
-                        val analyzedWidth = 1024f
-                        val analyzedHeight = 768f
+                        val analyzedWidth = 1280f
+                        val analyzedHeight = 720f
 
                         val scaleX = highResBitmap.width / analyzedWidth
                         val scaleY = highResBitmap.height / analyzedHeight
@@ -449,15 +466,13 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
                         // ✅ 4️⃣ UI Thread 복귀
                         Handler(Looper.getMainLooper()).post {
                             Log.d("CameraFragment", "사진 저장됨: $savedUri")
-                            viewModel.setFront(savedUri)
-                            viewModel.setStep(1)
+                            viewModel.setScreen(savedUri)
+                            viewModel.setStep(5)
 
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE
 
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                cameraActivity.changeFragment(0)
-                            }, 100)
+                            cameraActivity.changeFragment(0)
                         }
 
                     }.start()
@@ -480,6 +495,10 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
     // 이미지를 분석하는 함수
     private fun analyzeImage(imageProxy: ImageProxy) {
 
+        if (!autoCamera) {
+            imageProxy.close()
+            return
+        }
         if (!autoCaptureEnabled) {
             imageProxy.close()
             return

@@ -66,6 +66,7 @@ private var cameraProvider: ProcessCameraProvider? = null
 private var camera: Camera? = null
 private var cameraExecutor: ExecutorService? = null
 private lateinit var cameraActivity: CameraActivity
+private var autoCamera = true
 /**
  * A simple [Fragment] subclass.
  * Use the [LeftGuideFragment.newInstance] factory method to
@@ -78,6 +79,7 @@ class LeftGuideFragment : BaseFragment<FragmentLeftGuideBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private var autoCaptureEnabled = true
     private val viewModel: CameraViewModel by activityViewModels()
 
     // AutoCapture 변수
@@ -140,6 +142,8 @@ class LeftGuideFragment : BaseFragment<FragmentLeftGuideBinding>(
             binding.btnBack?.isVisible = true
             binding.btnShot?.isVisible = true
             binding?.btnGuide?.isVisible = true
+            binding.swAuto?.isVisible=true
+            binding.tvSwAuto?.isVisible=true
         }
 
         // 가이드 보기 버튼 눌렀을 떄
@@ -149,6 +153,8 @@ class LeftGuideFragment : BaseFragment<FragmentLeftGuideBinding>(
             binding.btnBack?.isVisible = false
             binding.btnShot?.isVisible = false
             binding?.btnGuide?.isVisible = false
+            binding.swAuto?.isVisible=false
+            binding.tvSwAuto?.isVisible=false
         }
 
         // 뒤로 가기 버튼 눌렀을 때
@@ -158,6 +164,18 @@ class LeftGuideFragment : BaseFragment<FragmentLeftGuideBinding>(
 
         binding.btnShot.setOnClickListener {
             takePhoto()
+        }
+
+        // 자동촬영 on/off 스위치 버튼
+        binding.swAuto?.setOnCheckedChangeListener { _, isChecked ->
+            autoCamera = isChecked
+            if (!isChecked) {
+                // 상태 초기화
+                stableFrameCount = 0
+                lastBox = null
+                candidateBitmaps.forEach { it.recycle() }
+                candidateBitmaps.clear()
+            }
         }
     }
 
@@ -455,6 +473,11 @@ class LeftGuideFragment : BaseFragment<FragmentLeftGuideBinding>(
 
     // 이미지를 분석하는 함수
     private fun analyzeImage(imageProxy: ImageProxy) {
+
+        if (!autoCamera) {
+            imageProxy.close()
+            return
+        }
         // ImageProxy에서 가져온 카메라 프레임을 Bitmap으로 변환 (YOLO 입력용)
         val bitmap = imageProxyToBitmap(imageProxy)
         // YOLOv8 TFLite 모델에 넣기 위한 전처리 작업 (640x640 크기, float 정규화 등)

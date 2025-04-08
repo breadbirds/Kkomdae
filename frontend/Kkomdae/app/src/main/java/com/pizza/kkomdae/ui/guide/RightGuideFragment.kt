@@ -67,6 +67,7 @@ private var cameraProvider: ProcessCameraProvider? = null
 private var camera: Camera? = null
 private var cameraExecutor: ExecutorService? = null
 private lateinit var cameraActivity: CameraActivity
+private var autoCamera = true
 
 /**
  * A simple [Fragment] subclass.
@@ -81,6 +82,7 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private var autoCaptureEnabled = true
     private val viewModel: CameraViewModel by activityViewModels()
 
     // AutoCapture 변수
@@ -143,6 +145,8 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
             binding.btnBack?.isVisible = true
             binding.btnShot?.isVisible = true
             binding?.btnGuide?.isVisible = true
+            binding.swAuto?.isVisible=true
+            binding.tvSwAuto?.isVisible=true
         }
 
         // 가이드 보기 버튼 눌렀을 떄
@@ -152,6 +156,8 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
             binding.btnBack?.isVisible = false
             binding.btnShot?.isVisible = false
             binding?.btnGuide?.isVisible = false
+            binding.swAuto?.isVisible=false
+            binding.tvSwAuto?.isVisible=false
         }
 
         // 뒤로 가기 버튼 눌렀을 때
@@ -161,6 +167,17 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
 
         binding.btnShot.setOnClickListener {
             takePhoto()
+        }
+        // 자동촬영 on/off 스위치 버튼
+        binding.swAuto?.setOnCheckedChangeListener { _, isChecked ->
+            autoCamera = isChecked
+            if (!isChecked) {
+                // 상태 초기화
+                stableFrameCount = 0
+                lastBox = null
+                candidateBitmaps.forEach { it.recycle() }
+                candidateBitmaps.clear()
+            }
         }
     }
 
@@ -377,71 +394,67 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
 
                     // ✅ 3️⃣ Heavy 작업 백그라운드 처리
                     Thread {
-                        val savedUri = Uri.fromFile(photoFile)
-                        Log.d("CameraFragment", "사진 저장됨: $savedUri")
+                        val highResBitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
 
-                        val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+                        val analyzedWidth = 1280f
+                        val analyzedHeight = 720f
 
-                        // 📌 PreviewView의 실제 크기 (화면에 보이는 뷰 크기)
-                        val previewWidth = binding.previewView?.width ?:0
-                        val previewHeight = binding.previewView?.height ?:0
+                        val scaleX = highResBitmap.width / analyzedWidth
+                        val scaleY = highResBitmap.height / analyzedHeight
 
-                        // 📌 실제 캡처된 이미지 크기
-                        val imageWidth = bitmap.width
-                        val imageHeight = bitmap.height
-
-                        // PreviewView → 이미지 해상도 비율 (스케일 변환)
-                        val scaleX = imageWidth.toFloat() / previewWidth
-                        val scaleY = imageHeight.toFloat() / previewHeight
-
-                        // 중앙에서 4:3 비율 사각형 계산 (PreviewView 기준)
-                        val previewAspectRatio = 4f / 3f
-                        val cropPreviewRect: Rect = if (previewWidth.toFloat() / previewHeight > previewAspectRatio) {
-                            // 화면이 가로로 더 넓으면, 좌우 잘라냄
-                            val targetWidth = (previewHeight * previewAspectRatio).toInt()
-                            val left = (previewWidth - targetWidth) / 2
-                            Rect(left, 0, left + targetWidth, previewHeight)
-                        } else {
-                            // 화면이 세로로 더 크면, 위아래 잘라냄
-                            val targetHeight = (previewWidth / previewAspectRatio).toInt()
-                            val top = (previewHeight - targetHeight) / 2
-                            Rect(0, top, previewWidth, top + targetHeight)
-                        }
-
-                        // 위에서 계산한 rect를 이미지 크기 비율에 맞게 변환
-                        val cropImageRect = Rect(
-                            (cropPreviewRect.left * scaleX).toInt(),
-                            (cropPreviewRect.top * scaleY).toInt(),
-                            (cropPreviewRect.right * scaleX).toInt(),
-                            (cropPreviewRect.bottom * scaleY).toInt()
+                        val rectF = RectF(
+                            box.rect.left * scaleX,
+                            box.rect.top * scaleY,
+                            box.rect.right * scaleX,
+                            box.rect.bottom * scaleY
                         )
 
-                        // 크롭 실행
-                        val cropped = Bitmap.createBitmap(
-                            bitmap,
-                            cropImageRect.left,
-                            cropImageRect.top,
-                            cropImageRect.width(),
-                            cropImageRect.height()
+                        val paddingScale = 1.1f
+                        val centerX = rectF.centerX()
+                        val centerY = rectF.centerY()
+                        val halfWidth = rectF.width() / 2 * paddingScale
+                        val halfHeight = rectF.height() / 2 * paddingScale
+
+                        val expandedRect = RectF(
+                            centerX - halfWidth,
+                            centerY - halfHeight,
+                            centerX + halfWidth,
+                            centerY + halfHeight
                         )
 
-                        // 파일 덮어쓰기
+                        val cropRect = Rect(
+                            expandedRect.left.toInt().coerceAtLeast(0),
+                            expandedRect.top.toInt().coerceAtLeast(0),
+                            expandedRect.right.toInt().coerceAtMost(highResBitmap.width),
+                            expandedRect.bottom.toInt().coerceAtMost(highResBitmap.height)
+                        )
+
+                        val croppedBitmap = Bitmap.createBitmap(
+                            highResBitmap,
+                            cropRect.left,
+                            cropRect.top,
+                            cropRect.width(),
+                            cropRect.height()
+                        )
+
                         FileOutputStream(photoFile).use { out ->
-                            cropped.compress(Bitmap.CompressFormat.PNG, 100, out)
+                            croppedBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
                         }
 
+                        val savedUri = Uri.fromFile(photoFile)
+
+                        // ✅ 4️⃣ UI Thread 복귀
                         Handler(Looper.getMainLooper()).post {
-                            Log.d("CameraFragment", "크롭된 사진 저장됨: $savedUri")
-                            viewModel.setRight(savedUri)
-                            viewModel.setStep(4)
+                            Log.d("CameraFragment", "사진 저장됨: $savedUri")
+                            viewModel.setScreen(savedUri)
+                            viewModel.setStep(5)
 
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE
 
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                cameraActivity.changeFragment(0)
-                            }, 100)
+                            cameraActivity.changeFragment(0)
                         }
+
                     }.start()
                 }
 
@@ -461,6 +474,10 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
 
     // 이미지를 분석하는 함수
     private fun analyzeImage(imageProxy: ImageProxy) {
+        if (!autoCamera) {
+            imageProxy.close()
+            return
+        }
         // ImageProxy에서 가져온 카메라 프레임을 Bitmap으로 변환 (YOLO 입력용)
         val bitmap = imageProxyToBitmap(imageProxy)
         // YOLOv8 TFLite 모델에 넣기 위한 전처리 작업 (640x640 크기, float 정규화 등)

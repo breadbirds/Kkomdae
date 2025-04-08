@@ -53,8 +53,6 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
                 if(getItem(position).releasePdfName!=null){
                     binding.btReturnDownload.isVisible=true
                     binding.btReturn.isVisible=false
-                    binding.tvDate.isVisible=false
-                    binding.tvInputDate.isVisible=false
 
                 }else{
                     binding.btReturnDownload.isVisible=false
@@ -103,7 +101,7 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
             val withParentheses = match?.value
 
             binding.tvModelNumber.text= getItem(position).serialNum + withParentheses
-            binding.tvInputDate.text = getItem(position).dateTime
+            binding.tvInputDate.text = getItem(position).dateTime?.substring(2)?.replace("-", "/")
 
         }
     }

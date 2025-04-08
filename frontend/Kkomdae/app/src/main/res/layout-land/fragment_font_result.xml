@@ -40,6 +40,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop" />
+
+        <ImageView
+            android:id="@+id/iv_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@color/blue100" />
     </androidx.cardview.widget.CardView>
 
     <!-- 가이드라인: 화면을 좌우로 분할 -->
@@ -63,7 +70,7 @@
         app:layout_constraintBottom_toTopOf="@+id/iv_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_cancel"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <ImageView
@@ -79,11 +86,11 @@
 
     <TextView
         android:id="@+id/tv_text1"
-        style="@style/Body1"
+        style="@style/Body2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="24dp"
         android:gravity="center"
         android:lineSpacingMultiplier="1.1"
@@ -98,9 +105,10 @@
         android:id="@+id/button_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="25dp"
         android:gravity="center"
         android:orientation="horizontal"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/guideline"

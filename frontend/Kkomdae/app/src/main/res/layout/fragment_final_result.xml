@@ -6,12 +6,56 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.step3.FinalResultFragment">
 
-    <include
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/top_bar"
-        layout="@layout/layout_top_bar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="타이틀"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="20dp"
+            android:textColor="@color/gray800"
+            android:fontFamily="@font/pretendard_semi_bold"
+            android:lineSpacingMultiplier="1.4"/>
+
+        <FrameLayout
+            android:id="@+id/btn_cancel"
+            android:layout_width="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            android:layout_height="0dp"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="0dp">
+            <ImageButton
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_cancel"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:tint="@color/gray700" />
+
+        </FrameLayout>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ScrollView
         android:layout_width="0dp"
@@ -826,14 +870,13 @@
             app:layout_constraintTop_toBottomOf="@id/cl_step4"
             android:text="제출하기"
             style="@style/Title1"
-            android:layout_marginHorizontal="24dp"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp"/>
 
         <View
             android:id="@+id/bottom_spacer"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="30dp"
             app:layout_constraintTop_toBottomOf="@id/btn_submit"
             app:layout_constraintBottom_toBottomOf="parent"/>
 

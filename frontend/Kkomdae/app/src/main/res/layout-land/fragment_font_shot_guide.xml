@@ -29,6 +29,29 @@
         android:layout_height="match_parent"
         android:visibility="gone"/>
 
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/sw_auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:checked="true"
+        android:layout_marginStart="8dp"
+        app:layout_constraintTop_toBottomOf="@id/btn_back"
+        app:layout_constraintBottom_toTopOf="@id/btn_shot"
+        app:layout_constraintStart_toStartOf="@id/btn_shot"
+        app:layout_constraintEnd_toEndOf="@id/btn_shot"/>
+    <TextView
+        android:id="@+id/tv_sw_auto"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="자동촬영"
+        style="@style/Caption3"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="@id/sw_auto"
+        app:layout_constraintEnd_toEndOf="@id/sw_auto"
+        app:layout_constraintTop_toBottomOf="@id/sw_auto"/>
+
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/loadingLottie"
         android:layout_width="300dp"

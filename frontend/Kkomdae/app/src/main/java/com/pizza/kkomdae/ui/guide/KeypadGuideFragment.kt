@@ -66,6 +66,7 @@ private var imageCapture: ImageCapture? = null
 private var cameraProvider: ProcessCameraProvider? = null
 private var camera: Camera? = null
 private var cameraExecutor: ExecutorService? = null
+private var autoCamera = true
 
 private lateinit var cameraActivity: CameraActivity
 
@@ -81,6 +82,7 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private var autoCaptureEnabled = true
     private val viewModel: CameraViewModel by activityViewModels()
 
     // AutoCapture 변수
@@ -145,6 +147,8 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
             binding.btnBack?.isVisible = true
             binding.btnShot?.isVisible = true
             binding?.btnGuide?.isVisible = true
+            binding.swAuto?.isVisible=true
+            binding.tvSwAuto?.isVisible=true
         }
 
         // 가이드 보기 버튼 눌렀을 떄
@@ -154,6 +158,8 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
             binding.btnBack?.isVisible = false
             binding.btnShot?.isVisible = false
             binding?.btnGuide?.isVisible = false
+            binding.swAuto?.isVisible=false
+            binding.tvSwAuto?.isVisible=false
         }
         // 뒤로 가기 버튼 눌렀을 때
         binding.btnBack?.setOnClickListener {
@@ -162,6 +168,18 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
 
         binding.btnShot?.setOnClickListener {
             takePhoto()
+        }
+
+        // 자동촬영 on/off 스위치 버튼
+        binding.swAuto?.setOnCheckedChangeListener { _, isChecked ->
+            autoCamera = isChecked
+            if (!isChecked) {
+                // 상태 초기화
+                stableFrameCount = 0
+                lastBox = null
+                candidateBitmaps.forEach { it.recycle() }
+                candidateBitmaps.clear()
+            }
         }
 
     }
@@ -382,8 +400,8 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
                     Thread {
                         val highResBitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
 
-                        val analyzedWidth = 1024f
-                        val analyzedHeight = 768f
+                        val analyzedWidth = 1280f
+                        val analyzedHeight = 720f
 
                         val scaleX = highResBitmap.width / analyzedWidth
                         val scaleY = highResBitmap.height / analyzedHeight
@@ -432,8 +450,8 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
                         // ✅ 4️⃣ UI Thread 복귀
                         Handler(Looper.getMainLooper()).post {
                             Log.d("CameraFragment", "사진 저장됨: $savedUri")
-                            viewModel.setKeypad(savedUri)
-                            viewModel.setStep(6)
+                            viewModel.setScreen(savedUri)
+                            viewModel.setStep(5)
 
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE
@@ -460,6 +478,10 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
 
     // 이미지를 분석하는 함수
     private fun analyzeImage(imageProxy: ImageProxy) {
+        if (!autoCamera) {
+            imageProxy.close()
+            return
+        }
         // ImageProxy에서 가져온 카메라 프레임을 Bitmap으로 변환 (YOLO 입력용)
         val bitmap = imageProxyToBitmap(imageProxy)
         // YOLOv8 TFLite 모델에 넣기 위한 전처리 작업 (640x640 크기, float 정규화 등)

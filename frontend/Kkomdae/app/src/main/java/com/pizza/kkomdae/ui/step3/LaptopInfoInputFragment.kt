@@ -19,6 +19,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
@@ -258,7 +259,7 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         }
 
 
-        binding.btnOcrSerial.setOnClickListener {
+        binding.clBtnOcr.setOnClickListener {
             imageFile = File(requireContext().cacheDir, "ocr_image_${System.currentTimeMillis()}.jpg")
             imageUri = FileProvider.getUriForFile(
                 requireContext(),
@@ -563,26 +564,9 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
 
     // 날짜 설정
     private fun settingDate() {
-        binding.btnDate.setOnClickListener {
+        binding.clReceiveDate.setOnClickListener {
 
             showCustomCalendarDialog()
-//            val datePicker = MaterialDatePicker.Builder.datePicker()
-//                .setTitleText("날짜 선택")
-//                .setSelection(MaterialDatePicker.todayInUtcMilliseconds()) // 기본 선택 날짜 (오늘)
-//                .build()
-//
-//            // 날짜 선택 리스너
-//            datePicker.addOnPositiveButtonClickListener { selection ->
-//                val sdf = SimpleDateFormat("yyyy년 MM월 dd일", Locale.getDefault())
-//                val selectedDate = sdf.format(Date(selection))
-//                binding.tvDate.text = selectedDate
-//                date = dateFormat.format(Date(selection))
-//                checkNext()
-//
-//            }
-//
-//            // 다이얼로그 표시
-//            datePicker.show(requireActivity().supportFragmentManager, "DATE_PICKER")
         }
     }
 
@@ -591,9 +575,22 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         val calendarView = dialogView.findViewById<CalendarView>(R.id.calendarView)
         val btnSelectDate = dialogView.findViewById<Button>(R.id.btnSelectDate)
 
+
+
         val alertDialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .create()
+
+        val calendar = Calendar.getInstance()
+
+// 오늘 날짜의 끝으로 설정 (오늘 23:59:59)
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 59)
+        calendar.set(Calendar.MILLISECOND, 999)
+
+// 최대 선택 날짜는 오늘까지
+        calendarView.maxDate = calendar.timeInMillis
 
 
         var selectedDate: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
@@ -640,8 +637,20 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             " NT961XGL-COM(14세대)"
         )
         val adapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, items)
+            ArrayAdapter(requireContext(), R.layout.item_spinner_dropdown, items)
         binding.atvModelName.setAdapter(adapter)
+
+        binding.etSerial.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                binding.etBarcode.requestFocus() // 다음 EditText로 이동
+                true // 이벤트 소비 (키보드 기본 동작 막음)
+            } else {
+                false
+            }
+        }
+
+
+
 
         binding.atvModelName.setOnItemClickListener { _, _, _, _ ->
             checkNext()
