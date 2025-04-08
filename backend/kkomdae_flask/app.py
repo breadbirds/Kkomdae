@@ -194,7 +194,7 @@ def visualize_filtered(image_path, filtered_results):
         draw.text((x1, y1 - 10), f"damage {score:.2f}", fill=(255, 0, 0))
     return image
 
-def remove_overlapping_boxes(detections, iou_threshold=0.5):
+def remove_overlapping_boxes(detections, iou_threshold=0.3):
     if not detections:
         return []
 
