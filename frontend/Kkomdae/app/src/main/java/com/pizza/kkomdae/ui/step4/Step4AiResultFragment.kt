@@ -181,9 +181,12 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         viewModel.rePhoto1.observe(viewLifecycleOwner){
             it ?: return@observe
             adapter.hideTextAt(0)
+
+            data[0].damage=it.data.photo_ai_damage
             // 로딩 애니메이션 숨기기
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
+
 
 
             changeImage(adaterIndex)
@@ -199,6 +202,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
+            data[1].damage=it.data.photo_ai_damage
+
 
             changeImage(adaterIndex)
 
@@ -211,6 +216,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             // 로딩 애니메이션 숨기기
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
+
+            data[2].damage=it.data.photo_ai_damage
 
 
             changeImage(adaterIndex)
@@ -225,6 +232,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
+            data[3].damage=it.data.photo_ai_damage
+
 
             changeImage(adaterIndex)
 
@@ -237,6 +246,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             // 로딩 애니메이션 숨기기
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
+
+            data[4].damage=it.data.photo_ai_damage
 
 
             changeImage(adaterIndex)
@@ -251,6 +262,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             // 로딩 애니메이션 숨기기
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
+
+            data[5].damage=it.data.photo_ai_damage
 
 
             changeImage(adaterIndex)
@@ -360,17 +373,6 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             4-> viewModel.screenUri.value
             5 -> viewModel.keypadUri.value
             else -> ""
-        }
-
-        // 데미지 개수 가져오기
-        val damageCount = when(step) {
-            0 -> viewModel.frontDamage.value ?: 0
-            1 -> viewModel.backDamage.value ?: 0
-            2 -> viewModel.leftDamage.value ?: 0
-            3 -> viewModel.rightDamage.value ?: 0
-            4 -> viewModel.screenDamage.value ?: 0
-            5 -> viewModel.keyboardDamage.value ?: 0
-            else -> 0
         }
 
         // 결함 상태 텍스트
