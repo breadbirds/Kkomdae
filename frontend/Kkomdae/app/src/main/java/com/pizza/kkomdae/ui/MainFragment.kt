@@ -119,13 +119,25 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
         }
 
         // 서버에서 받아온 유저 정보
-        viewModel.userInfoResult.observe(viewLifecycleOwner){
-            Log.d("Post", "onViewCreated: ${it.userRentTestRes}")
-            step=it.stage
-            binding.tvWelcomeMessage.text="${it.name}님 안녕하세요!"
-            adapter.submitList(it.userRentTestRes.filter { item ->
+        viewModel.userInfoResult.observe(viewLifecycleOwner) { userInfo ->
+            Log.d("Post", "onViewCreated: ${userInfo.userRentTestRes}")
+            step = userInfo.stage
+            binding.tvWelcomeMessage.text = "${userInfo.name}님 안녕하세요!"
+
+            // 필터링된 제출 파일 목록
+            val filteredList = userInfo.userRentTestRes.filter { item ->
                 item.rentPdfName != null
-            }.reversed())
+            }.reversed()
+
+            // 목록이 비어있으면 "파일 없음" 메시지와 이미지 표시
+            if (filteredList.isEmpty()) {
+                binding.layoutNoFile.visibility = View.VISIBLE
+                binding.rvSubmission.visibility = View.GONE
+            } else {
+                binding.layoutNoFile.visibility = View.GONE
+                binding.rvSubmission.visibility = View.VISIBLE
+                adapter.submitList(filteredList)
+            }
 
             // 진행중인 과정이 있는지 확인하고 표시
             updateInProgressIndicator()
