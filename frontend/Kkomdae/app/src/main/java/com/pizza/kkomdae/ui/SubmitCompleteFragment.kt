@@ -119,12 +119,7 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
             }
         }
 
-
-
-
-        finalViewModel.pdfUrl.observe(viewLifecycleOwner){
-            viewModel.downloadPdf(it)
-        }
+        
     }
 
     suspend fun downloadPdf(context: Context, url: String): File = withContext(Dispatchers.IO) {

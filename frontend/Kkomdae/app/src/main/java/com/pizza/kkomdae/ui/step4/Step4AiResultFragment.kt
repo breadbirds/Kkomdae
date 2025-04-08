@@ -28,6 +28,7 @@ import com.bumptech.glide.request.transition.Transition
 import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.ui.NoteFragment
 import kotlinx.coroutines.launch
+import okhttp3.internal.notify
 
 /**
  * A simple [Fragment] subclass.
@@ -138,12 +139,15 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
                             data[4].damage= photo5_ai_damage?:0
                             data[5].damage= photo6_ai_damage?:0
                             adapter.notifyDataSetChanged()
+                            changeImage(0)
 
                         }
 
 
 
                         viewModel.setAllPhoto(it.data)
+
+
                     }else{
                         // todo 에러 뜰때 추가
                     }

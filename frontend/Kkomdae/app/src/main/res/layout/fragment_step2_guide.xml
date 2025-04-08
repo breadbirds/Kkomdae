@@ -285,6 +285,7 @@
 
     <Button
         android:id="@+id/btn_pass"
+        android:visibility="gone"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:backgroundTint="@color/gray500"
