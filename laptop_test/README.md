@@ -84,7 +84,7 @@ python -m PyInstaller --onefile --windowed \
 --add-data "./resource/font/SamsungOne-400.ttf;resource/font" \
 --add-data "./resource/font/SamsungOne-700.ttf;resource/font" \
 --add-data "./resource/font/NotoSansKR-VariableFont_wght.ttf;resource/font" \
-kkomdae_port3.py
+kkomdae_random_port3.py
 ```
 ---
 ### port 1개
@@ -101,7 +101,7 @@ python -m PyInstaller --onefile --windowed \
 --add-data "./resource/font/SamsungOne-400.ttf;resource/font" \
 --add-data "./resource/font/SamsungOne-700.ttf;resource/font" \
 --add-data "./resource/font/NotoSansKR-VariableFont_wght.ttf;resource/font" \
-kkomdae_port1.py
+kkomdae_random_port1.py
 ```
 
 > **참고:** 빌드 시 `resource_path()` 함수를 통해 리소스 파일의 경로를 동적으로 설정하므로, 리소스 파일들이 올바른 위치에 있어야 합니다.
