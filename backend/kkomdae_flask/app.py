@@ -197,7 +197,7 @@ def remove_overlapping_boxes(detections, iou_threshold=0.5):
         return []
 
     # bbox를 Tensor로 변환
-    boxes = torch.tensor([[int(v) for v in det['bbox']] for det in detections])
+    boxes = torch.tensor([det['bbox'] for det in detections])
     scores = torch.tensor([det['score'] for det in detections])
 
     # NMS로 겹치는 bbox 중에서 점수 높은 것만 남김
