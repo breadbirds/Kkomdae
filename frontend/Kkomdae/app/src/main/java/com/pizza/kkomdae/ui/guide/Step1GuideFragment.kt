@@ -7,12 +7,20 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
+import android.Manifest
+import android.app.AlertDialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.SyncStateContract
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
 import androidx.activity.OnBackPressedCallback
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -24,6 +32,7 @@ import com.pizza.kkomdae.databinding.FragmentLaptopInfoInputBinding
 import com.pizza.kkomdae.databinding.FragmentMainBinding
 import com.pizza.kkomdae.databinding.FragmentStep1GuideBinding
 import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
+
 import kotlin.math.log
 
 private lateinit var mainActivity: MainActivity
@@ -32,6 +41,10 @@ private lateinit var mainActivity: MainActivity
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
+private val cameraPermissionType = "카메라"
+
+private val cameraFunction = "사진 찍기"
+private var cameraPermissionGranted = false
 private var step =0
 
 /**
@@ -164,21 +177,52 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
 
         // 촬영하기 버튼
         binding.btnNext.setOnClickListener {
-            if (step == 6) {
-                // 완료 버튼 클릭 시 Step2GuideFragment로 이동
-                val transaction = mainActivity.supportFragmentManager.beginTransaction()
-                mainActivity.supportFragmentManager.popBackStack()
-                transaction.replace(R.id.fl_main, Step2GuideFragment())
-                    .addToBackStack("")
-                transaction.commit()
-            } else {
-                // 촬영 단계가 완료되지 않았으면 촬영 계속
-                mainActivity.next()
+            when {
+                // 권한이 있는지 확인
+
+                // 권한이 있을 때
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    // 권한이 있으므로 액션 실행
+                    clickNext()
+                }
+
+                // 왜 필요한지 한번도 설명
+                ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
+                    Manifest.permission.CAMERA) -> {
+                    showPermissionRationalDialog(cameraPermissionType, cameraFunction)
+                }
+                else -> {
+                    ActivityCompat.requestPermissions(requireActivity(),
+                        arrayOf(Manifest.permission.CAMERA),
+                        204)
+                }
+
             }
+
+
+
+
         }
 
         if (step == 0) {
             showIntroDialog()
+        }
+    }
+
+    private fun clickNext() {
+        if (step == 6) {
+            // 완료 버튼 클릭 시 Step2GuideFragment로 이동
+            val transaction = mainActivity.supportFragmentManager.beginTransaction()
+            mainActivity.supportFragmentManager.popBackStack()
+            transaction.replace(R.id.fl_main, Step2GuideFragment())
+                .addToBackStack("")
+            transaction.commit()
+        } else {
+            // 촬영 단계가 완료되지 않았으면 촬영 계속
+            mainActivity.next()
         }
     }
 
@@ -201,11 +245,67 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
         // 확인 버튼
         val confirmButton = introDialog?.findViewById<Button>(R.id.btn_confirm)
         confirmButton?.setOnClickListener {
+
             introDialog?.dismiss()
             introDialog = null
         }
 
         introDialog?.show()
+    }
+
+    // 권한이 필요한지 알려주고 권한 설정으로 이동 여부 다이얼로그 함수
+    private fun showPermissionRationalDialog(permission: String, function: String) {
+        AlertDialog.Builder(requireContext())
+            .setMessage("$permission 권한을 켜주셔야지 ${function}가 가능합니다. 앱 설정 화면으로 진입하셔 권한을 켜주세요")
+            .setPositiveButton("권한 변경하러 가기") { _, _ ->
+                // 권한 설정 화면으로 이동하는 함수 호출
+                navigateToAppSetting()
+            }.setNegativeButton("취소") { dialogInterface, _ -> dialogInterface.cancel() }
+            .show()
+    }
+
+    // 권한 설정 화면으로 이동하는 함수
+    private fun navigateToAppSetting() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", requireContext().packageName, null)
+        }
+        startActivity(intent)
+    }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        // 권한이 있는지 확인
+        cameraPermissionGranted = requestCode ==204 &&
+                grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
+
+        // 카메라 권한 있을 시
+        if (cameraPermissionGranted) {
+            clickNext()
+        } else{
+            if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
+                    Manifest.permission.CAMERA)
+            ) {
+                showPermissionRationalDialog(cameraPermissionType, cameraFunction)
+            } else {
+                showPermissionSettingDialog(cameraPermissionType, cameraFunction)
+            }
+        }
+    }
+
+    // 권한이 필요한지 알려주는 다이얼로그 함수
+    private fun showPermissionSettingDialog(permission: String, function: String) {
+        AlertDialog.Builder(requireContext())
+            .setMessage("$permission 권한을 켜주셔야지 ${function}가 가능합니다.")
+            .setPositiveButton("권한 허용하기") { _, _ ->
+                ActivityCompat.requestPermissions(requireActivity(),
+                    arrayOf(Manifest.permission.CAMERA),
+                    204)
+            }.setNegativeButton("취소") { dialogInterface, _ -> dialogInterface.cancel() }
+            .show()
     }
 
     override fun onDestroyView() {
