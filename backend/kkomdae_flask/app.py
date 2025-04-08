@@ -97,7 +97,7 @@ async def analyze(data: AnalyzeRequest):
     yolo_results = detect_laptop_yolo(yolo_model_cached, original_image)
     filtered_results = filter_faster_by_yolo(faster_results, yolo_results)
     print(f"🧹 YOLO 필터링 후 damage 개수: {len(filtered_results)}")
-    filtered_results = remove_overlapping_boxes(filtered_results, iou_threshold=0.5)
+    filtered_results = remove_overlapping_boxes(filtered_results, iou_threshold=0.3)
     print(f"✅ 중복 박스 제거 후 damage 개수: {len(filtered_results)}")
     new_image = visualize_filtered(local_download_path, filtered_results)
     # ---------------------------------------------------------------------------
@@ -199,13 +199,40 @@ def remove_overlapping_boxes(detections, iou_threshold=0.3):
         return []
 
     # bbox를 Tensor로 변환
-    boxes = torch.tensor([det['bbox'] for det in detections])
-    scores = torch.tensor([det['score'] for det in detections])
+    boxes = torch.tensor([det['bbox'] for det in detections], dtype=torch.float32)
+    scores = torch.tensor([det['score'] for det in detections], dtype=torch.float32)
+
+    for i in range(len(boxes)):
+        for j in range(i+1, len(boxes)):
+            iou = compute_iou(boxes[i], boxes[j])
+            if iou > 0.3:
+                print(f"Box {i} and {j} overlap: IoU={iou:.2f}")
 
     # NMS로 겹치는 bbox 중에서 점수 높은 것만 남김
     keep_indices = ops.nms(boxes, scores, iou_threshold)
+    print("🔍 NMS kept indices:", keep_indices.tolist())
 
     # 반환: 남은 인덱스만 필터링
     filtered = [detections[i] for i in keep_indices]
 
     return filtered
+
+def compute_iou(box1, box2):
+    # box1, box2: [x1, y1, x2, y2]
+    x1 = max(box1[0], box2[0])
+    y1 = max(box1[1], box2[1])
+    x2 = min(box1[2], box2[2])
+    y2 = min(box1[3], box2[3])
+
+    # 교집합 넓이
+    inter_area = max(0, x2 - x1) * max(0, y2 - y1)
+
+    # 각 박스 넓이
+    box1_area = (box1[2] - box1[0]) * (box1[3] - box1[1])
+    box2_area = (box2[2] - box2[0]) * (box2[3] - box2[1])
+
+    # 합집합 넓이
+    union_area = box1_area + box2_area - inter_area
+
+    # IoU 계산
+    return inter_area / union_area if union_area > 0 else 0.0
