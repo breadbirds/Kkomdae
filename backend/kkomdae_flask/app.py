@@ -165,8 +165,10 @@ def detect_laptop_yolo(model, pil_image):
         label = model.names[cls_id]
         conf = float(box.conf)
         xyxy = box.xyxy.cpu().tolist()[0]
-        if label == "ssafy_laptop":
+        if label in ["ssafy_laptop", "laptop"]:
             result.append({"bbox": xyxy, "label": label, "score": conf})
+        # if label == "ssafy_laptop":
+        #     result.append({"bbox": xyxy, "label": label, "score": conf})
     return result
 
 def is_inside(inner_box, outer_box):
