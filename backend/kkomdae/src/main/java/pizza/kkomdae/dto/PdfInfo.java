@@ -46,8 +46,10 @@ public class PdfInfo {
         this.photos = result.getPhotos();
         if (result.getRelease()) {
             this.returnDate = result.getDate();
+            log.info("returnDate : {}",this.rentDate);
         }else{
             this.rentDate = result.getDate();
+            log.info("rentDate : {}",this.rentDate);
         }
         this.description = result.getDescription();
     }

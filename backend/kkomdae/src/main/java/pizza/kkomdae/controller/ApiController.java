@@ -17,10 +17,8 @@ import pizza.kkomdae.entity.Photo;
 import pizza.kkomdae.s3.S3Service;
 import pizza.kkomdae.security.dto.CustomUserDetails;
 import pizza.kkomdae.service.*;
-import javax.crypto.MacSpi;
 import pizza.kkomdae.ssafyapi.MattermostNotificationService;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
