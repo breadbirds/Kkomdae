@@ -64,8 +64,8 @@ class Step3ViewModel@Inject constructor(
     val mousePad: LiveData<Int>
         get() = _mousePad
 
-    private var _postResponse = MutableLiveData<PostResponse>()
-    val postResponse: LiveData<PostResponse>
+    private var _postResponse = MutableLiveData<PostResponse?>()
+    val postResponse: LiveData<PostResponse?>
         get() = _postResponse
 
 

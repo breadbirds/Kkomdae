@@ -92,8 +92,8 @@ class CameraViewModel @Inject constructor(
         get() = _postResult
 
 
-    private val _reCameraUri = MutableLiveData<Uri>()
-    val reCameraUri: LiveData<Uri>
+    private val _reCameraUri = MutableLiveData<Uri?>()
+    val reCameraUri: LiveData<Uri?>
         get() = _reCameraUri
 
 

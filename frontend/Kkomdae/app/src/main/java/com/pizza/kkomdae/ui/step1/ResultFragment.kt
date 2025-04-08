@@ -149,6 +149,7 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
 
         // 재촬영 url
         viewModel.reCameraUri.observe(viewLifecycleOwner){
+            it?: return@observe
             cameraActivity.moveToBackReCamera(it)
         }
     }
