@@ -1,5 +1,3 @@
-# 수정된 FastAPI 코드 - 모델 캐싱 적용
-
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +8,7 @@ from PIL import Image, ImageDraw
 import os
 import boto3
 import tempfile
+import torchvision.ops as ops
 import torch
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
@@ -91,11 +90,17 @@ async def analyze(data: AnalyzeRequest):
         logger.error(f"Failed to open image: {e}")
         raise HTTPException(status_code=400, detail="이미지를 열 수 없습니다.")
 
+    # ---------------------------------------------------------------------------
     image_tensor = load_image(original_image)
     faster_results = predict_and_get_result(faster_model_cached, image_tensor)
+    print(f"📦 Faster R-CNN 탐지된 damage 개수: {len(faster_results)}")
     yolo_results = detect_laptop_yolo(yolo_model_cached, original_image)
     filtered_results = filter_faster_by_yolo(faster_results, yolo_results)
+    print(f"🧹 YOLO 필터링 후 damage 개수: {len(filtered_results)}")
+    filtered_results = remove_overlapping_boxes(filtered_results, iou_threshold=0.5)
+    print(f"✅ 중복 박스 제거 후 damage 개수: {len(filtered_results)}")
     new_image = visualize_filtered(local_download_path, filtered_results)
+    # ---------------------------------------------------------------------------
 
     new_key = f"{folder}analyzed_{s3_key}"
     new_image_bytes = BytesIO()
@@ -186,3 +191,19 @@ def visualize_filtered(image_path, filtered_results):
         draw.rectangle([(x1, y1), (x2, y2)], outline=(255, 0, 0), width=2)
         draw.text((x1, y1 - 10), f"damage {score:.2f}", fill=(255, 0, 0))
     return image
+
+def remove_overlapping_boxes(detections, iou_threshold=0.5):
+    if not detections:
+        return []
+
+    # bbox를 Tensor로 변환
+    boxes = torch.tensor([[int(v) for v in det['bbox']] for det in detections])
+    scores = torch.tensor([det['score'] for det in detections])
+
+    # NMS로 겹치는 bbox 중에서 점수 높은 것만 남김
+    keep_indices = ops.nms(boxes, scores, iou_threshold)
+
+    # 반환: 남은 인덱스만 필터링
+    filtered = [detections[i] for i in keep_indices]
+
+    return filtered
