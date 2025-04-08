@@ -400,8 +400,8 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
                     Thread {
                         val highResBitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
 
-                        val analyzedWidth = 1024f
-                        val analyzedHeight = 768f
+                        val analyzedWidth = 1280f
+                        val analyzedHeight = 720f
 
                         val scaleX = highResBitmap.width / analyzedWidth
                         val scaleY = highResBitmap.height / analyzedHeight
@@ -450,8 +450,8 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
                         // ✅ 4️⃣ UI Thread 복귀
                         Handler(Looper.getMainLooper()).post {
                             Log.d("CameraFragment", "사진 저장됨: $savedUri")
-                            viewModel.setKeypad(savedUri)
-                            viewModel.setStep(6)
+                            viewModel.setScreen(savedUri)
+                            viewModel.setStep(5)
 
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE
