@@ -8,7 +8,7 @@
         android:id="@+id/cardView"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_margin="10dp"
         android:backgroundTint="@color/white"
         app:cardCornerRadius="15dp"
         app:strokeColor="@color/gray200"
@@ -79,8 +79,8 @@
 
     <TextView
         android:id="@+id/tv_damage_badge"
-        android:layout_width="12dp"
-        android:layout_height="12dp"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
         android:background="@drawable/bg_damage_badge"
         android:text=""
         android:gravity="center"

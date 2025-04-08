@@ -2,6 +2,7 @@ package com.pizza.kkomdae.ui
 
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
@@ -37,15 +38,16 @@ class SubmissionAdapter(val clickRelease:(UserRentTestResponse)->Unit, val click
                 binding.tvStateRant.isVisible=false
                 binding.btReturnDownload.isVisible=true
                 binding.btReturn.isVisible=false
+                binding.tvDate.text="반납일자"
             }else{
-                binding.tvStateRelease.isVisible=false
+                binding.tvStateRelease.visibility= View.INVISIBLE
                 binding.tvStateRant.isVisible=true
                 binding.btReturnDownload.isVisible=false
                 binding.btReturn.isVisible=true
             }
             binding.btnDown.setOnClickListener {
                 binding.tvStateRant.isVisible = false
-                binding.tvStateRelease.isVisible=false
+                binding.tvStateRelease.visibility= View.INVISIBLE
                 binding.clMenu.isVisible=true
                 binding.btnUp.isVisible=true
                 binding.btnDown.isVisible=false

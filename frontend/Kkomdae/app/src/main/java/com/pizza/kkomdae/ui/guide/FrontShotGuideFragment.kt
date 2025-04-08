@@ -433,7 +433,7 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
                         val centerX = rectF.centerX()
                         val centerY = rectF.centerY()
                         val halfWidth = rectF.width() / 2 * paddingScale
-                        val halfHeight = rectF.height() / 2 * paddingScale
+                        val halfHeight = halfWidth * 4f / 3f
 
                         val expandedRect = RectF(
                             centerX - halfWidth,
