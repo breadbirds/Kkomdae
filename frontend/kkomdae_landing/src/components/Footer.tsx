@@ -2,9 +2,11 @@ import "../styles/Footer.css";
 import axios from "axios";
 import { useState } from "react";
 import qrCodeImage from "../assets/qr-code.png";
+import Modal from "./Modal";
 
 const Footer: React.FC = () => {
   const [showQRModal, setShowQRModal] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   const handleAppDownload = () => {
     setShowQRModal(true);
@@ -16,17 +18,7 @@ const Footer: React.FC = () => {
 
   const handleDownload = async () => {
     try {
-      // 배포
-      const response = await axios.get(`https://j12d101.p.ssafy.io/django/s3app/presigned-url/?file=kkomdae_diagnostics.exe`);
-
-      // 개발
-      // const response = await axios.get(`http://127.0.0.1:8000/s3app/presigned-url/?file=kkomdae_diagnostics.exe`);
-
-      const presignedUrl = response.data.url;
-      console.log(response);
-
-      // presigned URL로 브라우저를 이동하면 S3에서 직접 다운로드 시작
-      window.location.href = presignedUrl;
+      setShowDownloadModal(true);
     } catch (error) {
       console.error(error);
       alert("파일 다운로드 중 오류가 발생했습니다.");
@@ -69,7 +61,7 @@ const Footer: React.FC = () => {
                 </li>
                 <li>
                   <button onClick={handleDownload} className="footer-modal-link">
-                    자가진단 프로그램
+                    자가진단 프로그램 다운로드
                   </button>
                 </li>
               </ul>
@@ -100,6 +92,13 @@ const Footer: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Download Modal */}
+      <Modal 
+        isOpen={showDownloadModal} 
+        onClose={() => setShowDownloadModal(false)}
+        overlayClose={true}
+      />
     </footer>
   );
 };

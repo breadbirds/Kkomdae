@@ -87,10 +87,13 @@ async def analyze(data: AnalyzeRequest):
     try:
         original_image = Image.open(local_download_path)
     except Exception as e:
+
+        
         logger.error(f"Failed to open image: {e}")
         raise HTTPException(status_code=400, detail="이미지를 열 수 없습니다.")
 
     # ---------------------------------------------------------------------------
+    # AI 로직
     image_tensor = load_image(original_image)
     faster_results = predict_and_get_result(faster_model_cached, image_tensor)
     print(f"📦 Faster R-CNN 탐지된 damage 개수: {len(faster_results)}")
