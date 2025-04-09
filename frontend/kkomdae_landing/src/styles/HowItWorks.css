@@ -38,6 +38,8 @@
   margin-bottom: 80px;
   gap: 60px;
   opacity: 0;
+  max-width: 1600px;
+  min-width: 900px;
 }
 
 .step-item:nth-child(even) {
