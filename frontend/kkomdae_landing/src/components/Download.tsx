@@ -2,7 +2,6 @@ import kkomdae_logo from "../assets/kkomdae_logo.svg";
 import { useEffect, useState } from "react";
 import { initScrollAnimations } from "../utils/animations";
 import "../styles/Download.css";
-import axios from "axios";
 import qrCodeImage from "../assets/qr-code.png";
 import Modal from "./Modal";
 
