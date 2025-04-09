@@ -1,0 +1,31 @@
+# python:3.11-slim 기반 이미지를 사용
+FROM python:3.11-slim
+
+# 1) libGL.so.1 을 제공하는 mesa, 그리고 OpenCV가 필요로 할 수 있는 기타 시스템 라이브러리 설치
+RUN apt-get update && \
+    apt-get install -y libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 && \
+    rm -rf /var/lib/apt/lists/*
+
+# 작업 경로 설정
+WORKDIR /app
+
+# requirements 파일 복사
+COPY requirements.txt /app/requirements.txt
+
+# 최신 pip으로 업그레이드 후, requirements 설치
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 실제 코드 복사
+COPY . /app
+
+# Flask 혹은 gunicorn이 사용하는 포트
+EXPOSE 5000
+
+# 환경 변수 설정 (예: Flask)
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=production
+
+# gunicorn으로 Flask 앱 실행
+# CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "app:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:5000"]

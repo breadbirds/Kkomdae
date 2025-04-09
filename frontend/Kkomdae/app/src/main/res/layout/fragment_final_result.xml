@@ -1,0 +1,889 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.step3.FinalResultFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/top_bar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="타이틀"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="20dp"
+            android:textColor="@color/gray800"
+            android:fontFamily="@font/pretendard_semi_bold"
+            android:lineSpacingMultiplier="1.4"/>
+
+        <FrameLayout
+            android:id="@+id/btn_cancel"
+            android:layout_width="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            android:layout_height="0dp"
+            android:layout_margin="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="0dp">
+            <ImageButton
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_cancel"
+                android:layout_gravity="center"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:tint="@color/gray700" />
+
+        </FrameLayout>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_step"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="24dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_step1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <FrameLayout
+                android:id="@+id/fl_step1"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="@drawable/step_circle_background"
+                android:backgroundTint="@color/blue100"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <TextView
+                    style="@style/Title1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="1"
+                    android:textColor="@color/blue500"
+                    android:textSize="15sp"/>
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tv_step1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="노트북 외관 촬영"
+                style="@style/Title1"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toEndOf="@id/fl_step1"
+                app:layout_constraintTop_toTopOf="@id/fl_step1"
+                app:layout_constraintBottom_toBottomOf="@id/fl_step1" />
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/view_pager"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/fl_step1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:id="@+id/indicator_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/view_pager"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="8dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_step2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            app:layout_constraintTop_toBottomOf="@id/cl_step1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <FrameLayout
+                android:id="@+id/fl_step2"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="@drawable/step_circle_background"
+                android:backgroundTint="@color/blue100"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <TextView
+                    style="@style/Title1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="2"
+                    android:textColor="@color/blue500"
+                    android:textSize="15sp"/>
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tv_step2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="노트북 자가진단"
+                style="@style/Title1"
+                android:layout_marginStart="16dp"
+                app:layout_constraintStart_toEndOf="@id/fl_step2"
+                app:layout_constraintTop_toTopOf="@id/fl_step2"
+                app:layout_constraintBottom_toBottomOf="@id/fl_step2" />
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_step2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="12dp"
+            app:layout_constraintTop_toBottomOf="@id/tv_step2"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_keyboard"
+                    style="@style/Label1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="16dp"
+                    android:text="키보드"
+                    app:layout_constraintEnd_toStartOf="@+id/iv_keyboard"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/iv_keyboard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_success"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_keyboard"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_usb"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/tv_keyboard"
+                    app:layout_constraintTop_toTopOf="@id/tv_keyboard" />
+
+                <TextView
+                    android:id="@+id/tv_usb"
+                    style="@style/Label1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="USB 연결 상태"
+                    app:layout_constraintEnd_toStartOf="@+id/iv_usb"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/iv_keyboard"
+                    app:layout_constraintTop_toTopOf="@id/tv_keyboard" />
+
+                <ImageView
+                    android:id="@+id/iv_usb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:src="@drawable/ic_success"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_usb"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/tv_usb"
+                    app:layout_constraintTop_toTopOf="@id/tv_usb" />
+
+
+                <TextView
+                    android:id="@+id/tv_camera"
+                    style="@style/Label1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="카메라"
+                    app:layout_constraintTop_toBottomOf="@id/tv_keyboard"
+                    app:layout_constraintStart_toStartOf="@id/tv_keyboard"/>
+
+                <ImageView
+                    android:id="@+id/iv_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_success"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_camera"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@id/iv_keyboard"
+                    app:layout_constraintEnd_toEndOf="@id/iv_keyboard"
+                    app:layout_constraintTop_toTopOf="@id/tv_camera" />
+
+                <TextView
+                    android:id="@+id/tv_battery"
+                    style="@style/Label1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="배터리 성능"
+                    app:layout_constraintStart_toStartOf="@id/tv_usb"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintTop_toTopOf="@id/tv_camera" />
+
+                <ImageView
+                    android:id="@+id/iv_battery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_success"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_battery"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@id/iv_usb"
+                    app:layout_constraintEnd_toEndOf="@id/iv_usb"
+                    app:layout_constraintTop_toTopOf="@id/tv_battery" />
+
+
+                <TextView
+                    android:id="@+id/tv_charger"
+                    style="@style/Label1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="충전기"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_marginBottom="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/tv_camera"
+                    app:layout_constraintStart_toStartOf="@id/tv_keyboard"/>
+
+                <ImageView
+                    android:id="@+id/iv_charger"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_success"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_charger"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="@id/iv_keyboard"
+                    app:layout_constraintEnd_toEndOf="@id/iv_keyboard"
+                    app:layout_constraintTop_toTopOf="@id/tv_charger" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_step3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            app:layout_constraintTop_toBottomOf="@id/cl_step2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <FrameLayout
+                android:id="@+id/fl_step3"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="@drawable/step_circle_background"
+                android:backgroundTint="@color/blue100"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+            <!-- 텍스트 중앙 배치 -->
+            <TextView
+                style="@style/Title1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="3"
+                android:textColor="@color/blue500"
+                android:textSize="15sp"/>
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="정보 입력"
+            style="@style/Title1"
+            app:layout_constraintStart_toEndOf="@id/fl_step3"
+            app:layout_constraintTop_toTopOf="@id/fl_step3"
+            app:layout_constraintBottom_toBottomOf="@id/fl_step3"
+            android:layout_marginStart="16dp"/>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="12dp"
+            app:layout_constraintTop_toBottomOf="@id/fl_step3"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/tv_info"
+                    style="@style/Title4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="노트북 정보"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                    android:id="@+id/line1"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@color/gray200"
+                    app:layout_constraintTop_toBottomOf="@id/tv_info" />
+
+                <TextView
+                    android:id="@+id/tv_model_name"
+                    style="@style/Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="모델 정보 : "
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/line1" />
+
+                <TextView
+                    android:id="@+id/tv_input_model_name"
+                    style="@style/Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NT961XFH-X01/C(13세대)"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_model_name"
+                    app:layout_constraintStart_toEndOf="@id/tv_model_name"
+                    app:layout_constraintTop_toTopOf="@id/tv_model_name" />
+
+                <TextView
+                    android:id="@+id/tv_serial"
+                    style="@style/Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="시리얼 번호 : "
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_input_model_name" />
+
+                <TextView
+                    android:id="@+id/tv_input_serial"
+                    style="@style/Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="69P59FFWC00258"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_serial"
+                    app:layout_constraintStart_toEndOf="@id/tv_serial"
+                    app:layout_constraintTop_toTopOf="@id/tv_serial" />
+
+                <TextView
+                    android:id="@+id/tv_barcode"
+                    style="@style/Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="바코드 번호 : "
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_input_serial" />
+
+                <TextView
+                    android:id="@+id/tv_input_barcode"
+                    style="@style/Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="A10301373A"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_barcode"
+                    app:layout_constraintStart_toEndOf="@id/tv_barcode"
+                    app:layout_constraintTop_toTopOf="@id/tv_barcode" />
+
+                <TextView
+                    android:id="@+id/tv_date"
+                    style="@style/Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="수령일자 : "
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_input_barcode" />
+
+                <TextView
+                    android:id="@+id/tv_input_date"
+                    style="@style/Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2015.01.03"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_date"
+                    app:layout_constraintStart_toEndOf="@id/tv_date"
+                    app:layout_constraintTop_toTopOf="@id/tv_date" />
+
+                <TextView
+                    android:id="@+id/tv_count"
+                    style="@style/Title4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:text="구성품 수량"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_input_date" />
+
+                <View
+                    android:id="@+id/line2"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@color/gray200"
+                    app:layout_constraintTop_toBottomOf="@id/tv_count" />
+
+                <TextView
+                    android:id="@+id/tv_laptop_count"
+                    style="@style/Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+
+                    android:text="노트북"
+                    app:layout_constraintEnd_toStartOf="@+id/cl_laptop"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="spread_inside"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/line2" />
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_laptop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toStartOf="@+id/cl_mouse"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/tv_laptop_count"
+                    app:layout_constraintTop_toTopOf="@id/tv_laptop_count">
+
+                    <TextView
+                        android:id="@+id/tv_input_laptop_count"
+                        style="@style/Title4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1"
+                        android:textColor="@color/blue500"
+                        app:layout_constraintStart_toStartOf="parent"
+
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        style="@style/Title4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="개"
+                        app:layout_constraintStart_toEndOf="@id/tv_input_laptop_count"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_mouse"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toStartOf="@+id/cl_mouse_input"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/cl_laptop"
+                    app:layout_constraintTop_toTopOf="@id/cl_laptop">
+
+                    <TextView
+                        android:id="@+id/tv_mouse"
+                        style="@style/Body2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="마우스"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        style="@style/Body2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="(리시버 포함)"
+                        android:textColor="@color/gray300"
+                        app:layout_constraintStart_toEndOf="@id/tv_mouse"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_mouse_input"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/cl_mouse"
+                    app:layout_constraintTop_toTopOf="@id/tv_laptop_count">
+
+                    <TextView
+                        android:id="@+id/tv_input_mouse_count"
+                        style="@style/Title4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1"
+                        android:textColor="@color/blue500"
+                        app:layout_constraintStart_toStartOf="parent"
+
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        style="@style/Title4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="개"
+                        app:layout_constraintStart_toEndOf="@id/tv_input_mouse_count"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <TextView
+                    android:id="@+id/tv_power_count"
+                    style="@style/Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="전원선"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_laptop_count" />
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_power"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@id/cl_laptop"
+                    app:layout_constraintTop_toTopOf="@id/tv_power_count">
+
+                    <TextView
+                        android:id="@+id/tv_input_power_count"
+                        style="@style/Title4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1"
+                        android:textColor="@color/blue500"
+                        app:layout_constraintStart_toStartOf="parent"
+
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        style="@style/Title4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="개"
+                        app:layout_constraintStart_toEndOf="@id/tv_input_power_count"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_bag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@+id/cl_mouse"
+                    app:layout_constraintTop_toTopOf="@id/cl_power">
+
+                    <TextView
+                        android:id="@+id/tv_bag"
+                        style="@style/Body2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="가방"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        style="@style/Body2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="(가방끈 포함)"
+                        android:textColor="@color/gray300"
+                        app:layout_constraintStart_toEndOf="@id/tv_bag"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_bag_input"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@+id/cl_mouse_input"
+                    app:layout_constraintTop_toTopOf="@+id/cl_bag">
+
+                    <TextView
+                        android:id="@+id/tv_input_bag_count"
+                        style="@style/Title4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1"
+                        android:textColor="@color/blue500"
+                        app:layout_constraintStart_toStartOf="parent"
+
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        style="@style/Title4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="개"
+                        app:layout_constraintStart_toEndOf="@id/tv_input_bag_count"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <TextView
+                    android:id="@+id/tv_adapter_count"
+                    style="@style/Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="어댑터"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_power_count" />
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_adapter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@id/cl_laptop"
+                    app:layout_constraintTop_toTopOf="@id/tv_adapter_count">
+
+                    <TextView
+                        android:id="@+id/tv_input_adapter_count"
+                        style="@style/Title4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1"
+                        android:textColor="@color/blue500"
+                        app:layout_constraintStart_toStartOf="parent"
+
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        style="@style/Title4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="개"
+                        app:layout_constraintStart_toEndOf="@id/tv_input_adapter_count"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/tv_pad_count"
+                    style="@style/Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="마우스 패드"
+                    app:layout_constraintStart_toStartOf="@id/cl_bag"
+                    app:layout_constraintTop_toBottomOf="@id/tv_power_count" />
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_pad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="@id/cl_mouse_input"
+                    app:layout_constraintTop_toTopOf="@id/tv_adapter_count">
+
+                    <TextView
+                        android:id="@+id/tv_input_pad_count"
+                        style="@style/Title4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1"
+                        android:textColor="@color/blue500"
+                        app:layout_constraintStart_toStartOf="parent"
+
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        style="@style/Title4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="개"
+                        app:layout_constraintStart_toEndOf="@id/tv_input_pad_count"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_step4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            app:layout_constraintTop_toBottomOf="@id/cl_step3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <FrameLayout
+                android:id="@+id/fl_step4"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="@drawable/step_circle_background"
+                android:backgroundTint="@color/blue100"
+                android:gravity="center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                style="@style/Title1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="4"
+                android:textColor="@color/blue500"
+                android:textSize="15sp"/>
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tv_step4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="기타 특이사항"
+            style="@style/Title1"
+            app:layout_constraintStart_toEndOf="@id/fl_step4"
+            app:layout_constraintTop_toTopOf="@id/fl_step4"
+            app:layout_constraintBottom_toBottomOf="@id/fl_step4"
+            android:layout_marginStart="16dp"/>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cv_note"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="12dp"
+            app:layout_constraintTop_toBottomOf="@id/fl_step4"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/tv_front_title"
+                    style="@style/Body2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="전면부"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/btn_submit"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:backgroundTint="@color/orange500"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cl_step4"
+            android:text="제출하기"
+            style="@style/Title1"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"/>
+
+        <View
+            android:id="@+id/bottom_spacer"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            app:layout_constraintTop_toBottomOf="@id/btn_submit"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

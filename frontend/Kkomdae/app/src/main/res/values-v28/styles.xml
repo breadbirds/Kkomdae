@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Display2">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textFontWeight">600</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.35</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+    <style name="Headline1">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textFontWeight">600</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.4</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+    <style name="Title1">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textFontWeight">600</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.4</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+    <style name="Title2">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textFontWeight">600</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.4</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+    <style name="Title3">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.4</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+    <style name="Title4">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textFontWeight">600</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.4</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+    <style name="Body1">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.4</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+    <style name="Body2">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.4</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+    <style name="Label1">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.4</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+    <style name="Label3">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.35</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+    <style name="Label4">
+        <item name="android:textSize">11sp</item>
+
+        <item name="android:textFontWeight">500</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.3</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+    <style name="Caption3">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.2</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+    <style name="Caption2">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.2</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+    <style name="Caption1">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:fontFamily">@font/pretendard</item>
+        <item name="android:lineSpacingMultiplier">1.35</item> <!-- 줄 간격 135% 적용 -->
+    </style>
+
+
+</resources>

@@ -1,0 +1,20 @@
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="?attr/colorControlHighlight"> <!-- 터치 시 나타나는 주황색 ripple -->
+
+    <!-- ripple 퍼짐 제한 마스크 (둥글게 퍼지도록) -->
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <corners android:radius="50dp" />
+            <solid android:color="@android:color/white" />
+        </shape>
+    </item>
+
+    <!-- 버튼 기본 배경: 회색 + 둥근 모서리 -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="50dp" />
+            <solid android:color="@color/gray100" />
+        </shape>
+    </item>
+
+</ripple>

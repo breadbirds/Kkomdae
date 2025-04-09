@@ -1,0 +1,23 @@
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#33FF7325">
+
+    <!-- Ripple 효과를 제한하는 마스크 (모양 정의) -->
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <corners android:radius="50dp" />
+            <solid android:color="@android:color/white" />
+        </shape>
+    </item>
+
+    <!-- 실제 배경 (원래 너가 쓰던 스타일) -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="50dp" />
+            <stroke
+                android:width="1dp"
+                android:color="@color/orange500" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+
+</ripple>

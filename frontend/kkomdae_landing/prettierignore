@@ -1,0 +1,5 @@
+bash
+package-lock.json
+coverage
+build
+dist

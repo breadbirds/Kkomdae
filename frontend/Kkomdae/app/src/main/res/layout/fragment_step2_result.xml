@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.guide.Step1GuideFragment">
+
+    <include
+        android:id="@+id/top_bar"
+        layout="@layout/layout_register_top_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingTop="32dp"
+        android:paddingBottom="32dp"
+        android:paddingStart="36dp"
+        android:paddingEnd="36dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintBottom_toTopOf="@id/btn_next">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="자가진단 결과"
+            style="@style/Display2"
+            android:textColor="@color/gray700"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <TextView
+            app:layout_constraintStart_toStartOf="parent"
+            android:id="@+id/tv_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="노트북 항목별로 상세한 진단 결과를 확인해보세요."
+            app:layout_constraintTop_toBottomOf="@id/tv_title"
+            style="@style/Label1"
+            android:textColor="@color/gray700"
+            android:layout_marginTop="10dp"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_diagnostic_results"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="10dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_subtitle">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 키보드 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="28dp"
+                android:paddingEnd="28dp"
+                android:paddingTop="30dp"
+                android:paddingBottom="20dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_keyboard" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:text="키보드"
+                    android:textColor="@color/gray700"
+                    style="@style/Headline3" />
+
+                <TextView
+                    android:id="@+id/tv_keyboard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_rounded_blue_light"
+                    android:paddingStart="18dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="18dp"
+                    android:paddingBottom="4dp"
+                    android:text="통과"
+                    android:textColor="#485B78"
+                    style="@style/Title3" />
+            </LinearLayout>
+
+
+            <!-- 카메라 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="28dp"
+                android:paddingEnd="28dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_webcam" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:text="카메라"
+                    android:textColor="@color/gray700"
+                    style="@style/Headline3" />
+
+                <TextView
+                    android:id="@+id/tv_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_rounded_blue_light"
+                    android:paddingStart="18dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="18dp"
+                    android:paddingBottom="4dp"
+                    android:text="통과"
+                    android:textColor="#485B78"
+                    style="@style/Title3" />
+            </LinearLayout>
+
+
+            <!-- USB 연결 상태 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="28dp"
+                android:paddingEnd="28dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_usb" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:text="USB 연결 상태"
+                    android:textColor="@color/gray700"
+                    style="@style/Headline3" />
+
+                <TextView
+                    android:id="@+id/tv_usb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_rounded_blue_light"
+                    android:paddingStart="18dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="18dp"
+                    android:paddingBottom="4dp"
+                    android:text="통과"
+                    android:textColor="#485B78"
+                    style="@style/Title3" />
+            </LinearLayout>
+
+
+            <!-- 충전기 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="28dp"
+                android:paddingEnd="28dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_battery_charge" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:text="충전기"
+                    android:textColor="@color/gray700"
+                    style="@style/Headline3" />
+
+                <TextView
+                    android:id="@+id/tv_charger"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_rounded_red_light"
+                    android:paddingStart="18dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="18dp"
+                    android:paddingBottom="4dp"
+                    android:text="실패"
+                    android:textColor="#E4614F"
+                    style="@style/Title3"/>
+            </LinearLayout>
+
+            <!-- 배터리 성능 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="28dp"
+                android:paddingEnd="28dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="30dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_battery_performance" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:text="배터리 성능"
+                    android:textColor="@color/gray700"
+                    style="@style/Headline3" />
+
+                <TextView
+                    android:id="@+id/tv_battery"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_rounded_blue_light"
+                    android:paddingStart="18dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="18dp"
+                    android:paddingBottom="4dp"
+                    android:text="통과"
+                    android:textColor="#485B78"
+                    style="@style/Title3" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/tvDetailedInfoGuide"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="* 자세한 진단 결과는 노트북에 설치된 자가진단 프로그램을 통해 확인하실 수 있습니다."
+            style="@style/Caption1"
+            android:textColor="@color/gray300"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintTop_toBottomOf="@id/card_diagnostic_results"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/btn_next"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:backgroundTint="@color/blue500"
+        android:textColor="@color/white"
+        android:text="저장 후 다음단계"
+        android:layout_margin="24dp"
+        style="@style/Title1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>

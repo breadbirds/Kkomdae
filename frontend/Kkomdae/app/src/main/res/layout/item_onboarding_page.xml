@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="30dp">
+
+    <LinearLayout
+        android:id="@+id/step_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="24dp">
+
+        <TextView
+            android:id="@+id/tv_step_prefix"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="STEP"
+            android:textColor="@color/gray700"
+            style="@style/Display1" />
+
+        <TextView
+            android:id="@+id/tv_step_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="1"
+            android:textColor="@color/blue500"
+            style="@style/Display1" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="노트북 외관촬영"
+        android:textColor="@color/gray700"
+        style="@style/Display2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/step_header"
+        android:layout_marginTop="30dp" />
+
+    <TextView
+        android:id="@+id/tv_subtitle_line1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="노트북의 기기 상태를 기록하기 위해"
+        android:textColor="@color/gray300"
+        style="@style/Body2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_title"
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:id="@+id/tv_subtitle_line2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="총 6방향에서 촬영해주세요"
+        android:textColor="@color/gray300"
+        style="@style/Body2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_subtitle_line1"
+        android:layout_marginTop="4dp" />
+
+    <ImageView
+        android:id="@+id/iv_step_image"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:src="@drawable/onboarding_step1"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_subtitle_line2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="70dp"
+        android:layout_marginBottom="70dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

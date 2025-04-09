@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.OathFragment">
+
+    <include
+        android:id="@+id/top_bar"
+        layout="@layout/layout_top_bar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintBottom_toTopOf="@id/btn_next">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:padding="24dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="서약서에 동의해주세요"
+                style="@style/Display2"
+                android:textColor="@color/gray700"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+            <TextView
+                app:layout_constraintStart_toStartOf="parent"
+                android:id="@+id/tv_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="노트북 이용 전, 꼭 확인해주세요!"
+                app:layout_constraintTop_toBottomOf="@id/tv_title"
+                style="@style/Label1"
+                android:textColor="@color/gray700"
+                android:layout_marginTop="10dp"/>
+
+            <!-- 약관 1: 손실 및 파손 책임 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardAgreement1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_subtitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/oath_title1"
+                        layout="@layout/item_oath_title" />
+
+                    <LinearLayout
+                        android:id="@+id/oath_content1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="0dp">
+
+                        <!-- 약관 1 내용 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="4dp">
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginTop="4dp"
+                                android:src="@drawable/ic_bullet_pink" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="파손 시 전액 수령자 비용 부담으로 수리하여 원상태로 반납합니다."
+                                android:textColor="#E4614F"
+                                style="@style/Body2" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="4dp">
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:src="@drawable/ic_bullet_pink"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginTop="4dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="실금, 흠집 등 미세 하자도 파손에 포함되므로 최초 수령 시 외관 상태 촬영 필수입니다."
+                                android:textColor="#E4614F"
+                                style="@style/Body2" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="4dp">
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:src="@drawable/ic_bullet_gray"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginTop="4dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="분실 또는 도난 시 동일한 성능의 노트북으로 변상합니다."
+                                android:textColor="@color/gray300"
+                                style="@style/Body2" />
+                        </LinearLayout>
+
+                        <include
+                            android:id="@+id/included_notebook_prices"
+                            layout="@layout/layout_notebook_prices"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <!-- 약관 2: 사용 규정 및 의무 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardAgreement2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:layout_constraintTop_toBottomOf="@id/cardAgreement1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/oath_title2"
+                        layout="@layout/item_oath_title" />
+
+                    <LinearLayout
+                        android:id="@+id/oath_content2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="0dp">
+
+                        <!-- 약관 2 내용 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="4dp">
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginTop="4dp"
+                                android:src="@drawable/ic_bullet_gray" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="교육 외(게임, 쇼핑 등) 용도로 노트북을 사용하지 않습니다."
+                                android:textColor="@color/gray300"
+                                style="@style/Body2" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="4dp">
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:src="@drawable/ic_bullet_gray"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginTop="4dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="오프라인 출석 시에는 반드시 지참해야 합니다."
+                                android:textColor="@color/gray300"
+                                style="@style/Body2" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="4dp">
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:src="@drawable/ic_bullet_gray"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginTop="4dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="타인게에 임의 양도 및 대여하지 않습니다."
+                                android:textColor="@color/gray300"
+                                style="@style/Body2" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="4dp">
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:src="@drawable/ic_bullet_gray"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginTop="4dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="소프트웨어/데이터 저작권 위반 책임은 수령자에게 있습니다."
+                                android:textColor="@color/gray300"
+                                style="@style/Body2" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- 약관 3: 반납 및 보관 의무 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardAgreement3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:layout_constraintTop_toBottomOf="@id/cardAgreement2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/oath_title3"
+                        layout="@layout/item_oath_title" />
+
+                    <LinearLayout
+                        android:id="@+id/oath_content3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="0dp">
+
+                        <!-- 약관 3 내용 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="4dp">
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginTop="4dp"
+                                android:src="@drawable/ic_bullet_gray" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="교육 종료 시 모든 구성품을 포함하여 원래 상태 그대로 반납합니다."
+                                android:textColor="@color/gray300"
+                                style="@style/Body2" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="4dp">
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:src="@drawable/ic_bullet_gray"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginTop="4dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="교육 도중 퇴소하게 되는 경우에도 이상 없이 반납합니다."
+                                android:textColor="@color/gray300"
+                                style="@style/Body2" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="4dp">
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:src="@drawable/ic_bullet_gray"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginTop="4dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="허가된 장소(자택, 캠퍼스, 오프라인 강의실 및 기타 허가받은 장소) 외에 무단으로 반출 시 절도에 해당하는 민•형사상 법적 책임이 발생할 수 있습니다."
+                                android:textColor="@color/gray300"
+                                style="@style/Body2" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="4dp">
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:src="@drawable/ic_bullet_gray"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginTop="4dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="서약서 내용을 위반할 시에는 즉시 중도 최소 조치됩니다."
+                                android:textColor="@color/gray300"
+                                style="@style/Body2" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <!-- 약관 4: 인수 확인 -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardAgreement4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:layout_constraintTop_toBottomOf="@id/cardAgreement3"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/oath_title4"
+                        layout="@layout/item_oath_title" />
+
+                    <LinearLayout
+                        android:id="@+id/oath_content4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="0dp">
+
+                        <!-- 약관 4 내용 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="4dp">
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:src="@drawable/ic_bullet_gray"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginTop="4dp" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="분실 또는 도난 시 동일한 성능의 노트북으로 변상합니다."
+                                android:textColor="@color/gray300"
+                                style="@style/Body2" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="4dp">
+
+                            <ImageView
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:layout_marginTop="4dp"
+                                android:src="@drawable/ic_bullet_pink" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="수령 이후 노트북에 이상이 발견될 경우 즉시 이를 알리고 필요한 작업에 적극적으로 협조합니다."
+                                android:textColor="#E4614F"
+                                style="@style/Body2" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_next"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_margin="24dp"
+        android:text="위 내용을 동의합니다."
+        android:backgroundTint="@color/blue200"
+        style="@style/Title1"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

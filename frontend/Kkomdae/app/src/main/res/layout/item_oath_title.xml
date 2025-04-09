@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/oath_title_background_selector"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/iv_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_check_false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_model_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="서약서 제목"
+        style="@style/Title1"
+        android:textColor="@color/gray700"
+        android:gravity="center_vertical"
+        android:paddingVertical="16dp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toEndOf="@id/iv_check"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_required"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(필수)"
+        style="@style/Title1"
+        android:gravity="center_vertical"
+        android:paddingVertical="16dp"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/blue500"
+        app:layout_constraintStart_toEndOf="@id/tv_model_number"
+        app:layout_constraintTop_toTopOf="@id/tv_model_number"
+        app:layout_constraintBottom_toBottomOf="@id/tv_model_number"/>
+
+    <TextView
+        android:id="@+id/tv_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="보기"
+        style="@style/Label3"
+        android:textColor="@color/gray300"
+        android:layout_marginEnd="20dp"
+        tools:visibility="visible"
+        android:visibility="gone"
+        android:background="@drawable/underline_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

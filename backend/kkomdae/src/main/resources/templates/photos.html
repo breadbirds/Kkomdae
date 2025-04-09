@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>노트북 사진 목록</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .image-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .image-table td {
+            padding: 15px;
+            border: 1px solid #dee2e6;
+        }
+        .image-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+            text-align: center;
+        }
+        .image-container {
+            text-align: center;
+        }
+        .laptop-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .laptop-image:hover {
+            transform: scale(1.02);
+            cursor: pointer;
+        }
+        .no-images {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 18px;
+        }
+        .back-button {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="back-button">
+        <div class="back-button">
+            <a href="javascript:void(0);" onclick="history.back()" class="btn btn-primary">결과 목록으로 돌아가기</a>
+        </div>
+    </div>
+
+    <h1>노트북 사진 목록</h1>
+
+    <div th:if="${#lists.isEmpty(photos)}" class="no-images">
+        등록된 사진이 없습니다.
+    </div>
+
+    <div th:unless="${#lists.isEmpty(photos)}">
+        <table class="image-table">
+            <tbody>
+            <tr th:each="photo : ${photos}">
+                <td>
+                    <div class="image-title">
+                        <span th:switch="${photo.getType()}">
+                            <span th:case="1">전면부 원본 사진</span>
+                            <span th:case="2">후면부 원본 사진</span>
+                            <span th:case="3">좌측면 원본 사진</span>
+                            <span th:case="4">우측면 원본 사진</span>
+                            <span th:case="5">모니터 원본 사진</span>
+                            <span th:case="6">키보드 원본 사진</span>
+                        </span>
+                    </div>
+                    <div class="image-container">
+                        <a th:href="${photo.getUrl()}" target="_blank">
+                            <img th:src="${photo.getUrl()}"
+                                 th:alt="${photo.getName()}"
+                                 class="laptop-image">
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div th:unless="${#lists.isEmpty(photos)}">
+        <table class="image-table">
+            <tbody>
+            <tr th:each="photo : ${photos}">
+                <td>
+                    <div class="image-title">
+                        <span th:switch="${photo.getType()}">
+                            <span th:case="1">전면부 AI 분석 사진</span>
+                            <span th:case="2">후면부 AI 분석 사진</span>
+                            <span th:case="3">좌측면 AI 분석 사진</span>
+                            <span th:case="4">우측면 AI 분석 사진</span>
+                            <span th:case="5">모니터 AI 분석 사진</span>
+                            <span th:case="6">키보드 AI 분석 사진</span>
+                        </span>
+                    </div>
+                    <div class="image-container">
+                        <a th:href="${photo.getAiUrl()}" target="_blank">
+                            <img th:src="${photo.getAiUrl()}"
+                                 th:alt="${photo.getAiName()}"
+                                 class="laptop-image">
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

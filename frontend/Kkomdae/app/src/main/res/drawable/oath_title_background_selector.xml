@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 선택됐을 때 배경 -->
+    <item android:state_selected="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/blue50" />
+            <corners android:radius="10dp" />
+            <stroke android:width="1dp" android:color="@color/gray400" />
+        </shape>
+    </item>
+
+    <!-- 기본 상태일 때의 배경 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white" />
+            <corners android:radius="10dp" />
+            <stroke android:width="1dp" android:color="@color/gray200" />
+        </shape>
+    </item>
+</selector>

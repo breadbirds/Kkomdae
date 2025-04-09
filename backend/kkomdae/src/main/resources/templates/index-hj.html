@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!--begin::Head-->
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>AdminLTE v4 | Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@4.0.2/dist/js/adminlte.min.js"></script>
+
+    <!--begin::Primary Meta Tags-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="title" content="AdminLTE v4 | Dashboard" />
+    <!--end::Primary Meta Tags-->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+      integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q="
+      crossorigin="anonymous"
+    />
+    <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+    crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link th:href="@{/css/adminlte.css}" rel="stylesheet" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <!--end::Head-->
+  <!--begin::Body-->
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <!--begin::App Wrapper-->
+    <div class="app-wrapper">
+      <!--begin::Header-->
+      <nav class="app-header navbar navbar-expand bg-body">
+        <!--begin::Container-->
+        <div class="container-fluid">
+          <!--begin::Start Navbar Links-->
+          <ul class="navbar-nav">
+            <li class="nav-item d-none d-md-block">
+              <a href="#" class="nav-link">Home</a>
+            </li>
+            <li class="nav-item d-none d-md-block">
+              <a href="#" class="nav-link">Contact</a>
+            </li>
+          </ul>
+            <!--begin::User Menu Dropdown-->
+            <span class="d-none d-md-inline">성춘향 님</span>
+
+            <!--end::User Menu Dropdown-->
+          </ul>
+          <!--end::End Navbar Links-->
+        </div>
+        <!--end::Container-->
+      </nav>
+      <!--end::Header-->
+      <!--begin::App Main-->
+      <main class="app-main">
+        <!--begin::App Content Header-->
+        <div class="app-content-header">
+          <!--begin::Container-->
+          <div class="container-fluid">
+            <!-- begin searchBar -->
+            <div class="row justify-content-center">
+              <div class="col-md-6">
+                  <form>
+                      <div class="input-group mb-3">
+                          <select class="form-select" style="max-width: 150px;">
+                                  <option selected>All Categories</option>
+                                  <option value="1">Category 1</option>
+                                  <option value="2">Category 2</option>
+                                  <option value="3">Category 3</option>
+                              </select>
+                          <input type="text" class="form-control" placeholder="Search...">
+                          <button class="btn btn-secondary" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                      </div>
+                  </form>
+              </div>
+          </div>          
+            <!-- begin searchBar -->
+            <!--begin::Row-->
+            <div class="row">
+              <div class="col-sm-6"><h3 class="mb-0">Dashboard</h3></div>
+            </div>
+            <!--end::Row-->
+          </div>
+          <!--end::Container-->
+        </div>
+        <!--end::App Content Header-->
+        <!--begin::App Content-->
+        <div class="app-content">
+          <!--begin::Container-->
+          <div class="container-fluid">
+            <!--begin::Row-->
+            <div class="row">
+              <div class="col-12">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>학번</th>
+                      <th>이름</th>
+                      <th>지역</th>
+                      <th>대여 상태</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  <tr data-widget="expandable-table" aria-expanded="false">
+                    <td>292233534545</td>
+                    <td>홍길동</td>
+                    <td>구미</td>
+                    <td><span class="badge text-bg-warning">대여중</span></td>
+                  </tr>
+                  <tr class="expandable-body">
+                    <td colspan="4">
+                      <div class="row">
+                        <div class="col-10">
+                          <table class="table table-bordered">
+                            <thead>
+                              <tr>
+                                <th>기기</th>
+                                <th>모델명</th>
+                                <th>시리얼 번호</th>
+                                <th>대여 여부</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>노트북</td>
+                                <td>삼성 갤럭시북</td>
+                                <td>32312323213123</td>
+                                <td>대여중</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr data-widget="expandable-table" aria-expanded="false">
+                    <td>231232e22</td>
+                    <td>임꺽정</td>
+                    <td>대전</td>
+                    <td><span class="badge text-bg-success">반납 완료</span></td>
+                  </tr>
+                  <tr class="expandable-body">
+                    <td colspan="4">
+                      <div class="row">
+                        <div class="col-10">
+                          <table class="table table-bordered">
+                            <thead>
+                              <tr>
+                                <th>기기</th>
+                                <th>모델명</th>
+                                <th>시리얼 번호</th>
+                                <th>대여 여부</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>노트북</td>
+                                <td>삼성 갤럭시북</td>
+                                <td>32312323213123</td>
+                                <td>대여중</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>                
+              </div>
+            </div>
+            <!--end::Pagination-->
+            <div class="row">
+              <div class="d-flex justify-content-center">
+                <ul class="pagination pagination-md m-0 float-end secondary">
+                  <li class="page-item"><a class="page-link" href="#">«</a></li>
+                  <li class="page-item"><a class="page-link" href="#">1</a></li>
+                  <li class="page-item"><a class="page-link" href="#">2</a></li>
+                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                  <li class="page-item"><a class="page-link" href="#">»</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!--end::Container-->
+        </div>
+        <!--end::App Content-->
+      </main>
+      <!--end::App Main-->
+    </div>
+    <!--end::App Wrapper-->
+    <!--begin::Script-->
+    <script>
+      $(document).ready(function () {
+        $(document).on("click", 'tr[data-widget="expandable-table"]', function () {
+          var $this = $(this);
+          var $nextRow = $this.next(".expandable-body");
+
+          // 토글 클래스 추가/제거
+          $nextRow.toggleClass("show");
+
+          // aria-expanded 속성 업데이트
+          var isExpanded = $this.attr("aria-expanded") === "true";
+          $this.attr("aria-expanded", !isExpanded);
+        });
+      });
+    </script>
+  </body>
+  <!--end::Body-->
+</html>

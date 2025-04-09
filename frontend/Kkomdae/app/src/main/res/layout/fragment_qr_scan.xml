@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.step2.QrScanFragment">
+
+    <!-- 📸 카메라 미리보기 뷰 -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+
+    <com.pizza.kkomdae.ui.QrScanOverlayView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
+
+    <TextView
+        style="@style/Body1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="모니터에 표시된 QR 코드를 스캔해주세요."
+        app:layout_constraintTop_toBottomOf="@id/tv_text1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@color/white" />
+    <TextView
+        android:id="@+id/tv_text1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="100dp"
+        android:text="QR 코드 스캔"
+        style="@style/Display1"
+        android:textColor="@color/white"
+        />
+
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="QR 코드를"
+        style="@style/Body1"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tv_text3"/>
+
+    <TextView
+        android:id="@+id/tv_text3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="격자 안에 맞추면 자동으로 인식됩니다."
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@color/white"
+        android:layout_marginBottom="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="24dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_cancel"
+        android:id="@+id/btn_back"/>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <FrameLayout
+        android:id="@+id/fl_step1"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/step_circle_background"
+        android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@+id/step_line2"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- 텍스트 중앙 배치 -->
+        <TextView
+            style="@style/Title1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="1"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp" />
+    </FrameLayout>
+
+    <TextView
+        style="@style/Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="전면"
+        android:textColor="@color/gray300"
+        app:layout_constraintEnd_toEndOf="@id/fl_step1"
+        app:layout_constraintStart_toStartOf="@id/fl_step1"
+        app:layout_constraintTop_toBottomOf="@id/fl_step1" />
+
+    <View
+        android:id="@+id/step_line2"
+        android:layout_width="18dp"
+        android:layout_height="1dp"
+        android:background="@color/gray200"
+        app:layout_constraintBottom_toBottomOf="@id/fl_step1"
+        app:layout_constraintEnd_toStartOf="@+id/fl_step2"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/fl_step1"
+        app:layout_constraintTop_toTopOf="@id/fl_step1" />
+
+    <FrameLayout
+        android:id="@+id/fl_step2"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/step_circle_background"
+        android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@+id/step_line3"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/step_line2"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- 텍스트 중앙 배치 -->
+        <TextView
+            style="@style/Title1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="2"
+
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"/>
+    </FrameLayout>
+
+    <TextView
+        style="@style/Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="후면"
+        android:textColor="@color/gray300"
+        app:layout_constraintEnd_toEndOf="@id/fl_step2"
+        app:layout_constraintStart_toStartOf="@id/fl_step2"
+        app:layout_constraintTop_toBottomOf="@id/fl_step2" />
+
+    <View
+        android:id="@+id/step_line3"
+        android:layout_width="18dp"
+        android:layout_height="1dp"
+        android:background="@color/gray200"
+        app:layout_constraintBottom_toBottomOf="@id/fl_step2"
+        app:layout_constraintEnd_toStartOf="@+id/fl_step3"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/fl_step2"
+        app:layout_constraintTop_toTopOf="@id/fl_step2" />
+
+    <FrameLayout
+        android:id="@+id/fl_step3"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/step_circle_background"
+        android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@+id/step_line4"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/step_line3"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- 텍스트 중앙 배치 -->
+        <TextView
+            style="@style/Title1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="3"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp" />
+    </FrameLayout>
+
+    <TextView
+        style="@style/Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="좌측"
+        android:textColor="@color/gray300"
+        app:layout_constraintEnd_toEndOf="@id/fl_step3"
+        app:layout_constraintStart_toStartOf="@id/fl_step3"
+        app:layout_constraintTop_toBottomOf="@id/fl_step3" />
+
+    <View
+        android:id="@+id/step_line4"
+        android:layout_width="18dp"
+        android:layout_height="1dp"
+        android:background="@color/gray200"
+        app:layout_constraintBottom_toBottomOf="@id/fl_step3"
+        app:layout_constraintEnd_toStartOf="@+id/fl_step4"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/fl_step3"
+        app:layout_constraintTop_toTopOf="@id/fl_step3" />
+
+    <FrameLayout
+        android:id="@+id/fl_step4"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/step_circle_background"
+        android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@+id/step_line5"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/step_line4"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- 텍스트 중앙 배치 -->
+        <TextView
+            style="@style/Title1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="4"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp" />
+    </FrameLayout>
+
+    <TextView
+        style="@style/Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="우측"
+        android:textColor="@color/gray300"
+        app:layout_constraintEnd_toEndOf="@id/fl_step4"
+        app:layout_constraintStart_toStartOf="@id/fl_step4"
+        app:layout_constraintTop_toBottomOf="@id/fl_step4" />
+
+    <View
+        android:id="@+id/step_line5"
+        android:layout_width="18dp"
+        android:layout_height="1dp"
+        android:background="@color/gray200"
+        app:layout_constraintBottom_toBottomOf="@id/fl_step4"
+        app:layout_constraintEnd_toStartOf="@+id/fl_step5"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/fl_step4"
+        app:layout_constraintTop_toTopOf="@id/fl_step4" />
+
+    <FrameLayout
+        android:id="@+id/fl_step5"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/step_circle_background"
+        android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@+id/step_line6"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/step_line5"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- 텍스트 중앙 배치 -->
+        <TextView
+            style="@style/Title1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="5"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp" />
+    </FrameLayout>
+
+    <TextView
+        style="@style/Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="화면"
+        android:textColor="@color/gray300"
+        app:layout_constraintEnd_toEndOf="@id/fl_step5"
+        app:layout_constraintStart_toStartOf="@id/fl_step5"
+        app:layout_constraintTop_toBottomOf="@id/fl_step5" />
+
+    <View
+        android:id="@+id/step_line6"
+        android:layout_width="18dp"
+        android:layout_height="1dp"
+        android:background="@color/gray200"
+        app:layout_constraintBottom_toBottomOf="@id/fl_step5"
+        app:layout_constraintEnd_toStartOf="@+id/fl_step6"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/fl_step5"
+        app:layout_constraintTop_toTopOf="@id/fl_step5" />
+
+    <FrameLayout
+        android:id="@+id/fl_step6"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/step_circle_background"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/step_line6"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- 텍스트 중앙 배치 -->
+        <TextView
+            style="@style/Title1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="6"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp" />
+    </FrameLayout>
+
+    <TextView
+        style="@style/Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="키판"
+        android:textColor="@color/gray300"
+        app:layout_constraintEnd_toEndOf="@id/fl_step6"
+        app:layout_constraintStart_toStartOf="@id/fl_step6"
+        app:layout_constraintTop_toBottomOf="@id/fl_step6" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

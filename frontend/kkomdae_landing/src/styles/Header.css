@@ -1,0 +1,177 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: transparent;
+  padding: 20px 0;
+  transition: all 0.3s ease;
+}
+
+.header.scrolled {
+  background-color: var(--white);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+  padding: 15px 0;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-text {
+  font-size: 24px;
+  font-weight: 700;
+  margin-left: 8px;
+  color: var(--white);
+  letter-spacing: -0.5px;
+  font-family: "MangoDdobak-B", var(--font-family);
+}
+.header.scrolled .logo-text {
+  color: var(--primary-color);
+}
+
+.nav-list {
+  display: flex;
+  list-style: none;
+}
+
+.nav-item {
+  margin: 0 15px;
+}
+
+.nav-link {
+  color: var(--white);
+  font-weight: 500;
+  font-size: 16px;
+  transition: color 0.3s ease;
+  position: relative;
+}
+.header.scrolled .nav-link {
+  color: var(--text-color);
+}
+
+.nav-link:hover {
+  color: var(--white);
+}
+.header.scrolled .nav-link:hover {
+  color: var(--primary-color);
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--white);
+  transition: width 0.3s ease;
+}
+.header.scrolled .nav-link::after {
+  background-color: var(--primary-color);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.btn-download {
+  background-color: var(--white);
+  color: var(--primary-color);
+
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+.header.scrolled .btn-download {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.btn-download:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(205, 215, 244, 0.3);
+}
+
+.header.scrolled .btn-download:hover {
+  background-color: #2a5aeb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px #3e70ff4d;
+}
+
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+}
+
+.bar {
+  height: 3px;
+  width: 100%;
+  background-color: var(--text-color);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+@media screen and (max-width: 768px) {
+  .nav {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 70%;
+    height: 100vh;
+    background-color: var(--white);
+    padding: 80px 40px;
+    transition: right 0.3s ease;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav.open {
+    right: 0;
+  }
+
+  .nav-list {
+    flex-direction: column;
+  }
+
+  .nav-item {
+    margin: 15px 0;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  .menu-toggle.active .bar:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+  }
+
+  .menu-toggle.active .bar:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-toggle.active .bar:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+  }
+}

@@ -1,0 +1,144 @@
+.features {
+  background-color: var(--white);
+  padding: 100px 0;
+}
+
+.section-header-feature {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.section-title-feature {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  color: var(--text-color);
+}
+
+.section-subtitle-feature {
+  font-size: 1.2rem;
+  color: var(--dark-grey);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.feature-card {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 30px;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(62, 112, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.feature-icon svg {
+  width: 28px;
+  height: 28px;
+  color: var(--primary-color);
+}
+
+.feature-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: var(--text-color);
+}
+
+.feature-description {
+  font-size: 1rem;
+  color: var(--dark-grey);
+  line-height: 1.6;
+}
+
+/* 애니메이션 지연 효과 */
+.features-grid .feature-card:nth-child(1) {
+  transition-delay: 0.1s;
+}
+.features-grid .feature-card:nth-child(2) {
+  transition-delay: 0.2s;
+}
+.features-grid .feature-card:nth-child(3) {
+  transition-delay: 0.3s;
+}
+.features-grid .feature-card:nth-child(4) {
+  transition-delay: 0.4s;
+}
+.features-grid .feature-card:nth-child(5) {
+  transition-delay: 0.5s;
+}
+.features-grid .feature-card:nth-child(6) {
+  transition-delay: 0.6s;
+}
+
+/* 반응형 스타일 */
+@media screen and (max-width: 992px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .features {
+    padding: 70px 0;
+  }
+
+  .section-title-feature {
+    font-size: 2rem;
+  }
+
+  .section-subtitle-feature {
+    font-size: 1rem;
+  }
+
+  .feature-card {
+    padding: 25px;
+  }
+
+  .feature-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .feature-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .feature-title {
+    font-size: 1.1rem;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-card {
+    margin-bottom: 20px;
+  }
+}

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>학생 장비 대여 현황</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .hiddenRow {
+            padding: 0 !important;
+        }
+
+        .accordion-body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .form-select, .form-control {
+            height: 38px;
+        }
+
+        .align-items-end {
+            align-items: flex-end;
+        }
+
+        #classNumInput:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        /* 체크박스 커스텀 스타일링 */
+        input[type=checkbox] {
+            display: none;
+        }
+
+        /* style 태그 내에 추가 */
+        .checkbox-wrap {
+            position: relative;
+            padding-left: 25px;
+            cursor: pointer;
+            display: inline-block;
+            margin: 0;
+            vertical-align: middle; /* 추가: 수직 정렬 조정 */
+            line-height: normal; /* 추가: 라인 높이 조정 */
+        }
+
+        .checkbox-wrap .checkmark {
+            position: absolute;
+            top: 50%; /* 수정: 중앙 정렬 */
+            transform: translateY(-50%); /* 추가: 정확한 중앙 배치 */
+            left: 0;
+            height: 20px;
+            width: 20px;
+            width: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .checkbox-wrap:hover .checkmark {
+            background-color: #f5f5f5;
+        }
+
+        .checkbox-wrap input:checked ~ .checkmark {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .checkbox-wrap .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .checkbox-wrap input:checked ~ .checkmark:after {
+            display: block;
+            left: 7px;
+            top: 3px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-3">
+    <a th:href="@{/api/admin/students}">
+        <img th:src="@{/image/ssafy.svg}" style="width: 120px; height: 90px;" alt="이미지 설명" />
+    </a>
+</div>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-5 ">
+        <h2 class="mb-0">학생 장비 대여 현황</h2>
+        <div>
+            <a href="/api/admin/devices" class="btn btn-secondary me-1">
+                <i class="fas fa-laptop me-1"></i> 기기 목록
+            </a>
+            <button type="button" class="btn btn-primary" id="sendNotification">
+                <i class="fas fa-bell me-1"></i> 알림 발송
+            </button>
+            <form action="/api/admin/logout" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt me-1"></i> 로그아웃
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 검색 필터 섹션 -->
+    <form th:action="@{/api/admin/students}" method="get" class="mb-4">
+        <div class="row g-3 align-items-end">
+            <!-- 지역 선택 -->
+            <div class="col-md-2">
+                <select class="form-select"
+                        name="region"
+                        id="regionSelect"
+                        th:field="${studentWithRentCond.region}"
+                        onchange="toggleClassNumber()">
+                    <option value="">전체 지역</option>
+                    <option value="서울">서울</option>
+                    <option value="구미">구미</option>
+                    <option value="대전">대전</option>
+                    <option value="부울경">부울경</option>
+                    <option value="광주">광주</option>
+                </select>
+            </div>
+
+            <!-- 반 번호 입력 -->
+            <div class="col-md-2">
+                <input type="number"
+                       class="form-control"
+                       name="classNum"
+                       id="classNumInput"
+                       min="1"
+                       placeholder="숫자만 입력">
+            </div>
+
+            <!-- 검색 유형 선택 -->
+            <div class="col-md-2">
+                <select class="form-select" name="searchType" th:field="${studentWithRentCond.searchType}">
+                    <option value="">선택</option>
+                    <option value="학번">학번</option>
+                    <option value="이름">이름</option>
+                </select>
+            </div>
+
+            <!-- 키워드 입력 -->
+            <div class="col-md-4">
+                <input type="text" class="form-control"
+                       name="keyword"
+                       placeholder="검색어 입력">
+            </div>
+
+            <!-- 검색 버튼 -->
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> 검색
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <table class="table table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>
+                <label class="checkbox-wrap">
+                    <input type="checkbox" id="checkAll">
+                    <span class="checkmark"></span>
+                </label>
+            </th>
+            <th>학번</th>
+            <th>이름</th>
+            <th>지역</th>
+            <th>반</th>
+            <th>대여 상태</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 데이터가 있는 경우 -->
+        <th:block th:if="${not #lists.isEmpty(students)}" th:each="student : ${students}">
+            <tr class="accordion-toggle" data-bs-toggle="collapse"
+                th:attr="data-bs-target='#student-' + ${student.studentId}">
+                <td>
+                    <label class="checkbox-wrap">
+                        <input type="checkbox" name="selectedStudents" th:value="${student.studentId}">
+                        <span class="checkmark"></span>
+                    </label>
+                </td>
+                <td th:text="${student.getStudentId()}"></td>
+                <td th:text="${student.name}"></td>
+                <td th:text="${student.region}"></td>
+                <td th:text="${student.classNum}"></td>
+                <td>
+                    <span th:class="${student.status} ? 'badge bg-success' : 'badge bg-warning'"
+                          th:text="${student.status} ? '대여 장비 없음' : '장비 대여 중'"></span>
+                </td>
+                <td class="text-center">
+                    <i class="fa fa-chevron-down"></i>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="7" class="hiddenRow">
+                    <div th:id="'student-' + ${student.studentId}" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <div th:if="${not #lists.isEmpty(student.deviceRentHistory)}">
+                                <h5>대여 장비 목록</h5>
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-secondary">
+                                    <tr>
+                                        <th>장비 유형</th>
+                                        <th>모델 코드</th>
+                                        <th>일련번호</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="device : ${student.deviceRentHistory}">
+                                        <td th:text="${device.type}"></td>
+                                        <td th:text="${device.modelCode}"></td>
+                                        <td th:text="${device.serialNum}"></td>
+                                        <td>
+                                            <a th:href="@{/api/admin/test-results(studentId=${student.getStudentId()},deviceId=${device.getDeviceId()},deviceType=${device.getType()})}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-info-circle"></i> 상세
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div th:if="${#lists.isEmpty(student.deviceRentHistory)}" class="text-center">
+                                <p>대여한 장비가 없습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </th:block>
+
+        <!-- 데이터가 없는 경우 -->
+        <tr th:if="${#lists.isEmpty(students)}">
+            <td colspan="7" class="text-center">조회 결과가 없습니다</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleClassNumber() {
+        const regionSelect = document.getElementById('regionSelect');
+        const classNumInput = document.getElementById('classNumInput');
+        classNumInput.disabled = (regionSelect.value === '');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        toggleClassNumber();  // 초기 상태 적용
+
+        const accordionToggles = document.querySelectorAll('.accordion-toggle');
+
+        // DOMContentLoaded 이벤트 핸들러 내부에 추가
+        // 체크박스 클릭 이벤트 전파 방지
+        document.querySelectorAll('.checkbox-wrap, .checkbox-wrap input, .checkbox-wrap .checkmark').forEach(el => {
+            el.addEventListener('click', function (e) {
+                e.stopPropagation(); // 이벤트 전파 차단
+            });
+        });
+        accordionToggles.forEach(toggle => {
+            toggle.addEventListener('click', function () {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('fa-chevron-down')) {
+                    icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                } else {
+                    icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+                }
+            });
+        });
+
+        // 전체 선택 체크박스 동작
+        document.getElementById('checkAll').addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('input[name="selectedStudents"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+
+        // 개별 체크박스 변경 시 전체 선택 체크박스 상태 업데이트
+        const checkboxes = document.querySelectorAll('input[name="selectedStudents"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                const allChecked = [...checkboxes].every(c => c.checked);
+                document.getElementById('checkAll').checked = allChecked;
+            });
+        });
+
+        document.getElementById('sendNotification').addEventListener('click', function () {
+            // 체크된 학생 체크박스 선택
+            const selected = document.querySelectorAll('input[name="selectedStudents"]:checked');
+
+            // 선택된 학생이 없으면 경고 표시
+            if (selected.length === 0) {
+                alert('알림을 발송할 학생을 선택해주세요.');
+                return;
+            }
+
+            // 선택된 학생들의 ID 배열 생성
+            const studentIds = [...selected].map(el => el.value);
+
+            // AJAX 요청을 사용하여 POST 방식으로 학생 ID 배열 전송
+            fetch('/api/admin/notification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(studentIds)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert(`선택된 학생 ${selected.length}명에게 알림을 발송했습니다.`);
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        }
+                    } else {
+                        throw new Error('알림 발송 실패');
+                    }
+                })
+                .catch(error => {
+                    console.error('알림 전송 에러:', error);
+                    alert('알림 발송에 실패했습니다.');
+                });
+        });
+
+    });
+
+    document.querySelector('form').addEventListener('submit', function (e) {
+        if (!document.getElementById('regionSelect').value) {
+            document.getElementById('classNumInput').value = ''; // 전체 지역 선택 시 반 번호 초기화
+        }
+    });
+</script>
+</body>
+</html>

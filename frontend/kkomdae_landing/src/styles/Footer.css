@@ -1,0 +1,135 @@
+.footer {
+  background-color: #1a1a2e;
+  color: #ffffff;
+  padding: 40px 0 40px;
+}
+
+.footer-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.footer-logo {
+  flex: 0 0 100%;
+  max-width: 600px;
+  margin-bottom: 30px;
+}
+
+.logo-text-footer {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--white);
+  display: block;
+  margin-bottom: 15px;
+  font-family: "MangoDdobak-B", var(--font-family);
+}
+
+.footer-description {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+  line-height: 1.7;
+  max-width: 550px;
+  word-break: keep-all;
+  white-space: pre-line;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+  justify-content: flex-end;
+  gap: 60px;
+}
+
+.footer-links-column {
+  min-width: 160px;
+}
+
+.footer-links-title {
+  color: var(--white);
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.footer-links-list {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links-list li {
+  margin-bottom: 12px;
+}
+
+/* 공통 링크 스타일 */
+.footer-links-list a,
+.footer-modal-link {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.footer-links-list a:hover,
+.footer-modal-link:hover {
+  color: var(--white);
+  text-decoration: underline;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.copyright {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+}
+
+@media screen and (max-width: 992px) {
+  .footer-content {
+    flex-direction: column;
+  }
+
+  .footer-logo {
+    margin-bottom: 40px;
+    max-width: 100%;
+  }
+
+  .footer-links {
+    justify-content: flex-start;
+    gap: 40px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .footer {
+    padding: 60px 0 30px;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .footer-links-column {
+    width: 100%;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .copyright {
+    margin-bottom: 20px;
+  }
+}

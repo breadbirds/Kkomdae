@@ -1,0 +1,1364 @@
+# ===============================
+# 표준 라이브러리 및 외부 라이브러리 임포트
+# ===============================
+import sys
+import os
+import re
+import subprocess
+import logging
+import time
+import ctypes
+from ctypes import wintypes
+import json
+from datetime import datetime
+import requests
+# 외부 라이브러리
+from tkinter import messagebox
+import ttkbootstrap as ttkb
+from ttkbootstrap.constants import *
+from PIL import Image, ImageTk, ImageFont, ImageDraw, ImageEnhance
+import cv2
+import win32com.client
+import psutil
+import qrcode
+
+# ===============================
+# Windows API 상수 및 구조체 정의
+# ===============================
+# 플랫폼에 따라 LRESULT, LONG_PTR 타입 결정
+if ctypes.sizeof(ctypes.c_void_p) == 8:
+    LRESULT = ctypes.c_longlong
+    LONG_PTR = ctypes.c_longlong
+else:
+    LRESULT = ctypes.c_long
+    LONG_PTR = ctypes.c_long
+
+# Windows 메시지 상수
+WM_NCDESTROY = 0x0082
+WM_INPUT = 0x00FF
+RID_INPUT = 0x10000003
+GWL_WNDPROC = -4
+RIDI_DEVICENAME = 0x20000007
+RIM_TYPEKEYBOARD = 1
+RIDEV_INPUTSINK = 0x00000100
+RIDEV_NOLEGACY = 0x00000030  # legacy 메시지 차단
+RIDEV_REMOVE = 0x00000001   # Raw Input 해제 플래그
+
+RI_KEY_BREAK = 0x01
+RI_KEY_E0 = 0x02
+
+WM_DEVICECHANGE = 0x0219
+DBT_DEVICEARRIVAL = 0x8000
+DBT_DEVICEREMOVECOMPLETE = 0x8004
+DBT_DEVTYP_DEVICEINTERFACE = 0x00000005
+
+# user32 라이브러리 로드 및 함수 서명 지정
+user32 = ctypes.windll.user32
+user32.SetWindowLongPtrW.restype = LONG_PTR
+user32.SetWindowLongPtrW.argtypes = [wintypes.HWND, wintypes.INT, LONG_PTR]
+user32.CallWindowProcW.restype = LRESULT
+user32.CallWindowProcW.argtypes = [LONG_PTR, wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
+
+# Raw Input 관련 구조체 정의
+class RAWINPUTDEVICE(ctypes.Structure):
+    _fields_ = [
+        ("usUsagePage", ctypes.c_ushort),
+        ("usUsage", ctypes.c_ushort),
+        ("dwFlags", ctypes.c_ulong),
+        ("hwndTarget", ctypes.c_void_p)
+    ]
+
+class RAWINPUTHEADER(ctypes.Structure):
+    _fields_ = [
+        ("dwType", ctypes.c_uint),
+        ("dwSize", ctypes.c_uint),
+        ("hDevice", ctypes.c_void_p),
+        ("wParam", ctypes.c_ulong)
+    ]
+
+class RAWKEYBOARD(ctypes.Structure):
+    _fields_ = [
+        ("MakeCode", ctypes.c_ushort),
+        ("Flags", ctypes.c_ushort),
+        ("Reserved", ctypes.c_ushort),
+        ("VKey", ctypes.c_ushort),
+        ("Message", ctypes.c_uint),
+        ("ExtraInformation", ctypes.c_ulong)
+    ]
+
+class RAWINPUT(ctypes.Structure):
+    class _u(ctypes.Union):
+        _fields_ = [("keyboard", RAWKEYBOARD)]
+    _anonymous_ = ("u",)
+    _fields_ = [
+        ("header", RAWINPUTHEADER),
+        ("u", _u)
+    ]
+
+# WNDPROC 타입 선언 (윈도우 프로시저 콜백)
+WNDPROC = ctypes.WINFUNCTYPE(LRESULT, wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
+
+# 가상 키 코드 -> 문자열 매핑 딕셔너리
+VK_MAPPING = {
+    0x30: "0",   0x31: "1",   0x32: "2",   0x33: "3",   0x34: "4",
+    0x35: "5",   0x36: "6",   0x37: "7",   0x38: "8",   0x39: "9",
+    0x41: "A",   0x42: "B",   0x43: "C",   0x44: "D",   0x45: "E",
+    0x46: "F",   0x47: "G",   0x48: "H",   0x49: "I",   0x4A: "J",
+    0x4B: "K",   0x4C: "L",   0x4D: "M",   0x4E: "N",   0x4F: "O",
+    0x50: "P",   0x51: "Q",   0x52: "R",   0x53: "S",   0x54: "T",
+    0x55: "U",   0x56: "V",   0x57: "W",   0x58: "X",   0x59: "Y",
+    0x5A: "Z",
+    0x20: "SPACE",
+    0x0D: "ENTER",
+    0x1B: "ESC",
+    0x09: "TAB",
+    0x08: "BACK",
+    0x70: "F1",  0x71: "F2",  0x72: "F3",  0x73: "F4",
+    0x74: "F5",  0x75: "F6",  0x76: "F7",  0x77: "F8",
+    0x78: "F9",  0x79: "F10", 0x7A: "F11", 0x7B: "F12",
+    0x2D: "INS",
+    0x2E: "DEL",
+    0x25: "LEFT", 0x26: "UP", 0x27: "RIGHT", 0x28: "DOWN",
+    0x14: "CAPS",
+    0x90: "NUM\nLOCK",
+    0x60: "NUM\n0",
+    0x61: "NUM\n1", 0x62: "NUM\n2", 0x63: "NUM\n3",
+    0x64: "NUM\n4", 0x65: "NUM\n5", 0x66: "NUM\n6",
+    0x67: "NUM\n7", 0x68: "NUM\n8", 0x69: "NUM\n9",
+    0x6A: "N *", 0x6B: "NUM\n+", 0x6C: "NUM\nENT",
+    0x6D: "NUM\n-", 0x6E: "NUM\n.", 0x6F: "N /",
+    0xFF: "PRT",
+    0x2C: "PRT",
+    0xBB: "=",
+    0xBD: "-",
+    0xC0: "`",
+    0xDB: "[",
+    0xDD: "]",
+    0xDC: "\\",
+    0xBA: ";",
+    0xDE: "'",
+    0xBC: ",",
+    0xBE: ".",
+    0xBF: "/",
+    0xA0: "LSHIFT",
+    0xA1: "RSHIFT",
+    0x11: "CTRL",
+    0x5B: "WIN",
+    0x12: "ALT",
+    0x15: "한/영",
+    0x19: "한자",
+    0x10: "SHIFT"
+}
+
+
+# exe 빌드 시 파일 경를 찾기 위한 함수
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+
+# ===============================
+# Raw Input 관련 유틸리티 함수
+# ===============================
+def get_device_name(hDevice: int) -> str:
+    """
+    주어진 hDevice 핸들을 통해 장치 이름을 반환합니다.
+    """
+    size = ctypes.c_uint(0)
+    if user32.GetRawInputDeviceInfoW(hDevice, RIDI_DEVICENAME, None, ctypes.byref(size)) == 0:
+        buffer = ctypes.create_unicode_buffer(size.value)
+        if user32.GetRawInputDeviceInfoW(hDevice, RIDI_DEVICENAME, buffer, ctypes.byref(size)) > 0:
+            return buffer.value
+    return None
+
+def register_raw_input(hwnd: int) -> None:
+    """
+    지정된 윈도우 핸들에 대해 Raw Input을 등록합니다.
+    legacy 메시지(WM_KEYDOWN 등)를 생성하지 않도록 설정합니다.
+    """
+    rid = RAWINPUTDEVICE()
+    rid.usUsagePage = 0x01   # Generic Desktop Controls
+    rid.usUsage = 0x06       # Keyboard
+    rid.dwFlags = RIDEV_INPUTSINK | RIDEV_NOLEGACY
+    rid.hwndTarget = hwnd
+    if not user32.RegisterRawInputDevices(ctypes.byref(rid), 1, ctypes.sizeof(rid)):
+        raise ctypes.WinError()
+
+def unregister_raw_input() -> None:
+    """
+    등록된 Raw Input을 해제합니다.
+    """
+    rid = RAWINPUTDEVICE()
+    rid.usUsagePage = 0x01
+    rid.usUsage = 0x06
+    rid.dwFlags = RIDEV_REMOVE
+    rid.hwndTarget = 0
+    if not user32.RegisterRawInputDevices(ctypes.byref(rid), 1, ctypes.sizeof(rid)):
+        raise ctypes.WinError()
+
+# ===============================
+# TestApp 클래스 정의 (메인 GUI 애플리케이션)
+# ===============================
+class TestApp(ttkb.Window):
+    def __init__(self):
+        super().__init__(themename="flatly")
+        self.title("KkomDae Diagnostics")
+        self.geometry("1700x950")
+        self.resizable(False, False)
+        self._style = ttkb.Style()
+
+        # 변수 및 상태 초기화
+        self._init_variables()
+
+        # UI 구성
+        self.create_title_section()
+        self.create_test_items()
+
+    def _init_variables(self) -> None:
+        """
+        내부 변수와 상태를 초기화합니다.
+        """
+        # 내부 키보드의 Raw Input device 화이트리스트
+        self.INTERNAL_HWIDS = ["\\ACPI#MSF0001"]
+
+        # 테스트 완료 여부 딕셔너리
+        self.test_done = {
+            "키보드": False,
+            "카메라": False,
+            "USB": False,
+            "충전": False,
+            "배터리": False,
+            "QR코드": False
+        }
+
+        # 테스트 상태 문자열 설정
+        self.test_status = {
+            "키보드": "테스트 전",
+            "카메라": "테스트 전",
+            "충전": "테스트 전",
+            "배터리": "생성 전",
+            "QR코드": "생성 전"
+        }
+        self.test_status_ing = {
+            "키보드": "테스트 중",
+            "카메라": "테스트 중",
+            "충전": "테스트 중",
+            "배터리": "생성 중",
+            "QR코드": "생성 중"
+        }
+
+        # 테스트 상태 라벨 저장 딕셔너리
+        self.test_status_labels = {}
+
+        # 열려있는 테스트 창 관리 딕셔너리
+        self.active_test_windows = {}
+
+        # qr코드를 생성하기 위해 관리하는 set
+        self.qr_codes = set()
+
+        # 폰트 경로 설정
+        self.samsung_bold_path = resource_path("resource/font/SamsungSharpSans-Bold.ttf")
+        self.samsung_regular_path = resource_path("resource/font/SamsungOne-400.ttf")
+        self.samsung_700_path = resource_path("resource/font/SamsungOne-700.ttf")
+        self.notosans_path = resource_path("resource/font/NotoSansKR-VariableFont_wght.ttf")
+
+        # 각 테스트 상태에 따른 이미지 생성
+        self.status_images = {
+            "테스트 전": self.create_text_image("테스트 전", (120, 30), self.notosans_path, 16, (255, 0, 0), align_left=True),
+            "테스트 중": self.create_text_image("테스트 중", (120, 30), self.notosans_path, 16, (255, 165, 0), align_left=True),
+            "테스트 완료": self.create_text_image("테스트 완료", (120, 30), self.notosans_path, 16, (0, 128, 0), align_left=True),
+            "생성 전": self.create_text_image("생성 전", (120, 30), self.notosans_path, 16, (255, 0, 0), align_left=True),
+            "생성 중": self.create_text_image("생성 중", (120, 30), self.notosans_path, 16, (255, 165, 0), align_left=True),
+            "생성 완료": self.create_text_image("생성 완료", (120, 30), self.notosans_path, 16, (0, 128, 0), align_left=True),
+            "오류 발생": self.create_text_image("오류 발생", (120, 30), self.notosans_path, 16, (255, 0, 0), align_left=True),
+            "USB테스트 전":{
+                1:self.create_text_image("①", (120, 30), self.notosans_path, 16, (255, 0, 0), align_left=False),
+                2:self.create_text_image("②", (120, 30), self.notosans_path, 16, (255, 0, 0), align_left=False),
+                3:self.create_text_image("③", (120, 30), self.notosans_path, 16, (255, 0, 0), align_left=False)
+            },
+            "USB테스트 완료":{
+            #     1:self.create_text_image("①", (40, 30), self.notosans_path, 16, (0, 128, 0), align_left=False),
+            #     2:self.create_text_image("②", (40, 30), self.notosans_path, 16, (0, 128, 0), align_left=False),
+            #     3:self.create_text_image("③", (40, 30), self.notosans_path, 16, (0, 128, 0), align_left=False),
+                1:self.create_text_image("① 연결 확인", (120, 30), self.notosans_path, 16, (0, 128, 0), align_left=True),
+                2:self.create_text_image("② 연결 확인", (120, 30), self.notosans_path, 16, (0, 128, 0), align_left=True),
+                3:self.create_text_image("③ 연결 확인", (120, 30), self.notosans_path, 16, (0, 128, 0), align_left=True)
+            },
+        }
+        # 버튼 이미지 생성
+        self.button_images = {
+            "누르지 못한 키 보기": {
+                "normal": self.create_text_image("누르지 못한 키 보기", (200, 30), self.notosans_path, 16, (255, 255, 255)),
+                "disabled": self.create_text_image("누르지 못한 키 보기", (200, 30), self.notosans_path, 16, (180, 180, 180)),
+            },
+            "새로고침": {
+                "normal": self.create_text_image("새로고침", (200, 30), self.notosans_path, 16, (255, 255, 255)),
+                "disabled": self.create_text_image("새로고침", (200, 30), self.notosans_path, 16, (180, 180, 180)),
+            },
+            "리포트 확인하기": {
+                "normal": self.create_text_image("리포트 확인하기", (200, 30), self.notosans_path, 16, (255, 255, 255)),
+                "disabled": self.create_text_image("리포트 확인하기", (200, 20), self.notosans_path, 16, (180, 180, 180)),
+            },
+        }
+
+        # resource_path 함수를 이용해 이미지 파일의 경로를 동적으로 설정
+        self.test_icons = {
+            "키보드": resource_path("resource/image/keyboard.png"),
+            "카메라": resource_path("resource/image/camera.png"),
+            "USB": resource_path("resource/image/usb.png"),
+            "충전": resource_path("resource/image/charging.png"),
+            "배터리": resource_path("resource/image/battery.png"),
+            "QR코드": resource_path("resource/image/qrcode.png")
+        }
+
+        self.test_descriptions = {
+            "키보드": "키 입력이 정상적으로 작동하는지 확인합니다.",
+            "카메라": "카메라(웹캠)가 정상적으로 작동하는지 확인합니다.",
+            "USB": "모든 USB 포트가 정상적으로 인식되는지 확인합니다.",
+            "충전": "노트북이 정상적으로 충전되는지 확인합니다.",
+            "배터리": "배터리 리포트를 생성하여 성능을 확인합니다.",
+            "QR코드": "테스트 결과를 QR 코드로 생성합니다."
+        }
+
+        # USB 관련 변수 초기화
+        self.usb_ports = {"port1": False, "port2": False, "port3": False}
+        self.usb_test_complete = False
+
+        # usb 연결 완료 개수를 세기위한 변수
+        self.usb_alram = set()
+
+        # 배터리 리포트 파일 경로 초기화
+        self.report_path = None
+
+        # 키보드 테스트 관련 변수
+        self.failed_keys = []
+        self.pressed_keys = set()
+        self.keys_not_pressed = set()
+        self.all_keys = set()
+        self.key_widgets = {}
+        self.last_key_time = {}
+        self.keyboard_layout = [
+            [("ESC", 6), ("F1", 6), ("F2", 6), ("F3", 6), ("F4", 6), ("F5", 6),
+            ("F6", 6), ("F7", 6), ("F8", 6), ("F9", 6), ("F10", 6), ("F11", 6),
+            ("F12", 6), ("PRT", 6), ("INS", 6), ("DEL", 6), ("N /", 6), ("N *", 6)],
+
+            [("`", 6), ("1", 7), ("2", 7), ("3", 7), ("4", 7), ("5", 7),
+            ("6", 7), ("7", 7), ("8", 7), ("9", 7), ("0", 7), ("-", 7),
+            ("=", 7), ("BACK", 8), ("NUM\n-", 6), ("NUM\n+", 6), ("NUM\nLOCK", 6)],
+
+            [("TAB", 8), ("Q", 7), ("W", 7), ("E", 7), ("R", 7), ("T", 7),
+            ("Y", 7), ("U", 7), ("I", 7), ("O", 7), ("P", 7), ("[", 7),
+            ("]", 7), ("\\", 6), ("NUM\n7", 6), ("NUM\n8", 6), ("NUM\n9", 6)],
+
+            [("CAPS", 11), ("A", 7), ("S", 7), ("D", 7), ("F", 7), ("G", 7),
+            ("H", 7), ("J", 7), ("K", 7), ("L", 7), (";", 7), ("'", 7),
+            ("ENTER", 11), ("NUM\n4", 6), ("NUM\n5", 6), ("NUM\n6", 6)],
+
+            [("LSHIFT", 15), ("Z", 7), ("X", 7), ("C", 7), ("V", 7), ("B", 7),
+            ("N", 7), ("M", 7), (",", 7), (".", 7), ("/", 7), ("RSHIFT", 15),
+            ("NUM\n1", 6), ("NUM\n2", 6), ("NUM\n3", 6)],
+
+            [("CTRL", 8), ("", 7), ("WIN", 7), ("ALT", 7), ("SPACE", 31), ("한/영", 7),
+            ("한자", 7), ("LEFT", 7), ("DOWN", 7), ("UP", 7), ("RIGHT", 7),
+            ("NUM\n0", 6), ("NUM\n.", 6), ("NUM\nENT", 6)]
+        ]
+    # -------------------------------
+    # UI 구성 메서드들
+    # -------------------------------
+        # 🔹 Frame 스타일 설정
+        self._style.configure("Blue.TFrame", background="#0078D7")   # 타이틀 배경 파란색
+        self._style.configure("White.TFrame", background="white")   # 테스트 영역 배경 흰색
+
+
+    def create_text_image(self, text: str, size: tuple, font_path: str, font_size: int, color: tuple, align_left: bool = False) -> ImageTk.PhotoImage:
+        """
+        텍스트를 이미지로 변환하여 반환합니다.
+        """
+        img = Image.new("RGBA", size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        try:
+            font = ImageFont.truetype(font_path, font_size)
+        except IOError:
+            print(f"⚠️ 폰트 '{font_path}'을 찾을 수 없습니다. 기본 폰트 사용")
+            font = ImageFont.load_default()
+
+        # 텍스트 위치 계산
+        text_bbox = draw.textbbox((0, 0), text, font=font)
+        text_x = 10 if align_left else (size[0] - text_bbox[2]) // 2
+        text_y = (size[1] - font_size) // 2
+        draw.text((text_x, text_y), text, font=font, fill=color, spacing=2, stroke_width=0.2)
+        return ImageTk.PhotoImage(img)
+
+    # 키 이미지를 생성하는 헬퍼 함수
+    def create_key_image(self, key: str, size: tuple, pressed: bool = False) -> ImageTk.PhotoImage:
+        """
+        주어진 키 문자열과 크기에 따라, 상태(pressed 여부)에 따라 다른 배경/텍스트 색상의 이미지를 생성합니다.
+        """
+        # 상태에 따라 배경 및 텍스트 색상 설정
+        if not pressed:
+            bg_color = (220, 220, 220)   # 일반 상태: 연한 회색
+            text_color = (0, 0, 0)         # 검은색 텍스트
+        else:
+            bg_color = (100, 100, 100)     # pressed 상태: 어두운 회색
+            text_color = (255, 255, 255)   # 흰색 텍스트
+
+        # 지정된 크기로 배경색이 채워진 이미지 생성 (RGBA 모드)
+        img = Image.new("RGBA", size, bg_color + (255,))
+        draw = ImageDraw.Draw(img)
+        try:
+            font = ImageFont.truetype(self.notosans_path, 16)
+        except IOError:
+            font = ImageFont.load_default()
+
+        # 텍스트 크기 측정 후 중앙 정렬
+        text_bbox = draw.textbbox((0, 0), key, font=font, align='center')
+        text_width = text_bbox[2] - text_bbox[0]
+        text_height = text_bbox[3] - text_bbox[1]
+        text_x = (size[0] - text_width) // 2
+        text_y = ((size[1] - text_height) // 2) - 6
+        draw.text((text_x, text_y), key, font=font, fill=text_color, align='center')
+        return ImageTk.PhotoImage(img)
+
+
+    def update_status(self, test_name, new_status):
+        """
+        테스트 상태를 업데이트합니다.
+        """
+        status_label = self.test_status_labels[test_name]
+        new_img = self.status_images[new_status]
+        status_label.config(image=new_img)
+        status_label.image = new_img  # 이미지 참조 유지
+
+
+    def create_title_section(self) -> None:
+        """
+        상단 타이틀 영역을 생성합니다.
+        """
+        title_frame = ttkb.Frame(self, style="Blue.TFrame")
+        title_frame.place(relx=0, rely=0, relwidth=1, relheight=0.27)
+
+        # SSAFY 로고 이미지 삽입
+        img_path = resource_path("resource/image/ssafy_logo.png")
+        image = Image.open(img_path).resize((80, 60), Image.LANCZOS)
+        self.ssafy_logo = ImageTk.PhotoImage(image)
+        img_label = ttkb.Label(title_frame, image=self.ssafy_logo, background="#0078D7", anchor="w")
+        img_label.grid(row=0, column=0, padx=30, pady=(30, 10), sticky="w")
+
+        # 타이틀 및 서브타이틀 텍스트 이미지 생성
+        text_container = ttkb.Frame(title_frame, style="Blue.TFrame")
+        text_container.grid(row=1, column=0, padx=20, sticky="w")
+
+        self.title_img = self.create_text_image(
+            "KkomDae Diagnostics", (800, 55), self.samsung_regular_path, 40, (255, 255, 255), align_left=True
+        )
+        title_label = ttkb.Label(text_container, image=self.title_img, background="#0078D7", anchor="w")
+        title_label.grid(row=0, column=0, sticky="w")
+
+        self.subtitle_img1 = self.create_text_image(
+            "KkomDae Diagnostics로 노트북을 빠르고 꼼꼼하게 검사해보세요.",
+            (800, 45), self.notosans_path, 20, (255, 255, 255, 255), align_left=True
+        )
+        subtitle_label1 = ttkb.Label(text_container, image=self.subtitle_img1, background="#0078D7", anchor="w")
+        subtitle_label1.grid(row=1, column=0, sticky="w")
+
+        self.subtitle_img2 = self.create_text_image(
+            "각 테스트 항목의 아이콘을 클릭하면 테스트 또는 결과를 생성할 수 있습니다.",
+            (800, 30), self.notosans_path, 17, (255, 255, 255, 255), align_left=True
+        )
+        subtitle_label2 = ttkb.Label(text_container, image=self.subtitle_img2, background="#0078D7", anchor="w")
+        subtitle_label2.grid(row=2, column=0, sticky="w")
+
+
+    def create_test_items(self) -> None:
+        """
+        각 테스트 항목(키보드, 카메라, USB, 충전, 배터리, QR코드)의 UI를 생성합니다.
+        2행 3열의 격자 배치로 구성합니다.
+        """
+        test_frame = ttkb.Frame(self, style="White.TFrame")
+        test_frame.place(relx=0.1, rely=0.35, relwidth=0.8, relheight=0.6)
+        self.tests = ["키보드", "카메라", "USB", "충전", "배터리", "QR코드"]
+
+        # 2행으로 균등하게 분배 (각 행의 최소 높이 200)
+        for row in range(2):
+            test_frame.grid_rowconfigure(row, weight=1, minsize=200)
+        # 3열로 균등하게 분배 (각 열의 최소 폭 250)
+        for col in range(3):
+            test_frame.grid_columnconfigure(col, weight=1, minsize=250) # minsize를 250으로 늘려줌
+
+        # 각 테스트 항목을 2행 3열의 격자에 배치합니다.
+        for idx, name in enumerate(self.tests):
+            row = idx // 3  # 0,1,2 -> 0 / 3,4,5 -> 1
+            col = idx % 3   # 0,3 -> 0 / 1,4 -> 1 / 2,5 -> 2
+            self.create_test_item(test_frame, name, row, col)
+
+
+    def create_test_item(self, parent, name: str, row: int, col: int) -> None:
+        """
+        각 테스트 항목의 UI를 생성하고, 격자에 배치합니다.
+        """
+        # 컨테이너 프레임을 고정 크기로 생성 (크기는 원하는 대로 조정)
+        frame = ttkb.Frame(parent, padding=10, width=250, height=200) # width를 250으로 수정
+        frame.grid(row=row, column=col, padx=10, pady=10, sticky="nsew") # sticky 옵션 추가로 전체 격자 채우기
+
+        # [Row 0] 아이콘 전용 프레임 (고정 크기, 최상단에 배치)
+        icon_frame = ttkb.Frame(frame, width=55, height=55)
+        icon_frame.grid(row=0, column=0,sticky= "n", pady=(0, 5), padx=10)
+
+        # 아이콘 이미지 로드 및 명암(채도) 낮추기
+        icon_path = self.test_icons.get(name, "default.png")
+        icon_img = Image.open(icon_path).resize((50, 50), Image.LANCZOS)
+        enhancer = ImageEnhance.Color(icon_img)
+        icon_img = enhancer.enhance(0)  # 채도를 0으로 낮춰 흑백 효과
+        icon_photo = ImageTk.PhotoImage(icon_img)
+        icon_label = ttkb.Label(icon_frame, image=icon_photo,justify='center')
+        icon_label.image = icon_photo  # 이미지 참조 유지
+        icon_label.pack(expand=True, fill="both") # grid 에서 pack으로 수정해줍니다.
+
+        # 타이틀을 이미지로 변경
+        title_img = self.create_text_image(
+            text=name,
+            size=(200, 30),  # 필요에 따라 사이즈 조절
+            font_path=self.notosans_path,  # 적절한 폰트 지정
+            font_size=20,
+            color=(102, 102, 102),
+            align_left=True,
+        )
+        title_label = ttkb.Label(frame, image=title_img)
+        title_label.image = title_img
+        title_label.grid(row=1, column=0, sticky="ew", pady=(5, 0))
+
+        # 설명(subtitle)을 이미지로 변경
+        description_img = self.create_text_image(
+            text=self.test_descriptions.get(name, ""),
+            size=(350, 60),  # 설명이 길면 height를 더 늘리기
+            font_path=self.notosans_path,  # 적절한 폰트 지정
+            font_size=15,
+            color=(102, 102, 102),
+            align_left=True,
+        )
+        desc_label = ttkb.Label(frame, image=description_img)
+        desc_label.image = description_img
+        desc_label.grid(row=2, column=0, sticky="ew", pady=(5, 0))
+
+        # 테스트 상태를 이미지로 변경
+        status_img = self.status_images[self.test_status.get(name, "테스트 전")]
+        # 이미지를 라벨로 관리
+        status_label = ttkb.Label(frame, image=status_img)
+        status_label.image = status_img
+        status_label.grid(row=3, column=0, sticky="ew", pady=(5, 0))
+        self.test_status_labels[name] = status_label
+
+
+        if name == "키보드":
+            self.failed_keys_button = ttkb.Button(
+                frame,
+                image=self.button_images["누르지 못한 키 보기"]["disabled"],
+                state="disabled",
+                bootstyle=WARNING,
+                command=self.show_failed_keys
+            )
+            self.failed_keys_button.grid(row=4, column=0, sticky="ew", pady=(5, 0))
+
+        elif name == "USB":
+            # USB의 경우 상태 레이블은 숨기고, 포트 상태와 새로고침 버튼을 별도의 행에 배치
+            status_label.grid_forget()
+            self.usb_status_label = status_label
+            # USB 포트 상태 레이블들을 담을 프레임
+            usb_ports_frame = ttkb.Frame(frame)
+            usb_ports_frame.grid(row=3, column=0 )
+            usb_ports_frame.grid_columnconfigure(0, weight=1)
+            usb_ports_frame.grid_columnconfigure(1, weight=1)
+            usb_ports_frame.grid_columnconfigure(2, weight=1)
+            self.usb_port = []
+            for port in range(1, 4):
+                port_frame = ttkb.Frame(usb_ports_frame)
+                port_frame.grid(row=0, column=port-1, sticky='ew')
+                port_label = ttkb.Label(
+                    port_frame,
+                    image=self.status_images["USB테스트 전"][port],
+                )
+                port_label.pack(expand=True, fill='x')
+                self.usb_port.append(port_label)
+            # 새로고침 버튼
+            self.usb_refresh_button = ttkb.Button(
+                frame,
+                image=self.button_images["새로고침"]["disabled"],
+                bootstyle=SECONDARY,
+                command=self.refresh_usb_check,
+                state="disabled"
+            )
+            self.usb_refresh_button.grid(row=4, column=0, sticky="ew", pady=(5, 0))
+
+        elif name == "배터리":
+            self.battery_report_button = ttkb.Button(
+                frame,
+                image=self.button_images["리포트 확인하기"]["normal"],
+                bootstyle=SECONDARY,
+                command=self.view_battery_report
+            )
+            self.battery_report_button.grid(row=4, column=0, sticky="ew", pady=(5, 0))
+
+        # 항목 전체를 클릭하면 해당 테스트 시작 (아이콘 레이블 등에도 이벤트 바인딩)
+        frame.bind("<Button-1>", lambda e: self.start_test(name))
+        icon_label.bind("<Button-1>", lambda e: self.start_test(name))
+
+    # -------------------------------
+    # 테스트 시작 및 완료 처리 메서드
+    # -------------------------------
+    def start_test(self, name: str) -> None:
+        """
+        테스트 카드 클릭 시 해당 테스트 실행.
+        """
+        # 테스트 시작 시 상태 변환
+        if name != 'USB':
+            self.update_status(name, self.test_status_ing.get(name, ""))
+
+        if name == "키보드":
+            self.open_keyboard_test()
+        elif name == "카메라":
+            self.open_camera_test()
+        elif name == "USB":
+            self.start_usb_check()
+        elif name == "충전":
+            self.start_c_type_check()
+        elif name == "배터리":
+            self.generate_battery_report()
+        elif name == "QR코드":
+            self.generate_qr_code()
+
+        if not name == "QR코드":
+            self.qr_codes.add(name)
+
+    def mark_test_complete(self, test_name: str) -> None:
+        """
+        특정 테스트 완료 후 상태 업데이트 및 모든 테스트 완료시 메시지 출력.
+        """
+        if test_name in self.test_done:
+            self.test_done[test_name] = True
+            if test_name in ["배터리", "QR코드"]:
+                self.update_status(test_name, "생성 완료")
+            else:
+                self.update_status(test_name, "테스트 완료")
+            if all(self.test_done.values()):
+                messagebox.showinfo("모든 테스트 완료", "모든 테스트를 완료했습니다.\n수고하셨습니다!")
+
+
+    def open_test_window(self, test_name: str, create_window_func) -> ttkb.Toplevel:
+        """
+        이미 열려있는 테스트 창이 있는지 확인 후, 새 창을 생성합니다.
+        """
+        if test_name in self.active_test_windows:
+            messagebox.showwarning("경고", f"{test_name} 테스트 창이 이미 열려 있습니다.")
+            return
+        window = create_window_func()
+        self.active_test_windows[test_name] = test_name
+        return window
+
+    def on_test_window_close(self, test_name: str) -> None:
+        """
+        테스트 창 종료 시 관리 딕셔너리에서 제거합니다.
+        """
+        if test_name in self.active_test_windows:
+            del self.active_test_windows[test_name]
+
+    # -------------------------------
+    # 키보드 테스트 관련 메서드
+    # -------------------------------
+
+    def open_keyboard_test(self) -> None:
+        """
+        키보드 테스트 창을 열어 Raw Input 이벤트를 처리합니다.
+        """
+        # 키보드 테스트 창 생성 (create_keyboard_window 메서드 사용)
+        kb_window = self.open_test_window("키보드", self.create_keyboard_window)
+        if kb_window is None:
+            return
+
+        # 키보드 레이아웃 구성 및 키 위젯 초기화
+        self.setup_keyboard_layout(kb_window)
+
+        # Raw Input 등록 및 윈도우 프로시저 설정
+        hwnd = kb_window.winfo_id()
+        register_raw_input(hwnd)
+        kb_window.protocol("WM_DELETE_WINDOW", self.on_close_keyboard_window)
+        self.set_raw_input_proc(hwnd, kb_window)
+
+
+    def create_keyboard_window(self) -> ttkb.Toplevel:
+        """
+        키보드 테스트 창(Toplevel)을 생성하는 메서드
+        """
+        kb_window = ttkb.Toplevel(self)
+        kb_window.title("키보드 테스트")
+        kb_window.geometry("1800x700")
+        # 테스트 안내 레이블 추가
+        info_label = ttkb.Label(kb_window, text="모든 키를 한 번씩 눌러보세요.\n완료 시 창이 닫힙니다.")
+        info_label.pack(pady=5)
+        return kb_window
+
+
+    def setup_keyboard_layout(self, kb_window: ttkb.Toplevel) -> None:
+        """
+        키보드 레이아웃 UI를 이미지 위젯을 사용하여 구성합니다.
+        """
+
+        # 키보드 레이아웃을 감싸는 프레임 생성
+        keyboard_frame = ttkb.Frame(kb_window, borderwidth=2, padding=5)
+        keyboard_frame.pack(pady=5)
+
+        # 각 행별로 키 위젯 생성
+        for row_index, row_keys in enumerate(self.keyboard_layout):
+            row_frame = ttkb.Frame(keyboard_frame)
+            row_frame.pack(pady=5, fill='x')
+            for key, width in row_keys:
+                if key == "":  # 빈 키(스페이서)는 건너뜁니다.
+                    spacer = ttkb.Label(row_frame, text="", width=width, padding=(2, 12))
+                    spacer.pack(side='left', padx=3)
+                    continue
+                key_upper = key.upper()
+                self.all_keys.add(key_upper)
+                # 이미지 기반 키 위젯 생성 (높이는 예를 들어 60px로 고정)
+                if row_index == 0:
+                    btn = self.create_key_widget(row_frame, key, width, height=30)
+                else:
+                    btn = self.create_key_widget(row_frame, key, width, height=60)
+                btn.pack(side='left', padx=3)
+                self.key_widgets[key_upper] = btn
+
+        # 아직 눌리지 않은 키 목록은 전체 키에서 이전에 눌린 키들을 제외한 집합으로 설정
+        self.keys_not_pressed = self.all_keys - self.pressed_keys
+
+        # 모든 키가 눌렸으면 테스트 완료 처리
+        if not self.keys_not_pressed:
+            unregister_raw_input()
+            messagebox.showinfo("키보드 테스트", "키보드 테스트 완료")
+            self.failed_keys_button.config(
+                state="disabled",
+                image=self.button_images["누르지 못한 키 보기"]["disabled"]
+            )
+            self.close_keyboard_window()
+            self.mark_test_complete("키보드")
+
+    def create_key_widget(self, parent, key: str, width_unit: int, height: int = 60):
+        """
+        각 키에 대한 이미지 위젯을 생성합니다.
+        width_unit는 키보드 레이아웃에 정의된 단위값이며, 픽셀 단위의 실제 너비로 변환하여 사용합니다.
+        """
+        # 예: 1 단위당 10 픽셀로 환산 (필요시 조정)
+        pixel_width = width_unit * 10
+        size = (pixel_width, height)
+        key_upper = key.upper()
+
+        # normal, pressed 상태 이미지 생성
+        normal_img = self.create_key_image(key, size, pressed=False)
+        pressed_img = self.create_key_image(key, size, pressed=True)
+
+        # 각 키의 이미지 정보를 딕셔너리에 저장 (추후 상태 업데이트에 사용)
+        if not hasattr(self, "key_images"):
+            self.key_images = {}
+        self.key_images[key_upper] = {"normal": normal_img, "pressed": pressed_img}
+
+        # normal 이미지로 위젯 생성
+        if key in self.pressed_keys:
+            widget = ttkb.Label(parent, image=pressed_img)
+        else:
+            widget = ttkb.Label(parent, image=normal_img)
+        widget.image = normal_img  # 이미지 참조 유지
+        return widget
+
+
+    def set_raw_input_proc(self, hwnd, kb_window):
+        """
+        Raw Input 윈도우 프로시저를 설정하고 기존 프로시저를 저장합니다.
+        """
+        # 인스턴스 변수에 Raw Input 프로시저 저장
+        self._raw_input_wnd_proc = WNDPROC(self.raw_input_wnd_proc)
+        cb_func_ptr = ctypes.cast(self._raw_input_wnd_proc, ctypes.c_void_p).value
+        cb_func_ptr = LONG_PTR(cb_func_ptr)
+        old_proc = user32.SetWindowLongPtrW(hwnd, GWL_WNDPROC, cb_func_ptr)
+        self._kb_old_wnd_proc = old_proc
+        self._kb_hwnd = hwnd
+        self.kb_window_ref = kb_window
+
+
+    def raw_input_wnd_proc(self, hWnd, msg, wParam, lParam):
+        """
+        Raw Input 메시지를 처리하는 윈도우 프로시저입니다.
+        """
+        # 창 종료 처리
+        if msg == WM_NCDESTROY:
+            if self._kb_old_wnd_proc is not None:
+                user32.SetWindowLongPtrW(hWnd, GWL_WNDPROC, self._kb_old_wnd_proc)
+                self._kb_old_wnd_proc = None
+            return 0
+
+        if msg == WM_INPUT:
+            try:
+                logging.debug("raw_input_wnd_proc: WM_INPUT 메시지 처리 시작")
+                size = ctypes.c_uint(0)
+                # 입력 데이터 크기 확인
+                if user32.GetRawInputData(lParam, RID_INPUT, None, ctypes.byref(size),
+                                            ctypes.sizeof(RAWINPUTHEADER)) == 0:
+                    buffer = ctypes.create_string_buffer(size.value)
+                    if user32.GetRawInputData(lParam, RID_INPUT, buffer, ctypes.byref(size),
+                                            ctypes.sizeof(RAWINPUTHEADER)) == size.value:
+                        raw = ctypes.cast(buffer, ctypes.POINTER(RAWINPUT)).contents
+                        if raw.header.dwType == RIM_TYPEKEYBOARD:
+                            # Key Down 이벤트만 처리
+                            if (raw.u.keyboard.Flags & RI_KEY_BREAK) == 0:
+                                vkey = raw.u.keyboard.VKey
+                                make_code = raw.u.keyboard.MakeCode
+                                flags = raw.u.keyboard.Flags
+                                current_time = time.time()
+
+                                # 중복 이벤트 방지 (0.1초 이내)
+                                if vkey in self.last_key_time and (current_time - self.last_key_time[vkey] < 0.1):
+                                    return 0
+                                self.last_key_time[vkey] = current_time
+
+                                logging.debug(f"raw_input_wnd_proc: 키 입력 감지, vkey={vkey}")
+                                print(f"입력 키 정보\nVK: 0x{make_code}\nFlags: 0x{flags}\nvkey: {vkey}")
+
+                                # 키 심볼 결정 (별도 메서드 호출)
+                                key_sym = self.get_key_symbol(raw, flags)
+                                print("key_sym: ", key_sym)
+                                if key_sym:
+                                    # 내부 장치 여부 판단
+                                    device_name = get_device_name(raw.header.hDevice)
+                                    is_internal = False
+                                    if device_name:
+                                        device_name_lower = device_name.lower().replace("\\", "#")
+                                        is_internal = any(
+                                            internal_id.lower().replace("\\", "#") in device_name_lower
+                                            for internal_id in self.INTERNAL_HWIDS
+                                        )
+                                    if is_internal:
+                                        self.on_raw_key(key_sym)
+                                else:
+                                    # 매핑되지 않은 키의 경우 임시 매핑 및 사용자 안내
+                                    if vkey not in VK_MAPPING:
+                                        temp_key_sym = f"NEW_KEY_0x{vkey:02X}"
+                                        VK_MAPPING[vkey] = temp_key_sym
+                                        messagebox.showinfo('키 추가', f"해당 키({temp_key_sym})가 추가되었습니다. 한번 더 눌러주세요.")
+            except Exception as e:
+                logging.error(f"raw_input_wnd_proc 에러: {e}")
+            return 0
+
+        # 창이 유효하지 않은 경우 처리
+        if not user32.IsWindow(hWnd):
+            return 0
+
+        # 기존 윈도우 프로시저 호출
+        if self._kb_old_wnd_proc:
+            return user32.CallWindowProcW(self._kb_old_wnd_proc, hWnd, msg, wParam, lParam)
+        else:
+            return user32.DefWindowProcW(hWnd, msg, wParam, lParam)
+
+
+    def get_key_symbol(self, raw, flag) -> str:
+        """
+        Raw 입력 데이터로부터 키 심볼을 결정합니다.
+        """
+        vkey = raw.u.keyboard.VKey
+        if vkey in VK_MAPPING:
+            if vkey == 0x0D:
+                return "NUM\nENT" if (raw.u.keyboard.Flags & RI_KEY_E0) else "ENTER"
+            elif vkey == 0x10:
+                if raw.u.keyboard.MakeCode == 0x2A:
+                    return "LSHIFT"
+                elif raw.u.keyboard.MakeCode == 0x36:
+                    return "RSHIFT"
+                else:
+                    return "SHIFT"
+            elif vkey == 0x2E:
+                return "DEL" if (raw.u.keyboard.Flags & RI_KEY_E0) else "NUM\n."
+            elif vkey == 0x2D:
+                return "INS" if (raw.u.keyboard.Flags & RI_KEY_E0) else "NUM\n0"
+            elif vkey == 0x28:
+                return "DOWN" if (raw.u.keyboard.Flags & RI_KEY_E0) else "NUM\n2"
+            elif vkey == 0x25:
+                return "LEFT" if (raw.u.keyboard.Flags & RI_KEY_E0) else "NUM\n4"
+            elif vkey == 0x27:
+                return "RIGHT" if (raw.u.keyboard.Flags & RI_KEY_E0) else "NUM\n6"
+            elif vkey == 0x26:
+                return "UP" if (raw.u.keyboard.Flags & RI_KEY_E0) else "NUM\n8"
+            else:
+                return VK_MAPPING[vkey]
+        elif vkey == 0x23:
+            return "DEL" if (raw.u.keyboard.Flags & RI_KEY_E0) else "NUM\n1"
+        elif vkey == 0x22:
+            return "Pg Dn" if (raw.u.keyboard.Flags & RI_KEY_E0) else "NUM\n3"
+        elif vkey == 0x0C:
+            return "middle" if (raw.u.keyboard.Flags & RI_KEY_E0) else "NUM\n5"
+        elif vkey == 0x24:
+            return "Home" if (raw.u.keyboard.Flags & RI_KEY_E0) else "NUM\n7"
+        elif vkey == 0x21:
+            return "Pg Up" if (raw.u.keyboard.Flags & RI_KEY_E0) else "NUM\n9"
+        return None
+
+
+    def on_close_keyboard_window(self) -> None:
+        """
+        키보드 창 종료 시 누르지 않은 키가 있으면 기록한 후 창을 닫습니다.
+        """
+        if self.keys_not_pressed:
+            unregister_raw_input()
+            self.failed_keys = list(self.keys_not_pressed)
+            self.update_status("키보드", "오류 발생")
+            self.failed_keys_button.config(
+                state="normal",
+                image=self.button_images["누르지 못한 키 보기"]["normal"]
+            )
+        self.close_keyboard_window()
+
+
+    def close_keyboard_window(self) -> None:
+        """
+        키보드 테스트 종료 시 Raw Input 프로시저를 복원하고 창을 닫습니다.
+        """
+        if hasattr(self, '_kb_hwnd') and self._kb_hwnd and self._kb_old_wnd_proc is not None:
+            user32.SetWindowLongPtrW(self._kb_hwnd, GWL_WNDPROC, self._kb_old_wnd_proc)
+            self._kb_old_wnd_proc = None
+        if hasattr(self, 'kb_window_ref'):
+            self.kb_window_ref.destroy()
+        self.on_test_window_close("키보드")
+
+
+    def on_raw_key(self, key: str) -> None:
+        """
+        키 입력 이벤트 처리: 해당 키가 처음 눌리면 이미지 상태를 pressed로 변경하고,
+        모든 키가 눌리면 테스트 완료 처리를 진행합니다.
+        """
+        key_upper = key.upper()
+        # 이미 눌린 키라면 중복 처리하지 않습니다.
+        if key_upper not in self.pressed_keys:
+            # 눌린 키를 상태에 추가
+            self.pressed_keys.add(key_upper)
+            # 아직 누르지 않은 키 목록에서 제거
+            if key_upper in self.keys_not_pressed:
+                self.keys_not_pressed.remove(key_upper)
+            widget = self.key_widgets.get(key_upper)
+            if widget and key_upper in self.key_images:
+                pressed_img = self.key_images[key_upper]["pressed"]
+                widget.config(image=pressed_img)
+                widget.image = pressed_img  # 이미지 참조 유지
+            # 모든 키가 눌렸으면 테스트 완료 처리
+            if not self.keys_not_pressed:
+                unregister_raw_input()
+                messagebox.showinfo("키보드 테스트", "키보드 테스트 완료")
+                self.failed_keys_button.config(
+                    state="disabled",
+                    image=self.button_images["누르지 못한 키 보기"]["disabled"]
+                )
+                self.close_keyboard_window()
+                self.mark_test_complete("키보드")
+
+    def show_failed_keys(self) -> None:
+        """
+        누르지 못한 키와 눌린 키 상태를 실제 키보드 레이아웃과 같이 시각적으로 확인할 수 있는 창을 엽니다.
+        """
+        # 새 창(Toplevel) 생성 및 기본 설정
+        keys_win = ttkb.Toplevel(self)
+        keys_win.title("키보드 누름 상태")
+        keys_win.geometry("1400x800")
+
+        # 전체 키보드 레이아웃을 감싸는 프레임 생성
+        keyboard_frame = ttkb.Frame(keys_win, borderwidth=2, padding=5)
+        keyboard_frame.pack(pady=5)
+
+        # 각 행(row)별로 레이아웃 구성
+        for row_index, row_keys in enumerate(self.keyboard_layout):
+            # 행을 감싸는 프레임 생성
+            row_frame = ttkb.Frame(keyboard_frame)
+            row_frame.pack(pady=5, fill='x')
+
+            # 각 키에 대해 처리
+            for key, width in row_keys:
+                if key == "":  # 빈 키(스페이서)는 별도 처리
+                    spacer = ttkb.Label(row_frame, text="", width=width, padding=(2, 12))
+                    spacer.pack(side='left', padx=3)
+                    continue
+
+                key_upper = key.upper()  # 키 값 대문자 변환
+                # 1 단위 당 10 픽셀로 실제 너비 산출
+                pixel_width = width * 10
+                # 첫 번째 행은 높이를 30px, 나머지 행은 60px로 설정
+                key_height = 30 if row_index == 0 else 60
+
+                # 각 키의 이미지 선택
+                # 눌리지 않은 키(self.failed_keys에 포함되어 있다면) -> normal 이미지
+                # 눌린 키 -> pressed 이미지
+                if hasattr(self, "failed_keys") and key_upper in self.failed_keys:
+                    img = self.key_images[key_upper]["normal"]
+                else:
+                    img = self.key_images[key_upper]["pressed"]
+
+                # 이미지 위젯(Label) 생성 및 배치
+                label = ttkb.Label(row_frame, image=img)
+                label.image = img  # 이미지 참조 유지
+                label.pack(side='left', padx=3)
+
+    # -------------------------------
+    # USB 테스트 관련 메서드
+    # -------------------------------
+    def start_usb_check(self) -> None:
+        """
+        USB 테스트 초기화 후 상태 갱신 및 새로고침 버튼 활성화
+        """
+        # USB 테스트 완료 플래그 초기화
+        self.usb_test_complete = False
+
+        # 새로고침 버튼 활성화
+        self.usb_refresh_button.config(
+            state="normal",
+            image=self.button_images["새로고침"]["normal"]
+            )
+
+        self.refresh_usb_check()
+
+    def refresh_usb_check(self) -> None:
+        """
+        USB 연결 상태를 확인하여 UI 업데이트 후 모든 포트 연결시 테스트 완료 처리
+        """
+        try:
+            # 1. WMI를 통해 USB  장치 정보 획득
+            wmi_obj = win32com.client.GetObject("winmgmts:")
+            pnp_entities = wmi_obj.InstancesOf("Win32_PnPEntity")
+
+            # 2. USB 기기를 탐지했는지 확인하기 위한 flag와 한 번에 탐지한 usb 수를 기록하는 임시 리스트트
+            usb_found = False
+            temp_usb_alram = []
+
+            # 3. 모든 PnP 엔티티 순회
+            for entity in pnp_entities:
+                if hasattr(entity, 'PNPDeviceID') and entity.PNPDeviceID:
+                    device_path = entity.PNPDeviceID.upper()
+
+                    # USB 관련 장치만 검사
+                    if not device_path.startswith("USB\\"):
+                        continue
+
+                    # 4. 정규 표현식으로 포트 번호 추출
+                    match = re.search(r'&0&(\d)$', device_path)
+                    if match:
+                        port_number = int(match.group(1))
+                        if port_number in [1, 2, 3]:
+                            key = f"port{port_number}"
+
+                            # 해당 포트의 연결 상태를 업데이트
+                            self.usb_ports[key] = True
+
+                            # UI 업데이트: 이미지 설정
+                            self.usb_port[port_number-1].config(image=self.status_images["USB테스트 완료"][port_number])
+                            usb_found = True
+                            self.usb_alram.add(port_number)
+                            temp_usb_alram.append(port_number)
+
+
+            # 5. USB 기기를 하나도 찾지 못했을 경우
+            if usb_found == False and all(self.usb_ports.values()) == False:
+                usb_found = True
+                messagebox.showinfo("USB Test", "USB를 연결을 확인해주세요.")
+            else:
+                # usb_alram 리스트를 콤마로 구분된 문자열로 변환
+                usb_ports_str = ", ".join(map(str, temp_usb_alram))
+                # 메시지 박스에 표시할 문자열 생성
+                message = f"확인한 USB 포트 번호: {usb_ports_str}\n총 {len(self.usb_alram)}개의 포트 확인."
+                messagebox.showinfo("USB 확인", message)
+
+            # 6. 모든 포트가 연결된 경우 테스트 완료 처리
+            if all(self.usb_ports.values()):
+                self.usb_test_complete = True
+                self.usb_refresh_button.config(state="disabled")
+                self.mark_test_complete("USB")
+                messagebox.showinfo("USB Test", "모든 USB 포트 테스트 완료!")
+
+        except Exception as e:
+            messagebox.showerror("USB Error", f"USB 포트 확인 중 오류 발생:\n{e}")
+
+    # -------------------------------
+    # 카메라 테스트 관련 메서드
+    # -------------------------------
+    def open_camera_test(self) -> None:
+        """
+        카메라(웹캠) 테스트 창을 열어 프레임을 표시합니다.
+        """
+        # 이미 카메라 테스트가 실행 중인지 확인
+        if getattr(self, "camera_test_running", False):
+            messagebox.showinfo("정보", "카메라 테스트가 이미 실행 중입니다.")
+            return
+
+        # 테스트 시작 플래그 설정
+        self.camera_test_running = True
+
+        # 기본 카메라(인덱스 0)를 CAP_DSHOW 옵션으로 열기
+        self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+        if not self.cap.isOpened():
+            messagebox.showerror("카메라 오류", "카메라를 열 수 없습니다. 장치를 확인해주세요.")
+            self.update_status("카메라", "오류 발생")
+            self.camera_test_running = False
+            return
+
+        # 테스트 창 이름 설정 및 창 생성
+        self.window_name = "Camera Test - X to exit"
+        cv2.namedWindow(self.window_name)
+
+        # 예약된 after() 콜백 ID 초기화
+        self.camera_update_after_id = None
+
+        # 카메라 프레임 업데이트 시작
+        self.update_camera_frame()
+
+
+    def update_camera_frame(self) -> None:
+        """
+        Tkinter의 after()를 이용하여 주기적으로 카메라 프레임을 업데이트합니다.
+        """
+        # 테스트가 중지된 경우 함수 종료
+        if not self.camera_test_running:
+            return
+
+        try:
+            # 카메라에서 프레임 읽기
+            ret, frame = self.cap.read()
+            if not ret or frame is None:
+                messagebox.showerror("카메라 오류", "카메라 프레임을 읽을 수 없습니다.")
+                self.update_status("카메라", "오류 발생")
+                self.close_camera_test()
+                return
+
+            # 읽은 프레임을 테스트 창에 표시
+            cv2.imshow(self.window_name, frame)
+
+            # 1ms 동안 키 입력 감지 (ESC 키 또는 창 닫힘 시 테스트 종료)
+            key = cv2.waitKey(1) & 0xFF
+            if key == 27 or cv2.getWindowProperty(self.window_name, cv2.WND_PROP_VISIBLE) < 1:
+                self.close_camera_test()
+                return
+
+        except Exception as e:
+            # 예외 발생 시 사용자에게 오류 메시지 출력 및 테스트 종료
+            messagebox.showerror("카메라 오류", f"예외 발생: {str(e)}")
+            self.update_status("카메라", "오류 발생")
+            self.close_camera_test()
+            return
+
+        # 10ms 후 재호출하여 프레임 업데이트 반복
+        self.camera_update_after_id = self.after(10, self.update_camera_frame)
+
+
+    def close_camera_test(self) -> None:
+        """
+        카메라 테스트 종료 후 자원 해제 및 상태 복원.
+        """
+        # 예약된 after() 콜백이 있으면 취소
+        if hasattr(self, "camera_update_after_id") and self.camera_update_after_id is not None:
+            self.after_cancel(self.camera_update_after_id)
+            self.camera_update_after_id = None
+
+        try:
+            # 카메라 객체가 존재하면 해제하고 None으로 초기화
+            if hasattr(self, "cap") and self.cap is not None:
+                self.cap.release()
+                self.cap = None
+        except Exception as e:
+            messagebox.showerror("카메라 종료 오류", f"카메라 해제 중 오류 발생: {str(e)}")
+
+        try:
+            # 테스트 창이 존재하면 해당 창만 닫기
+            if hasattr(self, "window_name"):
+                cv2.destroyWindow(self.window_name)
+            else:
+                cv2.destroyAllWindows()
+        except Exception as e:
+            # 창 닫기 중 오류 발생 시 모든 창 닫기 시도
+            cv2.destroyAllWindows()
+
+        # 테스트 완료 처리 및 상태 복원
+        self.mark_test_complete("카메라")
+        self.camera_test_running = False
+
+    # -------------------------------
+    # 충전 테스트 관련 메서드
+    # -------------------------------
+    def start_c_type_check(self) -> None:
+        """
+        충전 테스트를 시작하고 충전 포트 상태를 확인합니다.
+        """
+        self.c_type_ports = {"충전": False}
+        # self.update_status("충전", "테스트 중")
+        self.check_c_type_port()
+
+    def check_c_type_port(self) -> None:
+        """
+        배터리 충전 상태를 확인하여 포트 상태를 갱신합니다.
+        """
+        battery = psutil.sensors_battery()
+        if battery is None:
+            messagebox.showerror("충전 Error", "배터리 정보를 가져올 수 없습니다.")
+            self.update_status("충전", "오류 발생")
+            return
+        if not battery.power_plugged:
+            messagebox.showinfo("충전 Test", "충전기가 연결되지 않았습니다.\n해당 포트에 충전기를 연결 후 다시 확인하세요.")
+            self.update_status("충전", "오류 발생")
+            return
+        if not self.c_type_ports["충전"]:
+            self.c_type_ports["충전"] = True
+            messagebox.showinfo("충전 Test", "충전 확인되었습니다.")
+            self.mark_test_complete("충전")
+
+    # -------------------------------
+    # 배터리 리포트 관련 메서드
+    # -------------------------------
+    def generate_battery_report(self) -> None:
+        """
+        powercfg 명령어를 통해 배터리 리포트를 생성합니다.
+        """
+        try:
+            # 다운로드 폴더 경로를 가져옵니다.
+            downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
+
+            # 다운로드 폴더가 없는 경우, 생성합니다.
+            if not os.path.exists(downloads_path):
+                os.makedirs(downloads_path)
+
+            # 컴퓨터 이름 가져오기
+            computer_name = os.getenv("COMPUTERNAME")
+            if computer_name is None:
+                computer_name = "Unknown"
+            # 현재 시간 가져오기
+            now = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+            # 배터리 리포트 파일명 생성
+            new_report_name = f"battery_report_{computer_name}_{now}.html"
+            new_report_path = os.path.join(downloads_path, new_report_name)
+
+            # 리포트 생성
+            temp_report_path = os.path.join(downloads_path, "battery_report.html")
+            subprocess.run(["powercfg", "/batteryreport", "/output", temp_report_path],
+                           check=True, capture_output=True, text=True)
+            # 리포트 파일 이름 변경
+            os.rename(temp_report_path, new_report_path)
+
+            self.report_path = new_report_path
+            messagebox.showinfo("배터리 리포트", f"배터리 리포트가 생성되었습니다.\n파일 경로:\n{self.report_path}")
+            self.battery_report_button.config(bootstyle="info")
+            self.update_status("배터리", "생성 완료")
+            self.mark_test_complete("배터리")
+            self.upload_battery_report(self.report_path)
+        except subprocess.CalledProcessError as e:
+            messagebox.showerror("배터리 리포트 오류", f"명령 실행 중 오류 발생:\n{e.stderr}")
+            self.update_status("배터리", "오류 발생")
+        except Exception as e:
+            messagebox.showerror("배터리 리포트 오류", f"오류 발생:\n{e}")
+            self.update_status("배터리", "오류 발생")
+
+    def get_computer_name(self):
+        """
+        컴퓨터 이름을 가져옵니다.
+        """
+        try:
+            computer_name = os.getenv("COMPUTERNAME")
+            if computer_name is None:
+                computer_name = "Unknown"
+            return computer_name
+        except Exception as e:
+            messagebox.showerror("컴퓨터 이름 오류", f"컴퓨터 이름을 가져오는 중 오류 발생:\n{e}")
+            return "Unknown"
+
+    def view_battery_report(self) -> None:
+        """
+        생성된 배터리 리포트 파일을 엽니다.
+        """
+        if self.report_path and os.path.exists(self.report_path):
+            try:
+                os.startfile(self.report_path)
+            except Exception as e:
+                messagebox.showerror("리포트 확인 오류", f"리포트를 열 수 없습니다:\n{e}")
+                self.update_status("배터리", "오류 발생")
+
+        else:
+            messagebox.showwarning("리포트 없음", "아직 배터리 리포트가 생성되지 않았습니다.\n먼저 '배터리 리포트 생성' 버튼을 눌러주세요.")
+            self.update_status("배터리", "생성 전")
+
+    def upload_battery_report(self, report_path):
+        """
+        (기존) S3 직접 업로드 -> (변경) Django 서버로 업로드
+        """
+        # Django 서버 endpoint
+        # 실제 주소/포트를 맞춰서 기입: 예) https://j12d101.p.ssafy.io/s3app/upload_battery/
+        django_url = "https://j12d101.p.ssafy.io/django/s3app/upload_battery/"
+        # django_url = "http://localhost:8000/s3app/upload_battery/"
+
+        try:
+            with open(report_path, 'rb') as f:
+                # 파일 전송
+                files = {'file': (os.path.basename(report_path), f, 'text/html')}
+                resp = requests.post(django_url, files=files)
+
+                if resp.status_code == 200:
+                    data = resp.json()
+                    messagebox.showinfo("업로드 완료", f"Django에 업로드 성공: {data}")
+                else:
+                    messagebox.showerror("업로드 오류", f"status={resp.status_code}, body={resp.text}")
+        except Exception as e:
+            messagebox.showerror("업로드 예외", f"Django 서버 업로드 중 오류 발생: {e}")
+
+    # -------------------------------
+    # QR 코드 생성 관련 메서드
+    # -------------------------------
+    def generate_qr_code(self) -> None:
+        """
+        테스트 결과를 JSON 형식으로 구성 후 QR 코드를 생성하여 표시합니다.
+        """
+        if len(self.qr_codes) == 5:
+            results = {
+                "keyboard": {
+                    "status": "pass" if self.test_done.get("키보드") else "fail",
+                    "failed_keys": sorted(self.failed_keys) if not self.test_done.get("키보드") else []
+                },
+                "usb": {
+                    "status": "pass" if self.test_done.get("USB") else "fail",
+                    "failed_ports": [port for port, connected in self.usb_ports.items() if not connected]
+                },
+                "camera": {
+                    "status": "pass" if self.test_done.get("카메라") else "fail"
+                },
+                "charger": {
+                    "status": "pass" if self.test_done.get("충전") else "fail"
+                },
+                "battery_report": "pass" if self.report_path and os.path.exists(self.report_path) else "fail"
+            }
+            qr_data = json.dumps(results, ensure_ascii=False, indent=2)
+            try:
+                qr = qrcode.QRCode(
+                    version=None,
+                    error_correction=qrcode.constants.ERROR_CORRECT_L,
+                    box_size=4,
+                    border=4,
+                )
+                qr.add_data(qr_data)
+                qr.make(fit=True)
+                img = qr.make_image(fill_color="black", back_color="white")
+                qr_img = ImageTk.PhotoImage(img)
+                qr_window = ttkb.Toplevel(self)
+                qr_window.title("상세 테스트 결과 QR 코드")
+                qr_label = ttkb.Label(qr_window, image=qr_img)
+                qr_label.image = qr_img  # 이미지 참조 유지
+                qr_label.pack(padx=10, pady=10)
+                self.mark_test_complete("QR코드")
+            except Exception as e:
+                messagebox.showerror("QR 코드 생성 오류", f"QR 코드 생성 중 오류 발생:\n{e}")
+        else:
+            messagebox.showerror("QR 코드 생성 오류", f"테스트를 진행하지 않아 QR코드를 생성할 수 없습니다. \n 현재까지 실시한 테스트 목록{self.qr_codes}")
+            self.update_status("QR코드", "오류 발생")
+
+# ===============================
+# 애플리케이션 실행
+# ===============================
+if __name__ == "__main__":
+    app = TestApp()
+    app.mainloop()
