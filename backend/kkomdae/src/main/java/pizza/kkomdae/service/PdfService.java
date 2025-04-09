@@ -47,9 +47,9 @@ public class PdfService {
         LaptopTestResult result = lapTopTestResultRepository.findByIdWithStudentAndDeviceAndPhotos(testId);
         LaptopTestResult rent = null;
         List<Photo> rentPhotos = null;
-
+        if(result.getSumOfDamages()==null)result.setSumOfDamages(0);
         for (Photo photo : result.getPhotos()) {
-            result.setSumOfDamages(result.getSumOfDamages()+photo.getDamage());
+            result.setSumOfDamages(result.getSumOfDamages() + photo.getDamage());
         }
         if (result.getRelease()) {
             rent = result.getRent().getLaptopTestResults().get(0);
@@ -116,9 +116,9 @@ public class PdfService {
                 Paragraph("\n\n"));
 
         // 노트북 촬영 섹션
-        addPhotoSection(document, koreanFont, info.getPhotos(),"촬영");
+        addPhotoSection(document, koreanFont, info.getPhotos(), "촬영");
 
-        if (info.isRelease()) addPhotoSection(document, koreanFont, info.getRentPhotos(),"분석");
+        if (info.isRelease()) addPhotoSection(document, koreanFont, info.getRentPhotos(), "분석");
         document.close();
         return baos;
     }
