@@ -20,9 +20,10 @@
 
 .modal {
   background: white;
-  padding: 20px;
+  padding: 55px;
+  padding-bottom: 30px;
   border-radius: 8px;
-  max-width: 500px;
+  max-width: 530px;
   width: 90%;
   z-index: 1001;
   position: relative;
