@@ -80,7 +80,8 @@ public class TestResultService {
         return photos.stream()
                 .map(photo -> {
                     String presignedUrl = s3Service.generatePresignedUrl(photo.getName());
-                    return new PhotoWithUrl(photo, presignedUrl);
+                    String presignedAiUrl = s3Service.generatePresignedUrl(photo.getAiName());
+                    return new PhotoWithUrl(photo, presignedUrl, presignedAiUrl);
                 })
                 .collect(Collectors.toList());
     }

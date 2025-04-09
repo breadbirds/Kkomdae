@@ -96,9 +96,7 @@ public class AdminController {
 
     @GetMapping("/photos")
     public String photos(@RequestParam long testResultId, Model model) {
-//        TODO 실제 사진 링크로 변경
         List<PhotoWithUrl> photos = testResultService.getPhotos(testResultId);
-
         log.info("urls size : {}", photos.size());
         model.addAttribute("photos", photos);
         return "photos";
