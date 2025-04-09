@@ -35,6 +35,6 @@ public class LaptopTestResultWithStudent {
     }
 
     public void setBatteryPdfUrl(String batteryPdfUrl) {
-        this.batteryPdfUrl = resultPdfUrl;
+        this.batteryPdfUrl = batteryPdfUrl;
     }
 }
