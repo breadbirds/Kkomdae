@@ -20,6 +20,7 @@ import pizza.kkomdae.dto.PdfInfo;
 import pizza.kkomdae.entity.LaptopTestResult;
 import pizza.kkomdae.entity.Photo;
 import pizza.kkomdae.repository.laptopresult.LapTopTestResultRepository;
+import pizza.kkomdae.repository.rent.RentRepository;
 import pizza.kkomdae.s3.S3Service;
 
 import java.io.ByteArrayOutputStream;
@@ -34,21 +35,25 @@ import java.util.List;
 public class PdfService {
     private final S3Service s3Service;
     private final LapTopTestResultRepository lapTopTestResultRepository;
+    private final RentRepository rentRepository;
 
-    public PdfService(S3Service s3Service, LapTopTestResultRepository lapTopTestResultRepository) {
+    public PdfService(S3Service s3Service, LapTopTestResultRepository lapTopTestResultRepository, RentRepository rentRepository) {
         this.s3Service = s3Service;
         this.lapTopTestResultRepository = lapTopTestResultRepository;
+        this.rentRepository = rentRepository;
     }
 
     public String makeAndUploadPdf(long testId) {
         LaptopTestResult result = lapTopTestResultRepository.findByIdWithStudentAndDeviceAndPhotos(testId);
         LaptopTestResult rent = null;
+        List<Photo> rentPhotos = null;
         if (result.getRelease()) {
             rent = result.getRent().getLaptopTestResults().get(0);
+            rentPhotos = rent.getPhotos();
         }
         String fileName;
         try {
-            PdfInfo pdfInfo = new PdfInfo(result, rent);
+            PdfInfo pdfInfo = new PdfInfo(result, rent, rentPhotos);
             ByteArrayOutputStream baso = initPdf(pdfInfo);
             fileName = s3Service.uploadPdf(baso, result);
         } catch (IOException e) {
@@ -107,8 +112,9 @@ public class PdfService {
                 Paragraph("\n\n"));
 
         // 노트북 촬영 섹션
-        addPhotoSection(document, koreanFont, info.getPhotos());
+        addPhotoSection(document, koreanFont, info.getPhotos(),"촬영");
 
+        if (info.isRelease()) addPhotoSection(document, koreanFont, info.getRentPhotos(),"분석");
         document.close();
         return baos;
     }
@@ -448,9 +454,13 @@ public class PdfService {
         table.addCell(valueCell2);
     }
 
-    private void addPhotoSection(Document document, PdfFont font, List<Photo> photos) throws MalformedURLException {
+    private void addPhotoSection(Document document, PdfFont font, List<Photo> photos, String status) throws MalformedURLException {
+
+        if (status.equals("분석")) {
+            document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+        }
         // 사진 섹션 제목 (밑줄 추가)
-        Paragraph photoTitle = new Paragraph("삼성 청년 S/W 아카데미 노트북 수령 상태 촬영")
+        Paragraph photoTitle = new Paragraph("삼성 청년 S/W 아카데미 노트북 상태 " + status)
                 .setFont(font)
                 .setFontSize(14)
                 .setBold()

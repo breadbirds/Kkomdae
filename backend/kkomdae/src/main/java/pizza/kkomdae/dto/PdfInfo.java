@@ -27,6 +27,7 @@ public class PdfInfo {
     private LocalDate returnDate;
     private LocalDate rentDate;
     private List<Photo>photos;
+    private List<Photo>rentPhotos;
     private boolean release;
     private int rentLaptopCount;
     private int rentPowerCableCount;
@@ -35,7 +36,7 @@ public class PdfInfo {
     private int rentBagCount;
     private int rentMousePadCount;
 
-    public PdfInfo(LaptopTestResult result, LaptopTestResult rent) {
+    public PdfInfo(LaptopTestResult result, LaptopTestResult rent, List<Photo> rentPhotos) {
         Student student = result.getStudent();
         this.name = student.getName();
         this.region = student.getRegion();
@@ -68,5 +69,6 @@ public class PdfInfo {
         this.rentAdapterCount = rent.getAdapter();
         this.rentLaptopCount = rent.getLaptop();
         this.rentPowerCableCount = rent.getPowerCable();
+        this.rentPhotos= rentPhotos;
     }
 }
