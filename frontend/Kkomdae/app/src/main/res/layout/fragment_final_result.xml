@@ -412,7 +412,10 @@
                 <TextView
                     android:id="@+id/tv_input_model_name"
                     style="@style/Body2"
-                    android:layout_width="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_width="0dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     android:layout_height="wrap_content"
                     android:text="NT961XFH-X01/C(13세대)"
                     app:layout_constraintBottom_toBottomOf="@id/tv_model_name"
@@ -432,7 +435,10 @@
                 <TextView
                     android:id="@+id/tv_input_serial"
                     style="@style/Body2"
-                    android:layout_width="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:layout_width="0dp"
+                    app:layout_constraintEnd_toEndOf="parent"
                     android:layout_height="wrap_content"
                     android:text="69P59FFWC00258"
                     app:layout_constraintBottom_toBottomOf="@id/tv_serial"
@@ -452,9 +458,12 @@
                 <TextView
                     android:id="@+id/tv_input_barcode"
                     style="@style/Body2"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="A10301373A"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="@id/tv_barcode"
                     app:layout_constraintStart_toEndOf="@id/tv_barcode"
                     app:layout_constraintTop_toTopOf="@id/tv_barcode" />
@@ -848,9 +857,10 @@
                 <TextView
                     android:id="@+id/tv_front_title"
                     style="@style/Body2"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="전면부"
+                    android:text=""
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 

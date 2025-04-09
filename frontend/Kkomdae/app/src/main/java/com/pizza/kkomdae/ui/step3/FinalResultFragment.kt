@@ -266,11 +266,8 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
         btnConfirm.setOnClickListener {
             // 다이얼로그 닫기
             dialog.dismiss()
-
             // api호출
             viewModel.postPdf()
-
-
         }
 
         dialog.show()
