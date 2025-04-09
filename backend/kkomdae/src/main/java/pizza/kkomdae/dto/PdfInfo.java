@@ -63,12 +63,14 @@ public class PdfInfo {
             log.info("rentDate : {}",this.rentDate);
         }
         this.description = result.getDescription();
-        this.rentMousePadCount = rent.getMousePad();
-        this.rentMouseCount = rent.getMouse();
-        this.rentBagCount = rent.getBag();
-        this.rentAdapterCount = rent.getAdapter();
-        this.rentLaptopCount = rent.getLaptop();
-        this.rentPowerCableCount = rent.getPowerCable();
-        this.rentPhotos= rentPhotos;
+        if (rent != null) {
+            this.rentMousePadCount = rent.getMousePad();
+            this.rentMouseCount = rent.getMouse();
+            this.rentBagCount = rent.getBag();
+            this.rentAdapterCount = rent.getAdapter();
+            this.rentLaptopCount = rent.getLaptop();
+            this.rentPowerCableCount = rent.getPowerCable();
+            this.rentPhotos= rentPhotos;
+        }
     }
 }
