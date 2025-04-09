@@ -18,6 +18,7 @@ public class LaptopTestResultWithStudent {
     private String batteryPdfUrl;
     private String resultPdfUrl;
     private final LocalDate date;
+    private String sumOfDamages;
 
     public LaptopTestResultWithStudent(LaptopTestResult laptopTestResult) {
         this.laptopTestId = laptopTestResult.getLaptopTestResultId();
@@ -29,6 +30,11 @@ public class LaptopTestResultWithStudent {
         if (laptopTestResult.getFailedPorts() != null) this.failedPorts = laptopTestResult.getFailedPorts();
         this.cameraStatus = laptopTestResult.getCameraStatus();
         this.date = laptopTestResult.getDate();
+        if (laptopTestResult.getSumOfDamages() != null) {
+            this.sumOfDamages = Integer.toString(laptopTestResult.getSumOfDamages());
+        } else {
+            this.sumOfDamages = "테스트 중";
+        }
     }
 
     public void setResultPdfUrl(String resultPdfUrl) {
