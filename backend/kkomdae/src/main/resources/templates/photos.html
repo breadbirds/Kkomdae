@@ -87,18 +87,45 @@
                 <td>
                     <div class="image-title">
                         <span th:switch="${photo.getType()}">
-                            <span th:case="1">전면부 사진</span>
-                            <span th:case="2">후면부 사진</span>
-                            <span th:case="3">좌측면 사진</span>
-                            <span th:case="4">우측면 사진</span>
-                            <span th:case="5">모니터 사진</span>
-                            <span th:case="6">키보드 사진</span>
+                            <span th:case="1">전면부 원본 사진</span>
+                            <span th:case="2">후면부 원본 사진</span>
+                            <span th:case="3">좌측면 원본 사진</span>
+                            <span th:case="4">우측면 원본 사진</span>
+                            <span th:case="5">모니터 원본 사진</span>
+                            <span th:case="6">키보드 원본 사진</span>
                         </span>
                     </div>
                     <div class="image-container">
                         <a th:href="${photo.getUrl()}" target="_blank">
                             <img th:src="${photo.getUrl()}"
                                  th:alt="${photo.getName()}"
+                                 class="laptop-image">
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div th:unless="${#lists.isEmpty(photos)}">
+        <table class="image-table">
+            <tbody>
+            <tr th:each="photo : ${photos}">
+                <td>
+                    <div class="image-title">
+                        <span th:switch="${photo.getType()}">
+                            <span th:case="1">전면부 AI 분석 사진</span>
+                            <span th:case="2">후면부 AI 분석 사진</span>
+                            <span th:case="3">좌측면 AI 분석 사진</span>
+                            <span th:case="4">우측면 AI 분석 사진</span>
+                            <span th:case="5">모니터 AI 분석 사진</span>
+                            <span th:case="6">키보드 AI 분석 사진</span>
+                        </span>
+                    </div>
+                    <div class="image-container">
+                        <a th:href="${photo.getAiUrl()}" target="_blank">
+                            <img th:src="${photo.getAiUrl()}"
+                                 th:alt="${photo.getAiName()}"
                                  class="laptop-image">
                         </a>
                     </div>

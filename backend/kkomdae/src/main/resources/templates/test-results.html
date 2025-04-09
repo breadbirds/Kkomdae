@@ -70,6 +70,7 @@
                 <th>실패한 키</th>
                 <th>실패한 포트</th>
                 <th>카메라 상태</th>
+                <th>AI 흠집 갯수</th>
                 <th>배터리 URL</th>
                 <th>PDF URL</th>
                 <th>날짜</th>
@@ -88,6 +89,7 @@
                     <span class="status-badge" th:classappend="${result.cameraStatus ? 'status-success' : 'status-danger'}"
                           th:text="${result.cameraStatus ? '정상' : '고장'}">카메라 상태</span>
                 </td>
+                <td th:text="${result.sumOfDamages}">AI 흠집 갯수</td>
                 <td>
                     <a th:if="${not #strings.isEmpty(result.batteryPdfUrl)}"
                        th:href="${result.batteryPdfUrl}" class="btn btn-sm btn-primary">보기</a>

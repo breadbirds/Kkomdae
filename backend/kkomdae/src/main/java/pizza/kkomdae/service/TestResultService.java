@@ -48,6 +48,7 @@ public class TestResultService {
         for (LaptopTestResult laptopTestResult : laptopTestResults) {
             LaptopTestResultWithStudent laptopTestResultWithStudent = new LaptopTestResultWithStudent(laptopTestResult);
             laptopTestResultWithStudent.setResultPdfUrl(s3Service.generatePresignedUrl(laptopTestResult.getPdfFileName()));
+            laptopTestResultWithStudent.setBatteryPdfUrl(s3Service.generatePresignedUrl(laptopTestResult.getBatteryReportUrl()));
             results.add(laptopTestResultWithStudent);
         }
         return results;
@@ -79,7 +80,8 @@ public class TestResultService {
         return photos.stream()
                 .map(photo -> {
                     String presignedUrl = s3Service.generatePresignedUrl(photo.getName());
-                    return new PhotoWithUrl(photo, presignedUrl);
+                    String presignedAiUrl = s3Service.generatePresignedUrl(photo.getAiName());
+                    return new PhotoWithUrl(photo, presignedUrl, presignedAiUrl);
                 })
                 .collect(Collectors.toList());
     }
@@ -233,7 +235,7 @@ public class TestResultService {
         List<Photo> photos = result.getPhotos();
         List<String> urls = new ArrayList<>();
         for (Photo photo : photos) {
-            urls.add(s3Service.generatePresignedUrl(photo.getName()));
+            urls.add(s3Service.generatePresignedUrl(photo.getAiName()));
         }
         res.setImageUrls(urls);
 

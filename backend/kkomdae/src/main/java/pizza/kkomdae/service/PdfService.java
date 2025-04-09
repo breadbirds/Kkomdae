@@ -47,6 +47,10 @@ public class PdfService {
         LaptopTestResult result = lapTopTestResultRepository.findByIdWithStudentAndDeviceAndPhotos(testId);
         LaptopTestResult rent = null;
         List<Photo> rentPhotos = null;
+
+        for (Photo photo : result.getPhotos()) {
+            result.setSumOfDamages(result.getSumOfDamages()+photo.getDamage());
+        }
         if (result.getRelease()) {
             rent = result.getRent().getLaptopTestResults().get(0);
             rentPhotos = rent.getPhotos();

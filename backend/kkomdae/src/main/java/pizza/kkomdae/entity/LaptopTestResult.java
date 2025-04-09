@@ -52,7 +52,8 @@ public class LaptopTestResult {
     private Integer picStage = 0;
     private String randomKey;
     private String description;
-    
+    private Integer sumOfDamages;
+
     @OneToMany(mappedBy = "laptopTestResult")
     private List<Photo> photos;
     @ManyToOne(fetch = FetchType.LAZY)

@@ -4,6 +4,7 @@ import lombok.Getter;
 import pizza.kkomdae.entity.LaptopTestResult;
 
 import java.time.LocalDate;
+
 @Getter
 public class LaptopTestResultWithStudent {
     private final long laptopTestId;
@@ -11,12 +12,13 @@ public class LaptopTestResultWithStudent {
     private final String studentRegion;
     private final String studentName;
     private final String studentNum;
-    private final String failedKeys;
-    private final String failedPorts;
+    private String failedKeys = "";
+    private String failedPorts = "";
     private final boolean cameraStatus;
-    private final String batteryPdfUrl;
-    private  String resultPdfUrl;
+    private String batteryPdfUrl;
+    private String resultPdfUrl;
     private final LocalDate date;
+    private String sumOfDamages;
 
     public LaptopTestResultWithStudent(LaptopTestResult laptopTestResult) {
         this.laptopTestId = laptopTestResult.getLaptopTestResultId();
@@ -24,14 +26,22 @@ public class LaptopTestResultWithStudent {
         this.studentName = laptopTestResult.getStudent().getName();
         this.studentNum = laptopTestResult.getStudent().getStudentNum();
         this.release = laptopTestResult.getRelease();
-        this.failedKeys = laptopTestResult.getFailedKeys();
-        this.failedPorts = laptopTestResult.getFailedPorts();
+        if (laptopTestResult.getFailedKeys() != null) this.failedKeys = laptopTestResult.getFailedKeys();
+        if (laptopTestResult.getFailedPorts() != null) this.failedPorts = laptopTestResult.getFailedPorts();
         this.cameraStatus = laptopTestResult.getCameraStatus();
-        this.batteryPdfUrl = laptopTestResult.getBatteryReportUrl();
         this.date = laptopTestResult.getDate();
+        if (laptopTestResult.getSumOfDamages() != null) {
+            this.sumOfDamages = Integer.toString(laptopTestResult.getSumOfDamages());
+        } else {
+            this.sumOfDamages = "테스트 중";
+        }
     }
 
     public void setResultPdfUrl(String resultPdfUrl) {
         this.resultPdfUrl = resultPdfUrl;
+    }
+
+    public void setBatteryPdfUrl(String batteryPdfUrl) {
+        this.batteryPdfUrl = batteryPdfUrl;
     }
 }
