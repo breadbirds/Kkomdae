@@ -26,8 +26,7 @@
         app:layout_constraintEnd_toEndOf="parent"
          app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:visibility="gone"/>
+        android:layout_height="match_parent"/>
 
     <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/sw_auto"

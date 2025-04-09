@@ -27,7 +27,7 @@
 
         <TextView
             android:id="@+id/tv_description1"
-            style="@style/Body2"
+            style="@style/Label3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -41,7 +41,7 @@
 
         <TextView
             android:id="@+id/tv_description2"
-            style="@style/Body2"
+            style="@style/Label3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"

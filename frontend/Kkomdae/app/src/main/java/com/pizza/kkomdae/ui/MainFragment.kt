@@ -117,6 +117,10 @@ class MainFragment :  BaseFragment<FragmentMainBinding>(
         binding.btnLogout.setOnClickListener {
             mainActivity.logout()
         }
+        viewModel.Fail.observe(viewLifecycleOwner){
+            mainActivity.performLogout()
+
+        }
 
         // 서버에서 받아온 유저 정보
         viewModel.userInfoResult.observe(viewLifecycleOwner) { userInfo ->

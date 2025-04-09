@@ -450,8 +450,8 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
                         // ✅ 4️⃣ UI Thread 복귀
                         Handler(Looper.getMainLooper()).post {
                             Log.d("CameraFragment", "사진 저장됨: $savedUri")
-                            viewModel.setScreen(savedUri)
-                            viewModel.setStep(5)
+                            viewModel.setKeypad(savedUri)
+                            viewModel.setStep(6)
 
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE

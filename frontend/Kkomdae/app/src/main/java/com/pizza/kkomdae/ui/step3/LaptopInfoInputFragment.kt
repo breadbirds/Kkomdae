@@ -1,8 +1,10 @@
 package com.pizza.kkomdae.ui.step3
 
+import android.Manifest
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -12,6 +14,7 @@ import android.os.Build
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Base64
 import android.util.Log
 import android.view.Gravity
@@ -24,6 +27,7 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.CalendarView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.RequiresApi
@@ -31,6 +35,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
@@ -260,19 +265,52 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
 
 
         binding.clBtnOcr.setOnClickListener {
-            imageFile = File(requireContext().cacheDir, "ocr_image_${System.currentTimeMillis()}.jpg")
-            imageUri = FileProvider.getUriForFile(
-                requireContext(),
-                "${requireContext().packageName}.fileprovider",
-                imageFile
-            )
 
-            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-            cameraLauncher.launch(intent)
+            when {
+                // 권한이 있는지 확인
+
+                // 권한이 있을 때
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    // 권한이 있으므로 액션 실행
+                    goOcr()
+                }
+                // 왜 필요한지 한번도 설명
+                ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
+                    Manifest.permission.CAMERA) -> {
+                    showDialog()
+                }
+
+                else -> {
+                    ActivityCompat.requestPermissions(requireActivity(),
+                        arrayOf(Manifest.permission.CAMERA),
+                        204)
+
+                    showDialog()
+                }
+
+            }
+
+
         }
 
     }
+
+    private fun goOcr() {
+        imageFile = File(requireContext().cacheDir, "ocr_image_${System.currentTimeMillis()}.jpg")
+        imageUri = FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.fileprovider",
+            imageFile
+        )
+
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+        cameraLauncher.launch(intent)
+    }
+
     //ocr
     private fun loadOcrResult() {
         val prefs = requireContext().getSharedPreferences("ocr_prefs", Context.MODE_PRIVATE)
@@ -674,6 +712,50 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         }
 
         dialog.show()
+    }
+
+    private fun showDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.layout_dialog_step3_confirm)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        val tvTitle1 = dialog.findViewById<TextView>(R.id.tv_description1)
+        val tvTitle2 = dialog.findViewById<TextView>(R.id.tv_description2)
+        tvTitle1.text= "사진 촬영을 위해 카메라 권한이 필요합니다."
+        tvTitle2.text= "설정에서 카메라 권한을 허용해 주세요."
+
+
+        // 닫기 버튼 클릭 리스너
+        val cancelButton = dialog.findViewById<View>(R.id.btn_cancel)
+
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+
+        // 입력 완료하기 버튼 클릭 리스너
+        val confirmButton = dialog.findViewById<TextView>(R.id.btn_confirm)
+        confirmButton.text="변경하러 가기"
+        confirmButton.setOnClickListener {
+            navigateToAppSetting()
+            dialog.dismiss()
+
+        }
+
+        dialog.show()
+    }
+
+    // 권한 설정 화면으로 이동하는 함수
+    private fun navigateToAppSetting() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", requireContext().packageName, null)
+        }
+        startActivity(intent)
     }
 
     // 완료 다이얼로그

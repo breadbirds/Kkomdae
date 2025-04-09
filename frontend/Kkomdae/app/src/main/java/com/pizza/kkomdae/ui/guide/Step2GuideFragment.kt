@@ -140,29 +140,29 @@ class Step2GuideFragment : BaseFragment<FragmentStep2GuideBinding>(
                     }else{
                         var data = ""
                         it.data?.let {
-                            if(it.keyboard_status!=true){
+                            if(it.keyboard_status==null){
                                 data += "키보드"
                             }
-                            if(it.camera_status != true){
+                            if(it.camera_status == null){
                                 if(data!=""){
                                     data += ", "
                                 }
                                 data += "카메라"
                             }
-                            if(it.usb_status != true){
+                            if(it.usb_status == null){
                                 if(data!=""){
                                     data += ", "
                                 }
                                 data += "USB"
                             }
-                            if(it.charging_status != true){
+                            if(it.charging_status == null){
                                 if(data!=""){
                                     data += ", "
                                 }
                                 data += "충전기"
                             }
 
-                            if(it.battery_report != true){
+                            if(it.battery_report == null){
                                 if(data!=""){
                                     data += ", "
                                 }

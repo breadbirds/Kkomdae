@@ -61,13 +61,14 @@
             app:layout_constraintBottom_toBottomOf="parent">
 
             <EditText
+                android:imeOptions="actionDone"
                 android:id="@+id/et_note_detail"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@null"
                 android:gravity="top|start"
                 android:hint="(예: 스페이스바 주변 미세 스크래치, 키보드 반응 느림, 화면 깜빡임 등)"
-                android:inputType="textMultiLine|textCapSentences"
+                android:inputType="text"
                 android:padding="18dp"
                 android:textColor="@color/gray700"
                 android:textColorHint="@color/gray300"

@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         customDialog.show()
     }
 
-    private fun performLogout() {
+     fun performLogout() {
         // 저장된 토큰 삭제
         val secureTokenManager = SecureTokenManager(this)
         secureTokenManager.deleteRefreshToken()

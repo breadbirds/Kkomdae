@@ -19,6 +19,8 @@ import android.provider.SyncStateContract
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -192,12 +194,14 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
                 // 왜 필요한지 한번도 설명
                 ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
                     Manifest.permission.CAMERA) -> {
-                    showPermissionRationalDialog(cameraPermissionType, cameraFunction)
+                    showConfirmDialog()
                 }
                 else -> {
                     ActivityCompat.requestPermissions(requireActivity(),
                         arrayOf(Manifest.permission.CAMERA),
                         204)
+
+                    showConfirmDialog()
                 }
 
             }
@@ -253,15 +257,41 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
         introDialog?.show()
     }
 
-    // 권한이 필요한지 알려주고 권한 설정으로 이동 여부 다이얼로그 함수
-    private fun showPermissionRationalDialog(permission: String, function: String) {
-        AlertDialog.Builder(requireContext())
-            .setMessage("$permission 권한을 켜주셔야지 ${function}가 가능합니다. 앱 설정 화면으로 진입하셔 권한을 켜주세요")
-            .setPositiveButton("권한 변경하러 가기") { _, _ ->
-                // 권한 설정 화면으로 이동하는 함수 호출
-                navigateToAppSetting()
-            }.setNegativeButton("취소") { dialogInterface, _ -> dialogInterface.cancel() }
-            .show()
+
+    private fun showConfirmDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.layout_dialog_step3_confirm)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        val tvTitle1 = dialog.findViewById<TextView>(R.id.tv_description1)
+        val tvTitle2 = dialog.findViewById<TextView>(R.id.tv_description2)
+        tvTitle1.text= "사진 촬영을 위해 카메라 권한이 필요합니다."
+        tvTitle2.text= "설정에서 카메라 권한을 허용해 주세요."
+
+
+        // 닫기 버튼 클릭 리스너
+        val cancelButton = dialog.findViewById<View>(R.id.btn_cancel)
+
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+
+        // 입력 완료하기 버튼 클릭 리스너
+        val confirmButton = dialog.findViewById<TextView>(R.id.btn_confirm)
+        confirmButton.text="변경하러 가기"
+        confirmButton.setOnClickListener {
+            navigateToAppSetting()
+            dialog.dismiss()
+
+        }
+
+        dialog.show()
     }
 
     // 권한 설정 화면으로 이동하는 함수
@@ -286,10 +316,11 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
         if (cameraPermissionGranted) {
             clickNext()
         } else{
+            Toast.makeText(requireContext(),"dsdsds",Toast.LENGTH_SHORT).show()
             if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
                     Manifest.permission.CAMERA)
             ) {
-                showPermissionRationalDialog(cameraPermissionType, cameraFunction)
+                showConfirmDialog()
             } else {
                 showPermissionSettingDialog(cameraPermissionType, cameraFunction)
             }

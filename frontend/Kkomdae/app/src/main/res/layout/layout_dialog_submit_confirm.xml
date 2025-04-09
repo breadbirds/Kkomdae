@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="검사 내용은 PDF로 생성되어 관리자에게 전송됩니다."
-        style="@style/Label3"
+        style="@style/Body2"
         android:textColor="@color/gray400"
         android:textAlignment="center"
         android:layout_marginTop="10dp"

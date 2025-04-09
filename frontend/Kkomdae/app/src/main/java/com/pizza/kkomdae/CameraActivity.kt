@@ -24,6 +24,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -37,7 +38,7 @@ class CameraActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
+        enableEdgeToEdge()
         val stage = intent.getIntExtra("stage", -1) + 1
         viewModel.setReCameraStage(stage)
 

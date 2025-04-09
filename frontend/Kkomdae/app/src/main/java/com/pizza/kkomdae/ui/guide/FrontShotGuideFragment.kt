@@ -177,10 +177,6 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
 
 
         binding.btnShot?.setOnClickListener {
-
-            if (isCapturing) return@setOnClickListener
-            autoCaptureEnabled = false // ✅ 자동 촬영 중지
-            isCapturing = true
             takePhoto()
         }
 
@@ -235,7 +231,7 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
         // 카메라 준비가 끝났을 때 실행
         cameraProviderFuture.addListener({
             // 카메라 관리 객체
-             cameraProvider = cameraProviderFuture.get()
+            cameraProvider = cameraProviderFuture.get()
             val my_preview_resolution = Size(3840, 2160) // 원하는 해상도
 
             // 후면으로 촬영
@@ -244,7 +240,7 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             // ✅ 1. Preview <- 미리 보기 구성. (Preview 화면 연결하여 미리보기 영상 출력)
             preview = Preview.Builder()
                 .setTargetResolution(my_preview_resolution) // 원하는 해상도 요청 <- 최대한 높은 걸로 달라고 요청
-//                .setTargetAspectRatio(AspectRatio.RATIO_16_9) // 📌 비율 설정
+//                .setTargetAspectRatio(AspectRatio.RATIO_4_3) // 📌 비율 설정
                 .build().also {
                     it.setSurfaceProvider(binding.previewView?.surfaceProvider) // preview와 연결
                 }
@@ -252,8 +248,7 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             // ✅ 2. ImageCapture
             // 사진을 캡처(저장)할 수 있도록 ImageCapture 객체 생성
             imageCapture = ImageCapture.Builder()
-                .setTargetResolution(my_preview_resolution)
-//                .setTargetAspectRatio(AspectRatio.RATIO_DEFAULT) // 📌 비율 설정
+                .setTargetResolution(my_preview_resolution)// 📌 비율 설정
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY) // 고화질 우선
 //                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY) // 빠른 캡처 모드
                 .build()
@@ -261,7 +256,7 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             // ✅ 3. ImageAnalysis
             // 카메라에서 들어오는 실시간 프레임(영상)을 분석
             val imageAnalyzer = ImageAnalysis.Builder()
-                .setTargetAspectRatio(AspectRatio.RATIO_4_3) // 📌 비율 설정
+                .setTargetAspectRatio(AspectRatio.RATIO_16_9) // 📌 비율 설정
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST) // 분석이 끝날 때까지 기다리지 말고, 가장 최근 프레임만 분석
                 .build().also {
                     // 프레임이 들어올 때마다 이미지 분석 함수 실행
@@ -382,7 +377,6 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
                             }, 100)
                         }
                     }.start()
-
                 }
 
                 override fun onError(exception: ImageCaptureException) {
@@ -390,7 +384,6 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
                 }
             })
     }
-
     // 자동 촬영 함수
     private fun autoTakePhoto() {
         val imageCapture = imageCapture ?: return
@@ -466,8 +459,8 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
                         // ✅ 4️⃣ UI Thread 복귀
                         Handler(Looper.getMainLooper()).post {
                             Log.d("CameraFragment", "사진 저장됨: $savedUri")
-                            viewModel.setScreen(savedUri)
-                            viewModel.setStep(5)
+                            viewModel.setFront(savedUri)
+                            viewModel.setStep(1)
 
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE

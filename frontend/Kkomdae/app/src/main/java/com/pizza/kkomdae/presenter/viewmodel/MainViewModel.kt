@@ -37,6 +37,10 @@ class MainViewModel@Inject constructor(
     val testId: LiveData<Long>
         get() = _testId
 
+    private val _Fail = MutableLiveData<Boolean>()
+    val Fail: LiveData<Boolean>
+        get() = _Fail
+
     private val _picStage = MutableLiveData<Int>()
     val picStage: LiveData<Int>
         get() = _picStage
@@ -178,6 +182,7 @@ class MainViewModel@Inject constructor(
 
             }.onFailure { exception ->
                 // 로그인 정보 불러오기 실패
+//                _Fail.postValue(false)
 
             }
 
