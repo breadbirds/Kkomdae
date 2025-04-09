@@ -24,6 +24,7 @@ public class RentService {
 
     public List<StudentWithRent> getStudentsWithRent(StudentWithRentCond studentWithRentCond) {
         List<Student> students = studentRepository.getStudentsByStudentInfo(studentWithRentCond);
+        log.info("학생 수 : {}", students.size());
         List<Rent> rents = rentRepository.getRentsByStudentInfo(studentWithRentCond);
         Map<Student, List<Rent>> studentAndRents = new HashMap<>();
         for (Student student : students) {

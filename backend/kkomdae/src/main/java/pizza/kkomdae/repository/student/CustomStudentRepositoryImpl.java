@@ -33,8 +33,8 @@ public class CustomStudentRepositoryImpl implements CustomStudentRepository {
         QDevice device = QDevice.device;
         return query.selectFrom(student)
                 .distinct()
-                .join(student.rent, rent).fetchJoin()
-                .join(rent.device, device).fetchJoin()
+                .leftJoin(student.rent, rent).fetchJoin()
+                .leftJoin(rent.device, device).fetchJoin()
 //                .join(rent.device.laptopTestResults, QLaptopTestResult.laptopTestResult).fetchJoin()
 //                .join(student.laptopTestResults, QLaptopTestResult.laptopTestResult).fetchJoin()
                 .where(isKeyword(studentWithRentCond.getKeyword(), studentWithRentCond.getSearchType()),
