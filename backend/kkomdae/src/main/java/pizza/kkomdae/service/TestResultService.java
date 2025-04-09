@@ -235,7 +235,7 @@ public class TestResultService {
         List<Photo> photos = result.getPhotos();
         List<String> urls = new ArrayList<>();
         for (Photo photo : photos) {
-            urls.add(s3Service.generatePresignedUrl(photo.getName()));
+            urls.add(s3Service.generatePresignedUrl(photo.getAiName()));
         }
         res.setImageUrls(urls);
 
