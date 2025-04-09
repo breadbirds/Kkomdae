@@ -438,6 +438,13 @@ class TestApp(ttkb.Window):
         self.report_path = None
         self.report = None
 
+        self.camera_test_running = False
+        self.camera_closing = False
+        self.cap = None
+        self.camera_update_after_id = None
+        self.window_name = None
+        self.photo_flag = True
+
         # 키보드 테스트 관련 변수
         self.failed_keys = []
         self.pressed_keys = set()
@@ -1213,12 +1220,7 @@ class TestApp(ttkb.Window):
     # 카메라 테스트 관련 메서드
     # -------------------------------
 
-        self.camera_test_running = False
-        self.camera_closing = False
-        self.cap = None
-        self.camera_update_after_id = None
-        self.window_name = None
-        self.photo_flag = True
+
 
     def open_camera_test(self) -> None:
         """

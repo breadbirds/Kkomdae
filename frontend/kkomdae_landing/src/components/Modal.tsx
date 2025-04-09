@@ -66,14 +66,14 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, overlayClose = true }) =
               className="modal-version-btn"
               onClick={() => handleDownload('kkomdae_random_port1.exe')}
             >
-              USB 포트 1개 버전 다운로드
+              USB 포트 1개 버전 다운로드 (13, 14세대)
             </button>
 
             <button
               className="modal-version-btn"
               onClick={() => handleDownload('kkomdae_random_port3.exe')}
             >
-              USB 포트 3개 버전 다운로드
+              USB 포트 3개 버전 다운로드 (10, 11세대)
             </button>
           </div>
         </div>
