@@ -74,6 +74,7 @@
   <img src="https://img.shields.io/badge/openjdk-000000?style=flat-square&logo=openjdk&logoColor=white">
   <img src="https://img.shields.io/badge/amazonelasticache-C925D1?style=flat-square&logo=amazonelasticache&logoColor=white">
   <img src="https://img.shields.io/badge/bootstrap-7952B3?style=flat-square&logo=bootstrap&logoColor=white">
+  <img src="https://img.shields.io/badge/thymeleaf-005F0F?style=flat-square&logo=thymeleaf&logoColor=white">
 
 </div>
 
