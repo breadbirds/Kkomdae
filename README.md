@@ -1,8 +1,8 @@
-# <img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d5d2bccfa0bf52e5c1d03fa8509c32d3/%EB%A1%9C%EA%B3%A0.png" width="20"> 꼼대 (꼼꼼하게 대신 점검해드려요)
+# <img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d5d2bccfa0bf52e5c1d03fa8509c32d3/%EB%A1%9C%EA%B3%A0.png"> 꼼대 (꼼꼼하게 대신 점검해드려요)
 
 [<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/056910973b87435ca5dfbf76a139962e/Group_34003.png">](https://j12d101.p.ssafy.io/)
 
-### 👆 위 이미지 클릭하면 `랜딩페이지로` 이동합니다 👆
+#### 👆 위 이미지 클릭하면 `랜딩페이지로` 이동합니다 👆
 
 <br/>
 
@@ -75,7 +75,6 @@
   <img src="https://img.shields.io/badge/amazonelasticache-C925D1?style=flat-square&logo=amazonelasticache&logoColor=white">
   <img src="https://img.shields.io/badge/bootstrap-7952B3?style=flat-square&logo=bootstrap&logoColor=white">
 
-
 </div>
 
 ### FrontEnd
@@ -108,7 +107,6 @@
   <img src="https://img.shields.io/badge/jupyter-F37626?style=flat-square&logo=jupyter&logoColor=white">
   <img src="https://img.shields.io/badge/googlecolab-F9AB00?style=flat-square&logo=googlecolab&logoColor=white">
   <img src="https://img.shields.io/badge/googleforms-7248B9?style=flat-square&logo=googleforms&logoColor=white">
-
 
 </div>
 
@@ -158,7 +156,7 @@
 
 ## ERD
 
-<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/12c33fca02144a6b1ffe9de8d079610c/erd.png">
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/2bbe33e7bb7cb7c5f0d948160d24fc24/erd.png">
 
 ## Git
 
