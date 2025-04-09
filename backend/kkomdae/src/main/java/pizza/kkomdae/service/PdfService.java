@@ -16,7 +16,6 @@ import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.properties.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pizza.kkomdae.controller.PdfController;
 import pizza.kkomdae.dto.PdfInfo;
 import pizza.kkomdae.entity.LaptopTestResult;
 import pizza.kkomdae.entity.Photo;
@@ -43,9 +42,13 @@ public class PdfService {
 
     public String makeAndUploadPdf(long testId) {
         LaptopTestResult result = lapTopTestResultRepository.findByIdWithStudentAndDeviceAndPhotos(testId);
+        LaptopTestResult rent = null;
+        if (result.getRelease()) {
+            rent = result.getRent().getLaptopTestResults().get(0);
+        }
         String fileName;
         try {
-            PdfInfo pdfInfo = new PdfInfo(result);
+            PdfInfo pdfInfo = new PdfInfo(result, rent);
             ByteArrayOutputStream baso = initPdf(pdfInfo);
             fileName = s3Service.uploadPdf(baso, result);
         } catch (IOException e) {
@@ -177,14 +180,30 @@ public class PdfService {
         addHeaderCell(table, font, "수령", 1, 1);
         addHeaderCell(table, font, "반납", 1, 1);
 
+
+        String rentLaptop = "";
+        String rentMouse = "";
+        String rentPowerCable = "";
+        String rentBag = "";
+        String rentAdapter = "";
+        String rentMousepad = "";
+        if (info.isRelease()) {
+            rentLaptop = Integer.toString(info.getRentLaptopCount());
+            rentMouse = Integer.toString(info.getRentMouseCount());
+            rentPowerCable = Integer.toString(info.getRentPowerCableCount());
+            rentBag = Integer.toString(info.getRentBagCount());
+            rentAdapter = Integer.toString(info.getRentAdapterCount());
+            rentMousepad = Integer.toString(info.getRentMousePadCount());
+        }
+
         // 테이블 내용 - 첫 번째 행
-        addComponentRow(table, font, "노트북", Integer.toString(info.getLaptopCount()), "마우스\n*리시버 포함", Integer.toString(info.getMouseCount()), info);
+        addComponentRow(table, font, "노트북", Integer.toString(info.getLaptopCount()), "마우스\n*리시버 포함", Integer.toString(info.getMouseCount()), info, rentLaptop, rentMouse);
 
         // 테이블 내용 - 두 번째 행
-        addComponentRow(table, font, "전원선", Integer.toString(info.getPowerCableCount()), "가방\n*가방끈 포함", Integer.toString(info.getBagCount()), info);
+        addComponentRow(table, font, "전원선", Integer.toString(info.getPowerCableCount()), "가방\n*가방끈 포함", Integer.toString(info.getBagCount()), info, rentPowerCable, rentBag);
 
         // 테이블 내용 - 세 번째 행
-        addComponentRow(table, font, "어댑터", Integer.toString(info.getAdapterCount()), "마우스패드", Integer.toString(info.getMousePadCount()), info);
+        addComponentRow(table, font, "어댑터", Integer.toString(info.getAdapterCount()), "마우스패드", Integer.toString(info.getMousePadCount()), info, rentAdapter, rentMousepad);
 
         // 특이사항 행
         Cell specialCell = new Cell(1, 1)
@@ -212,9 +231,9 @@ public class PdfService {
         table.addCell(cell);
     }
 
-    private void addComponentRow(Table table, PdfFont font, String item1, String qty1, String item2, String qty2, PdfInfo info) {
+    private void addComponentRow(Table table, PdfFont font, String item1, String qty1, String item2, String qty2, PdfInfo info, String rentQty1, String rentQty2) {
 
-        if (info.getRentDate() == null) { // 반납
+        if (info.isRelease()) { // 반납
             // 첫 번째 항목
             Cell cell1 = new Cell()
                     .add(new Paragraph(item1).setFont(font).setFontSize(10))
@@ -233,7 +252,7 @@ public class PdfService {
 
             // 첫 번째 항목 수령
             Cell cell3 = new Cell()
-                    .add(new Paragraph("☐").setFont(font).setFontSize(10))
+                    .add(new Paragraph(rentQty1).setFont(font).setFontSize(10))
                     .setTextAlignment(TextAlignment.CENTER)
                     .setVerticalAlignment(VerticalAlignment.MIDDLE)
                     .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
@@ -265,7 +284,7 @@ public class PdfService {
 
             // 두 번째 항목 수령
             Cell cell7 = new Cell()
-                    .add(new Paragraph("☐").setFont(font).setFontSize(10))
+                    .add(new Paragraph(rentQty2).setFont(font).setFontSize(10))
                     .setTextAlignment(TextAlignment.CENTER)
                     .setVerticalAlignment(VerticalAlignment.MIDDLE)
                     .setBorder(new SolidBorder(ColorConstants.BLACK, 1));
@@ -379,8 +398,8 @@ public class PdfService {
         addSignatureRow(signatureTable, font, "수 령 일 자 :", rentDate, "반 납 일 자 :", returnDate);
 
         // 두 번째 행
-        if (rentDate.isBlank()) {
-            addSignatureRow(signatureTable, font, "수 령 서 명 :", "", "반 납 서 명 :", info.getName());
+        if (info.isRelease()) {
+            addSignatureRow(signatureTable, font, "수 령 서 명 :", info.getName(), "반 납 서 명 :", info.getName());
         } else {
             addSignatureRow(signatureTable, font, "수 령 서 명 :", info.getName(), "반 납 서 명 :", "");
         }

@@ -129,7 +129,7 @@ public class TestResultService {
         }
         testResult.setDevice(device);
         Rent rent;
-        if (testResult.getRelease() == false) { // 대여로직
+        if (testResult.getRelease() == false && testResult.getRent()== null) { // 대여로직
             rent = new Rent();
             rent.setStudent(student);
             rent.setRentDateTime(thirdStageReq.getLocalDate());
