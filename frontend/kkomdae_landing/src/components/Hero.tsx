@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { typeWriter } from "../utils/animations";
 import "../styles/Hero.css";
-import axios from "axios";
+import Modal from "./Modal";
 import icon1 from "../assets/icon1.png";
 import icon2 from "../assets/icon2.png";
 import icon3 from "../assets/icon3.png";
@@ -16,6 +16,7 @@ import qrCodeImage from "../assets/qr-code.png";
 const Hero: React.FC = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [showQRModal, setShowQRModal] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   useEffect(() => {
     // 타이틀 타이핑 애니메이션 시작
@@ -39,23 +40,8 @@ const Hero: React.FC = () => {
   }, []);
 
   const handleSelfProgramDownload = async () => {
-    try {
-      // 배포
-      const response = await axios.get(`https://j12d101.p.ssafy.io/django/s3app/presigned-url/?file=kkomdae_diagnostics.exe`);
-
-      // 개발
-      // const response = await axios.get(`http://127.0.0.1:8000/s3app/presigned-url/?file=kkomdae_diagnostics.exe`);
-
-      const presignedUrl = response.data.url;
-      console.log(response);
-
-      // presigned URL로 브라우저를 이동하면 S3에서 직접 다운로드 시작
-      window.location.href = presignedUrl;
-    } catch (error) {
-      console.error(error);
-      alert("파일 다운로드 중 오류가 발생했습니다.");
-    }
-  };
+    setShowDownloadModal(true);
+    };
 
   const handleAppDownload = () => {
     // QR 코드 모달을 표시합니다
@@ -161,6 +147,11 @@ const Hero: React.FC = () => {
           </div>
         </div>
       )}
+      <Modal
+        isOpen={showDownloadModal}
+        onClose={() => setShowDownloadModal(false)}
+        overlayClose={true}
+      ></Modal>
     </section>
   );
 };

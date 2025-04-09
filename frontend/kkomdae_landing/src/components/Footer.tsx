@@ -1,5 +1,4 @@
 import "../styles/Footer.css";
-import axios from "axios";
 import { useState } from "react";
 import qrCodeImage from "../assets/qr-code.png";
 import Modal from "./Modal";
