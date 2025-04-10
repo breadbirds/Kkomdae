@@ -118,8 +118,6 @@ public class PdfService {
         // 노트북 촬영 섹션
         addPhotoSection(document, koreanFont, info.getPhotos(), "촬영");
 
-        if (info.isRelease()) addPhotoSection(document, koreanFont, info.getRentPhotos(), "분석");
-
         addAiPhotoSection(document, koreanFont, info.getPhotos());
         
         document.close();
