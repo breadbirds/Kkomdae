@@ -109,6 +109,7 @@ public class MattermostNotificationService {
                     HttpMethod.POST, request,
                     PutUserRtn.class);
             log.info(response.getBody().getChannel_id());
+            log.info("postId : {}" , response.getBody().getId());
         } catch (HttpClientErrorException e) {
             // 4xx 오류 시 자동 throw
             String responseBody = e.getResponseBodyAsString(); // 본문 추출
