@@ -5,7 +5,7 @@ import step1_gif from "../assets/step1.gif";
 import step2_gif from "../assets/step2.gif";
 import step3_gif from "../assets/step3.gif";
 
-const HowItWorks = () => {
+const HowItWorks = () => { 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
