@@ -95,6 +95,8 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
             }
         }
 
+//        showErrorDialog()
+
     }
 
     // 에러 다이얼로그
@@ -109,13 +111,13 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
         val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
         dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
 
-        val confirmButton = dialog.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btn_confirm)
+        val confirmButton = dialog.findViewById<TextView>(R.id.tv_confirm)
         val errorText = dialog.findViewById<TextView>(R.id.tv_error_message)
         val errorTitleText = dialog.findViewById<TextView>(R.id.tv_error_title)
-
+//
         errorTitleText.text="제출을 실패하였습니다."
         errorText.text="서버 오류로 인한 제출 실패입니다."
-
+//
         confirmButton.setOnClickListener {
             dialog.dismiss()
         }
