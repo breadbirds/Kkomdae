@@ -36,7 +36,7 @@
 
 #### 서비스 설명
 
--   SSAFY에서 대여하는 노트북을 체계적으로 관리할 수 있는 서비스. 노트북 수령 및 반납시 필요한 수령확인서 작성 절차를 앱 하나로 간편화. AI가 외관 결함을 자동으로 탐지하며 기기성능을 점검하는 기능도 제공.
+-   SSAFY에서 대여하는 노트북을 체계적으로 관리할 수 있는 서비스입니다. 노트북 수령 및 반납시 필요한 수령확인서 작성 절차를 앱 하나로 간편화했습니다. AI가 외관 결함을 자동으로 탐지하며 기기성능을 점검하는 기능도 제공합니다.
 
 #### 주요 기능
 
@@ -70,15 +70,15 @@
   <img src="https://img.shields.io/badge/intellijidea-000000?style=flat-square&logo=intellijidea&logoColor=white">
   <img src="https://img.shields.io/badge/spring-6DB33F?style=flat-square&logo=spring&logoColor=white">
   <img src="https://img.shields.io/badge/springboot-6DB33F?style=flat-square&logo=springboot&logoColor=white">
+   <img src="https://img.shields.io/badge/springsecurity-6DB33F?style=flat-square&logo=springsecurity&logoColor=white">
   <img src="https://img.shields.io/badge/jitpack-000000?style=flat-square&logo=jitpack&logoColor=white">
   <img src="https://img.shields.io/badge/openjdk-000000?style=flat-square&logo=openjdk&logoColor=white">
-  <img src="https://img.shields.io/badge/amazonelasticache-C925D1?style=flat-square&logo=amazonelasticache&logoColor=white">
   <img src="https://img.shields.io/badge/bootstrap-7952B3?style=flat-square&logo=bootstrap&logoColor=white">
   <img src="https://img.shields.io/badge/thymeleaf-005F0F?style=flat-square&logo=thymeleaf&logoColor=white">
 
 </div>
 
-### FrontEnd
+### Frontend
 
 <div align=left> 
   <img src="https://img.shields.io/badge/gradle-02303A?style=flat-square&logo=gradle&logoColor=white">
@@ -90,6 +90,7 @@
   <img src="https://img.shields.io/badge/androidstudio-3DDC84?style=flat-square&logo=androidstudio&logoColor=white">
   <img src="https://img.shields.io/badge/xml-005FAD?style=flat-square&logo=xml&logoColor=white">
   <img src="https://img.shields.io/badge/jitpack-000000?style=flat-square&logo=jitpack&logoColor=white">
+  <img src="https://img.shields.io/badge/Hilt-008FC7?style=flat-square&logo=Hilt&logoColor=white">
   <img src="https://img.shields.io/badge/googlecloud-4285F4?style=flat-square&logo=googlecloud&logoColor=white">
 
 </div>
@@ -117,10 +118,11 @@
   <img src="https://img.shields.io/badge/docker-2496ED?style=flat-square&logo=docker&logoColor=white">
   <img src="https://img.shields.io/badge/jenkins-D24939?style=flat-square&logo=jenkins&logoColor=white">
   <img src="https://img.shields.io/badge/nginx-009639?style=flat-square&logo=nginx&logoColor=white">
-  <!-- <img src="https://img.shields.io/badge/letsencrypt-003A70?style=flat-square&logo=letsencrypt&logoColor=white">
-  <img src="https://img.shields.io/badge/flydotio-24175B?style=flat-square&logo=flydotio&logoColor=white"> -->
+  <img src="https://img.shields.io/badge/letsencrypt-003A70?style=flat-square&logo=letsencrypt&logoColor=white">
   <img src="https://img.shields.io/badge/amazonec2-FF9900?style=flat-square&logo=amazonec2&logoColor=white">
   <img src="https://img.shields.io/badge/amazons3-569A31?style=flat-square&logo=amazons3&logoColor=white">
+  <img src="https://img.shields.io/badge/django-092E20?style=flat-square&logo=django&logoColor=white">
+  <img src="https://img.shields.io/badge/python-3776AB?style=flat-square&logo=python&logoColor=white">
 
 </div>
 
@@ -175,6 +177,8 @@
 | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d133ed351edaa7dcc1fa7e2c2d38826d/%EC%A0%95%EC%9C%A0%EC%A7%84.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/8530717db2391c0185e8e20df9f3c8af/%EA%B9%80%EC%84%B1%EC%88%98.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/eadaad75c6a97002348a7ce31c94271d/%EA%B9%80%EC%A0%95%EC%96%B8.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/82b7121599bcc7b174aedb3600f6ce2b/%EB%8F%84%EC%8A%B9%EA%B5%AD.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d8fe9aca9307af2d17c50f5181a481b2/%EC%9D%B4%EC%83%81%ED%98%81.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d524386635e6548591ff1eaa50b459f0/%EC%9D%B4%EC%86%A1%ED%9D%AC.png){width="800" height="800"} |
 |                                                                       Leader & AI Developer                                                                        |                                                                        &nbsp;Backend&nbsp;                                                                         |                                                                      &nbsp;AI Engineer&nbsp;                                                                       |                                                                    &nbsp;Infra & Backend&nbsp;                                                                     |                                                                        &nbsp;Frontend&nbsp;                                                                        |                                                                        &nbsp;Frontend&nbsp;                                                                        |
 
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/5e8b69dbc84407907465260e4316ee32/%EC%97%AD%ED%95%A0%EB%B6%84%EB%8B%B4.png">
+
 <br/>
 
 <div id="7"></div>
@@ -184,5 +188,3 @@
 -   [포팅메뉴얼]
 -   [Git](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/Git)
 -   [화면 설계서]
--   [ERD]
--   [API 명세서]
