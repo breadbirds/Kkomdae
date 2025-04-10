@@ -134,7 +134,7 @@
             <div class="col-md-2">
                 <input type="number"
                        class="form-control"
-                       name="classNum"
+                       name="className"
                        id="classNumInput"
                        min="1"
                        placeholder="숫자만 입력">
@@ -144,7 +144,7 @@
             <div class="col-md-2">
                 <select class="form-select" name="searchType" th:field="${studentWithRentCond.searchType}">
                     <option value="">선택</option>
-                    <option value="학번">학번</option>
+                    <option value="학생고유번호">학생고유번호</option>
                     <option value="이름">이름</option>
                 </select>
             </div>
@@ -174,7 +174,7 @@
                     <span class="checkmark"></span>
                 </label>
             </th>
-            <th>학번</th>
+            <th>학생고유번호</th>
             <th>이름</th>
             <th>지역</th>
             <th>반</th>
