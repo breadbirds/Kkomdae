@@ -45,7 +45,10 @@ const HowItWorks: React.FC = () => {
                 <h3 className="step-title">노트북 외관 촬영</h3>
               </div>
               <div className="step-content">
-                <p className="step-description">노트북의 상태를 정확하게 진단하기 위해 꼼대 앱에서 안내하는 각도와 방법에 따라 노트북의 상판, 하판, 측면, 모니터, 키보드 등을 꼼꼼하게 촬영해주세요.</p>
+                <p className="step-description">
+                  노트북의 상태를 정확하게 진단하기 위해 꼼대 앱에서 안내하는 각도와 방법에 따라 노트북의 상판, 하판, 측면, 모니터, 키보드 등을 꼼꼼하게 촬영해주세요. 자동 촬영 기능을 활용하여 최적의
+                  각도와 거리에서 촬영하세요.
+                </p>
               </div>
             </div>
             <div className="step-image-wrapper">
@@ -81,7 +84,10 @@ const HowItWorks: React.FC = () => {
                 <h3 className="step-title">AI 분석 및 보고서 생성</h3>
               </div>
               <div className="step-content">
-                <p className="step-description">입력하신 노트북 정보와 촬영된 사진을 AI가 분석하여 노트북의 상태를 정확하게 진단하고, 상세한 내용이 담긴 PDF 보고서를 자동으로 생성해드려요.</p>
+                <p className="step-description">
+                  입력하신 노트북 정보와 촬영된 사진을 AI가 분석하여 노트북의 상태를 정확하게 진단하고, 상세한 내용이 담긴 PDF 보고서를 자동으로 생성해드려요. 분석된 결과는 언제든지 재촬영하여 더
+                  정확한 진단을 받으실 수 있습니다.
+                </p>
               </div>
             </div>
             <div className="step-image-wrapper">
