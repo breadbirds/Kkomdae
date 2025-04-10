@@ -405,8 +405,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
                     override fun onLoadCleared(placeholder: Drawable?) {}
                 })
         }else{
-            binding.loadingAnimation.visibility = View.GONE
-            binding.ivImage.visibility = View.VISIBLE
+
             Glide.with(binding.ivImage)
                 .load(url)
                 .into(object : CustomTarget<Drawable>() {
@@ -418,6 +417,9 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
                     override fun onLoadCleared(placeholder: Drawable?) {}
                 })
+
+            binding.loadingAnimation.visibility = View.GONE
+            binding.ivImage.visibility = View.VISIBLE
         }
 
     }
