@@ -1,13 +1,11 @@
-import "../styles/HowItWorks.css";
-// import step1 from "../assets/step1.png";
-import step1_gif from "../assets/step1.gif";
-// import step2 from "../assets/step2.png";
-import step2_gif from "../assets/step2.gif";
-// import step3 from "../assets/step3.png";
-import step3_gif from "../assets/step3.gif";
 import { useEffect } from "react";
+import "../styles/HowItWorks.css";
+import mobileFrame from "../assets/mobile-frame.png";
+import step1_gif from "../assets/step1.gif";
+import step2_gif from "../assets/step2.gif";
+import step3_gif from "../assets/step3.gif";
 
-const HowItWorks: React.FC = () => {
+const HowItWorks = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -52,8 +50,15 @@ const HowItWorks: React.FC = () => {
               </div>
             </div>
             <div className="step-image-wrapper">
-              <div className="step-image-container">
-                <img src={step1_gif} alt="노트북 사진 촬영 화면" className="step-image" />
+              <div className="mobile-device-container">
+                {/* 모바일 프레임 (고정 백그라운드) */}
+                <div className="mobile-frame">
+                  <img src={mobileFrame} alt="모바일 디바이스 프레임" className="device-frame" />
+                </div>
+                {/* GIF를 화면 내부에 오버레이 */}
+                <div className="screen-content">
+                  <img src={step1_gif} alt="노트북 사진 촬영 화면" className="screen-gif" />
+                </div>
               </div>
             </div>
           </div>
@@ -71,8 +76,15 @@ const HowItWorks: React.FC = () => {
               </div>
             </div>
             <div className="step-image-wrapper">
-              <div className="step-image-container">
-                <img src={step2_gif} alt="자가진단 프로그램 실행 화면" className="step-image" />
+              <div className="mobile-device-container">
+                {/* 모바일 프레임 (고정 백그라운드) */}
+                <div className="mobile-frame">
+                  <img src={mobileFrame} alt="모바일 디바이스 프레임" className="device-frame" />
+                </div>
+                {/* GIF를 화면 내부에 오버레이 */}
+                <div className="screen-content">
+                  <img src={step2_gif} alt="자가진단 프로그램 실행 화면" className="screen-gif" />
+                </div>
               </div>
             </div>
           </div>
@@ -91,8 +103,15 @@ const HowItWorks: React.FC = () => {
               </div>
             </div>
             <div className="step-image-wrapper">
-              <div className="step-image-container">
-                <img src={step3_gif} alt="AI 분석 및 보고서 생성 화면" className="step-image" />
+              <div className="mobile-device-container">
+                {/* 모바일 프레임 (고정 백그라운드) */}
+                <div className="mobile-frame">
+                  <img src={mobileFrame} alt="모바일 디바이스 프레임" className="device-frame" />
+                </div>
+                {/* GIF를 화면 내부에 오버레이 */}
+                <div className="screen-content">
+                  <img src={step3_gif} alt="AI 분석 및 보고서 생성 화면" className="screen-gif" />
+                </div>
               </div>
             </div>
           </div>
