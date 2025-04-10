@@ -136,15 +136,25 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
         }
 
         viewModel.postResult.observe(viewLifecycleOwner){
+            it?: return@observe
             if(it?.success == true){
                 // 서버에 사진 전송 성공시에만 프론트에 단계 저장
                 viewModel.confirmPhoto(viewModel.step.value ?: 0)
                 // 다음 단계로 이동
                 cameraActivity.changeFragment((viewModel.step.value?:-1)+1)
                 viewModel.clearResult()
-            } else if (it != null) {
+            } else {
                 showNetworkErrorDialog()
             }
+        }
+
+        //실패시
+        viewModel.failResult.observe(viewLifecycleOwner){
+            it?: return@observe
+            Log.d(TAG, "onViewCreated: $it")
+            showNetworkErrorDialog()
+            viewModel.clearFail()
+            Log.d(TAG, "onViewCreated: $it")
         }
 
         // 재촬영 url

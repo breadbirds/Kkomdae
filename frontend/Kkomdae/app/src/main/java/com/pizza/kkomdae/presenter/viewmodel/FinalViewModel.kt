@@ -48,6 +48,10 @@ class FinalViewModel @Inject constructor(
     val pdfName: LiveData<String?>
         get() = _pdfName
 
+    private val _pdfNameResponse = MutableLiveData<Boolean?>()
+    val pdfNameResponse: LiveData<Boolean?>
+        get() = _pdfNameResponse
+
     private val _pdfUrl = MutableLiveData<String>()
     val pdfUrl: LiveData<String>
         get() = _pdfUrl
@@ -167,6 +171,14 @@ class FinalViewModel @Inject constructor(
         _rePhoto5.value=null
         _rePhoto6.value=null
     }
+    fun clearPhoto(){
+        _frontUri.value=null
+        _backUri.value=null
+        _leftUri.value=null
+        _rightUri.value=null
+        _screenUri.value=null
+        _keypadUri.value=null
+    }
 
     fun clearReCameraUri(){
         _reCameraUri.value=null
@@ -183,6 +195,7 @@ class FinalViewModel @Inject constructor(
 
     fun clearPostFinal(){
         _getFinalResult.postValue(null)
+        _pdfNameResponse.postValue(null)
     }
 
 
@@ -368,6 +381,9 @@ class FinalViewModel @Inject constructor(
             Log.d(TAG, "postPdf: $result")
             result.onSuccess {
                 _pdfName.postValue(it.message)
+            }.onFailure {
+                // 실패 했을때
+                _pdfNameResponse.postValue(true)
             }
         }
     }

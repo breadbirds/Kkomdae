@@ -22,7 +22,7 @@ public class CustomLapTopTestResultRepositoryImpl implements CustomLapTopTestRes
                 .leftJoin(QLaptopTestResult.laptopTestResult.student, QStudent.student).fetchJoin()
                 .leftJoin(QRent.rent).on(QRent.rent.device.eq(QDevice.device).and(QRent.rent.student.eq(QStudent.student)))
                 .where(isCond(student, device))
-                .orderBy(QLaptopTestResult.laptopTestResult.date.desc())
+                .orderBy(QLaptopTestResult.laptopTestResult.date.desc(), QLaptopTestResult.laptopTestResult.laptopTestResultId.desc())
                 .fetch()
                 ;
     }

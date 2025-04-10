@@ -39,12 +39,21 @@ public class CustomStudentRepositoryImpl implements CustomStudentRepository {
 //                .join(student.laptopTestResults, QLaptopTestResult.laptopTestResult).fetchJoin()
                 .where(isKeyword(studentWithRentCond.getKeyword(), studentWithRentCond.getSearchType()),
                         isRegion(studentWithRentCond.getRegion(), studentWithRentCond.getClassName())
-                        , isStudent(studentWithRentCond.getStudent())
+                        , isStudent(studentWithRentCond.getStudent()),
+                        isClass(studentWithRentCond.getClassName(), studentWithRentCond.getRegion())
                 )
                 .orderBy(student.studentNum.asc())
                 .fetch()
                 ;
     }
+
+    private Predicate isClass(String className, String region) {
+        if (className != null && region != null && !className.isBlank() && !region.isBlank()) {
+            return QStudent.student.classNum.like("%" + region + className + "%");
+        }
+        return null;
+    }
+
     private Predicate isStudent(Student student) {
         if (student != null) {
             return QStudent.student.eq(student);
@@ -54,7 +63,7 @@ public class CustomStudentRepositoryImpl implements CustomStudentRepository {
 
     private Predicate isRegion(String region, String classNum) {
         if (region != null && !region.isBlank() && classNum != null) {
-            return QStudent.student.region.eq(region).and(QStudent.student.classNum.eq(classNum));
+            return QStudent.student.region.eq(region).and(QStudent.student.classNum.like("%" + region + classNum + "%"));
         } else if (region != null && !region.isBlank()) {
             return QStudent.student.region.eq(region);
         }
@@ -67,8 +76,8 @@ public class CustomStudentRepositoryImpl implements CustomStudentRepository {
                 case "이름" -> {
                     return QStudent.student.name.like("%" + keyword + "%");
                 }
-                case "학번" -> {
-                    return QStudent.student.studentNum.like("%" + keyword + "%");
+                case "학생고유번호" -> {
+                    return QStudent.student.studentId.eq(Long.valueOf(keyword));
                 }
             }
         }
@@ -81,8 +90,8 @@ public class CustomStudentRepositoryImpl implements CustomStudentRepository {
                 case "이름" -> {
                     return QStudent.student.name.like("%" + searchKeyword + "%");
                 }
-                case "학번" -> {
-                    return QStudent.student.studentNum.like("%" + searchKeyword + "%");
+                case "학생고유번호" -> {
+                    return QStudent.student.studentId.eq(Long.valueOf(searchKeyword));
                 }
                 case "지역" -> {
                     return QStudent.student.region.like("%" + searchKeyword + "%");

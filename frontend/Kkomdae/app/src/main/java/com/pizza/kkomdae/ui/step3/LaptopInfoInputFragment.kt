@@ -775,6 +775,10 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             dialog.dismiss()
         }
 
+        if(mainViewModel.release.value==true){
+            binding.tvReceiveDate.text="반납일자"
+        }
+
         // 입력 완료하기 버튼 클릭 리스너
         val confirmButton = dialog.findViewById<View>(R.id.btn_confirm)
         confirmButton.setOnClickListener {

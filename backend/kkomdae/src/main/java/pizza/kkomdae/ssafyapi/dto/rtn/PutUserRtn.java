@@ -11,4 +11,5 @@ public class PutUserRtn {
     private String channel_id;
     private String user_id;
     private String roles;
+    private String id;
 }

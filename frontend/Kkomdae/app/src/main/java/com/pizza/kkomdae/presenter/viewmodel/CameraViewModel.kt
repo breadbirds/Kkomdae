@@ -91,6 +91,10 @@ class CameraViewModel @Inject constructor(
     val postResult: LiveData<PhotoResponse?>
         get() = _postResult
 
+    private val _failResult= MutableLiveData<Boolean?>()
+    val failResult: LiveData<Boolean?>
+        get() = _failResult
+
 
     private val _reCameraUri = MutableLiveData<Uri?>()
     val reCameraUri: LiveData<Uri?>
@@ -161,6 +165,10 @@ class CameraViewModel @Inject constructor(
 
     fun clearResult(){
         _postResult.postValue(null)
+        _failResult.postValue(null)
+    }
+    fun clearFail(){
+        _failResult.postValue(null)
     }
 
     fun postPhoto(){
@@ -210,11 +218,12 @@ class CameraViewModel @Inject constructor(
                         testResponse?.let {
 
                             _postResult.postValue(it)
+
                         }
 
                     }.onFailure { exception ->
                         // 로그인 정보 불러오기 실패
-
+                        _failResult.postValue(true)
                     }
 
                 }

@@ -118,7 +118,8 @@ public class PdfService {
         // 노트북 촬영 섹션
         addPhotoSection(document, koreanFont, info.getPhotos(), "촬영");
 
-        if (info.isRelease()) addPhotoSection(document, koreanFont, info.getRentPhotos(), "분석");
+        addAiPhotoSection(document, koreanFont, info.getPhotos());
+        
         document.close();
         return baos;
     }
@@ -491,7 +492,7 @@ public class PdfService {
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
         addPhotoItem(document, font, "[키판 사진]", s3Service.generatePresignedUrl(photos.get(5).getName()));
-
+        document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 
         // 기타 확인 사진을 위한 변수 n
         /*int n = 5; // 여기서 필요한 기타 사진 개수 설정
@@ -510,6 +511,40 @@ public class PdfService {
                 addPhotoItem(document, font, "[기타 확인이 필요하다고 판단되는 사진]");
             }
         }*/
+    }
+
+
+    private void addAiPhotoSection(Document document, PdfFont font, List<Photo> photos) throws MalformedURLException {
+
+        // 사진 섹션 제목 (밑줄 추가)
+        Paragraph photoTitle = new Paragraph("삼성 청년 S/W 아카데미 노트북 AI 분석 사진")
+                .setFont(font)
+                .setFontSize(14)
+                .setBold()
+                .setTextAlignment(TextAlignment.CENTER)
+                .setUnderline();
+        document.add(photoTitle);
+        document.add(new Paragraph("\n"));
+
+
+        // 첫 번째 페이지: 전면부와 후면부 사진
+        addPhotoItem(document, font, "[전면부 사진]", s3Service.generatePresignedUrl(photos.get(0).getAiName()));
+        addPhotoItem(document, font, "[후면부 사진]", s3Service.generatePresignedUrl(photos.get(1).getAiName()));
+
+        // 두 번째 페이지 후 페이지 나누기
+        document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+        addPhotoItem(document, font, "[우측 사진]", s3Service.generatePresignedUrl(photos.get(2).getAiName()));
+        document.add(new Paragraph("\n"));
+        document.add(new Paragraph("\n"));
+        addPhotoItem(document, font, "[좌측 사진]", s3Service.generatePresignedUrl(photos.get(3).getAiName()));
+        // 세 번째 페이지 후 페이지 나누기
+        document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+        // 세 번째 페이지: 액정과 키판 사진
+        addPhotoItem(document, font, "[액정 사진/카메라 랜즈 포함]", s3Service.generatePresignedUrl(photos.get(4).getAiName()));
+        document.add(new Paragraph("\n"));
+        document.add(new Paragraph("\n"));
+        addPhotoItem(document, font, "[키판 사진]", s3Service.generatePresignedUrl(photos.get(5).getAiName()));
+
     }
 
     // 사진 항목 하나를 추가하는 헬퍼 메소드
