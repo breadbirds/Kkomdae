@@ -1,7 +1,10 @@
 import "../styles/HowItWorks.css";
-import step1 from "../assets/step1.png";
-import step2 from "../assets/step2.png";
-import step3 from "../assets/step3.png";
+// import step1 from "../assets/step1.png";
+import step1_gif from "../assets/step1.gif";
+// import step2 from "../assets/step2.png";
+import step2_gif from "../assets/step2.gif";
+// import step3 from "../assets/step3.png";
+import step3_gif from "../assets/step3.gif";
 import { useEffect } from "react";
 
 const HowItWorks: React.FC = () => {
@@ -47,7 +50,7 @@ const HowItWorks: React.FC = () => {
             </div>
             <div className="step-image-wrapper">
               <div className="step-image-container">
-                <img src={step1} alt="노트북 사진 촬영 화면" className="step-image" />
+                <img src={step1_gif} alt="노트북 사진 촬영 화면" className="step-image" />
               </div>
             </div>
           </div>
@@ -66,7 +69,7 @@ const HowItWorks: React.FC = () => {
             </div>
             <div className="step-image-wrapper">
               <div className="step-image-container">
-                <img src={step2} alt="자가진단 프로그램 실행 화면" className="step-image" />
+                <img src={step2_gif} alt="자가진단 프로그램 실행 화면" className="step-image" />
               </div>
             </div>
           </div>
@@ -83,7 +86,7 @@ const HowItWorks: React.FC = () => {
             </div>
             <div className="step-image-wrapper">
               <div className="step-image-container">
-                <img src={step3} alt="AI 분석 및 보고서 생성 화면" className="step-image" />
+                <img src={step3_gif} alt="AI 분석 및 보고서 생성 화면" className="step-image" />
               </div>
             </div>
           </div>

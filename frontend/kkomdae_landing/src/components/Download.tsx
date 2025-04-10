@@ -2,7 +2,8 @@ import kkomdae_logo from "../assets/kkomdae_logo.svg";
 import { useEffect, useState } from "react";
 import { initScrollAnimations } from "../utils/animations";
 import "../styles/Download.css";
-import qrCodeImage from "../assets/qr-code.png";
+// import qrCodeImage from "../assets/qr-code.png";
+import qrCodeApplication from "../assets/qr_onestore.png";
 import Modal from "./Modal";
 
 const Download: React.FC = () => {
@@ -75,7 +76,8 @@ const Download: React.FC = () => {
                 </button>
               </div>
               <div className="qr-modal-content">
-                <img src={qrCodeImage} alt="꼼대 앱 QR 코드" className="qr-code-image" />
+                {/* <img src={qrCodeImage} alt="꼼대 앱 QR 코드" className="qr-code-image" /> */}
+                <img src={qrCodeApplication} alt="꼼대 앱 QR 코드" className="qr-code-image" />
                 <p>QR 코드를 스캔하여 꼼대 앱을 설치하세요.</p>
                 <p className="modal-note">* 모바일 기기에서만 이용 가능합니다.</p>
               </div>
@@ -84,11 +86,7 @@ const Download: React.FC = () => {
         )}
       </section>
 
-      <Modal 
-        isOpen={showDownloadModal} 
-        onClose={() => setShowDownloadModal(false)}
-        overlayClose={true}
-      />
+      <Modal isOpen={showDownloadModal} onClose={() => setShowDownloadModal(false)} overlayClose={true} />
     </>
   );
 };

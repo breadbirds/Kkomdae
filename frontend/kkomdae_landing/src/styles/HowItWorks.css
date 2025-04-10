@@ -38,6 +38,8 @@
   margin-bottom: 80px;
   gap: 60px;
   opacity: 0;
+  max-width: 1600px;
+  min-width: 900px;
 }
 
 .step-item:nth-child(even) {
@@ -108,7 +110,6 @@
 .step-image-container {
   position: relative;
   width: 100%;
-  padding: 20px 0;
   padding-bottom: 200%;
   background: linear-gradient(180deg, #ffffff 0%, #ffffff 100%);
   border-radius: 20px;
@@ -121,7 +122,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%;
+  width: 100%;
   height: auto;
   object-fit: contain;
 }
