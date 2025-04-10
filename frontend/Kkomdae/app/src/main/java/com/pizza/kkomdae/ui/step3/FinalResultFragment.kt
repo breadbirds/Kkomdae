@@ -87,6 +87,40 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
         // PDF 제출 성공 시 제출 완료 페이지로 이동
         goToNext()
 
+        // 결과 실패 했을때
+        viewModel.pdfNameResponse.observe(viewLifecycleOwner){
+            it ?: return@observe
+            if(it==true){
+                showErrorDialog()
+            }
+        }
+
+    }
+
+    // 에러 다이얼로그
+    private fun showErrorDialog() {
+
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.layout_error_dialog)
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val width = (resources.displayMetrics.widthPixels * 0.9).toInt()
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        val confirmButton = dialog.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.btn_confirm)
+        val errorText = dialog.findViewById<TextView>(R.id.tv_error_message)
+        val errorTitleText = dialog.findViewById<TextView>(R.id.tv_error_title)
+
+        errorTitleText.text="제출을 실패하였습니다."
+        errorText.text="서버 오류로 인한 제출 실패입니다."
+
+        confirmButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun showQuitBottomSheet() {
