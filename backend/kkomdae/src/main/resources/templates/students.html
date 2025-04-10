@@ -218,7 +218,8 @@
                                         <th>장비 유형</th>
                                         <th>모델 코드</th>
                                         <th>일련번호</th>
-                                        <th></th>
+                                        <th>대여 상태</th>
+                                        <th>상세</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -226,6 +227,7 @@
                                         <td th:text="${device.type}"></td>
                                         <td th:text="${device.modelCode}"></td>
                                         <td th:text="${device.serialNum}"></td>
+                                        <td th:text="${student.status} ? '반납' : '대여 중'"></td>
                                         <td>
                                             <a th:href="@{/api/admin/test-results(studentId=${student.getStudentId()},deviceId=${device.getDeviceId()},deviceType=${device.getType()})}" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-info-circle"></i> 상세

@@ -35,12 +35,13 @@ public class StudentWithRent {
     }
 
     @Getter
+    @Setter
     public static class DeviceRentHistory {
         private final long deviceId;
         private final String type;
         private final String modelCode;
         private final String serialNum;
-
+        private boolean status = true;
         public DeviceRentHistory(Device device) {
             this.deviceId=device.getDeviceId();
             log.info("Device id : {}", deviceId);
