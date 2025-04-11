@@ -11,7 +11,8 @@ import icon6 from "../assets/icon6.png";
 import icon7 from "../assets/icon7.png";
 import icon8 from "../assets/icon8.png";
 import icon9 from "../assets/icon9.png";
-import qrCodeImage from "../assets/qr-code.png";
+// import qrCodeImage from "../assets/qr-code.png";
+import qrCodeApplication from "../assets/qr_onestore.png";
 
 const Hero: React.FC = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -41,7 +42,7 @@ const Hero: React.FC = () => {
 
   const handleSelfProgramDownload = async () => {
     setShowDownloadModal(true);
-    };
+  };
 
   const handleAppDownload = () => {
     // QR 코드 모달을 표시합니다
@@ -140,18 +141,15 @@ const Hero: React.FC = () => {
               </button>
             </div>
             <div className="qr-modal-content">
-              <img src={qrCodeImage} alt="꼼대 앱 QR 코드" className="qr-code-image" />
+              {/* <img src={qrCodeImage} alt="꼼대 앱 QR 코드" className="qr-code-image" /> */}
+              <img src={qrCodeApplication} alt="꼼대 앱 QR 코드" className="qr-code-image" />
               <p>QR 코드를 스캔하여 꼼대 앱을 설치하세요.</p>
               <p className="modal-note">* 모바일 기기에서만 이용 가능합니다.</p>
             </div>
           </div>
         </div>
       )}
-      <Modal
-        isOpen={showDownloadModal}
-        onClose={() => setShowDownloadModal(false)}
-        overlayClose={true}
-      ></Modal>
+      <Modal isOpen={showDownloadModal} onClose={() => setShowDownloadModal(false)} overlayClose={true}></Modal>
     </section>
   );
 };

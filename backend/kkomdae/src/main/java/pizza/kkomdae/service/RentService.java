@@ -24,6 +24,7 @@ public class RentService {
 
     public List<StudentWithRent> getStudentsWithRent(StudentWithRentCond studentWithRentCond) {
         List<Student> students = studentRepository.getStudentsByStudentInfo(studentWithRentCond);
+        log.info("학생 수 : {}", students.size());
         List<Rent> rents = rentRepository.getRentsByStudentInfo(studentWithRentCond);
         Map<Student, List<Rent>> studentAndRents = new HashMap<>();
         for (Student student : students) {
@@ -41,8 +42,12 @@ public class RentService {
             List<Rent> rentList = studentAndRents.get(student);
             studentWithRent = new StudentWithRent(student);
             for (Rent rent : rentList) {
-                studentWithRent.getDeviceRentHistory().add(new StudentWithRent.DeviceRentHistory(rent.getDevice()));
-                if (rent.getReleaseDateTime() == null) studentWithRent.setStatus(false);
+                StudentWithRent.DeviceRentHistory deviceRentHistory = new StudentWithRent.DeviceRentHistory(rent.getDevice());
+                if (rent.getReleaseDateTime() == null) {
+                    studentWithRent.setStatus(false);
+                    deviceRentHistory.setStatus(false);
+                }
+                studentWithRent.getDeviceRentHistory().add(deviceRentHistory);
             }
             results.add(studentWithRent);
         }

@@ -46,7 +46,7 @@ public class CustomRentRepositoryImpl implements CustomRentRepository {
 
     private Predicate isRegion(String region, String classNum) {
         if (region != null && !region.isBlank() && classNum != null) {
-            return QStudent.student.region.eq(region).and(QStudent.student.classNum.eq(classNum));
+            return QStudent.student.region.eq(region).and(QStudent.student.classNum.like("%" + region + classNum + "%"));
         } else if (region != null && !region.isBlank()) {
             return QStudent.student.region.eq(region);
         }
@@ -59,8 +59,8 @@ public class CustomRentRepositoryImpl implements CustomRentRepository {
                 case "이름" -> {
                     return QStudent.student.name.like("%" + keyword + "%");
                 }
-                case "학번" -> {
-                    return QStudent.student.studentNum.like("%" + keyword + "%");
+                case "학생고유번호" -> {
+                    return QStudent.student.studentId.eq(Long.valueOf(keyword));
                 }
             }
         }

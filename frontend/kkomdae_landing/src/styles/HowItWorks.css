@@ -38,6 +38,8 @@
   margin-bottom: 80px;
   gap: 60px;
   opacity: 0;
+  max-width: 1600px;
+  min-width: 900px;
 }
 
 .step-item:nth-child(even) {
@@ -97,7 +99,7 @@
 .step-image-wrapper {
   flex: 1;
   position: relative;
-  max-width: 300px;
+  max-width: 320px;
   display: flex;
   justify-content: center;
   transform: translateX(50px);
@@ -105,10 +107,46 @@
   transition: all 0.8s ease;
 }
 
+.mobile-device-container {
+  position: relative;
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+.mobile-frame {
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+.device-frame {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.screen-content {
+  position: absolute;
+  top: 7%;
+  bottom: 7%;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: 20px; /* 화면의 모서리 둥글게 */
+  background-color: #fff; /* 화면 배경색 */
+  transform: translateX(40px);
+}
+
+.screen-gif {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* cover에서 contain으로 변경 */
+}
+
+/* 기존 컨테이너 스타일 */
 .step-image-container {
   position: relative;
   width: 100%;
-  padding: 20px 0;
   padding-bottom: 200%;
   background: linear-gradient(180deg, #ffffff 0%, #ffffff 100%);
   border-radius: 20px;
@@ -121,7 +159,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%;
+  width: 100%;
   height: auto;
   object-fit: contain;
 }

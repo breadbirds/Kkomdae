@@ -160,18 +160,17 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         }
 
 
-
-
-
-
         Log.d(TAG, "onViewCreated: reCameraUri")
         // 재촬영 이미지 uri 서버로 보내기
         viewModel.reCameraUri.observe(viewLifecycleOwner){
             it ?: return@observe
+
+
             Log.d(TAG, "onViewCreated: reCameraUri")
 
             binding.ivImage.visibility = View.INVISIBLE
             binding.loadingAnimation.visibility = View.VISIBLE
+            binding.ivLoading.visibility = View.VISIBLE
 
             viewModel.reCameraStage.value?.let {
                 adapter.showTextAt(it-1)
@@ -188,12 +187,14 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
             data[0].damage=it.data.photo_ai_damage
             // 로딩 애니메이션 숨기기
+            changeImage(adaterIndex)
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
 
 
-            changeImage(adaterIndex)
+
+
 
             // 토스트 메시지 표시
             showToast("전면부 사진이 재분석되었습니다.")
@@ -203,13 +204,14 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             it ?: return@observe
             adapter.hideTextAt(1)
             // 로딩 애니메이션 숨기기
+            changeImage(adaterIndex)
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
             data[1].damage=it.data.photo_ai_damage
 
 
-            changeImage(adaterIndex)
+
 
             // 토스트 메시지 표시
             showToast("후면부 사진이 재분석되었습니다.")
@@ -218,13 +220,14 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             it ?: return@observe
             adapter.hideTextAt(2)
             // 로딩 애니메이션 숨기기
+            changeImage(adaterIndex)
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
             data[2].damage=it.data.photo_ai_damage
 
 
-            changeImage(adaterIndex)
+
 
             // 토스트 메시지 표시
             showToast("좌측면 사진이 재분석되었습니다.")
@@ -233,13 +236,14 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             it ?: return@observe
             adapter.hideTextAt(3)
             // 로딩 애니메이션 숨기기
+            changeImage(adaterIndex)
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
             data[3].damage=it.data.photo_ai_damage
 
 
-            changeImage(adaterIndex)
+
 
             // 토스트 메시지 표시
             showToast("우측면 사진이 재분석되었습니다.")
@@ -248,13 +252,14 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             it ?: return@observe
             adapter.hideTextAt(4)
             // 로딩 애니메이션 숨기기
+            changeImage(adaterIndex)
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
             data[4].damage=it.data.photo_ai_damage
 
 
-            changeImage(adaterIndex)
+
 
             // 토스트 메시지 표시
             showToast("모니터 사진이 재분석되었습니다.")
@@ -262,15 +267,18 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         viewModel.rePhoto6.observe(viewLifecycleOwner){
             it ?: return@observe
 
+
             adapter.hideTextAt(5)
             // 로딩 애니메이션 숨기기
+
+            changeImage(adaterIndex)
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
             data[5].damage=it.data.photo_ai_damage
 
 
-            changeImage(adaterIndex)
+
 
             // 토스트 메시지 표시
             showToast("키보드 사진이 재분석되었습니다.")
@@ -405,8 +413,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
                     override fun onLoadCleared(placeholder: Drawable?) {}
                 })
         }else{
-            binding.loadingAnimation.visibility = View.GONE
-            binding.ivImage.visibility = View.VISIBLE
+
             Glide.with(binding.ivImage)
                 .load(url)
                 .into(object : CustomTarget<Drawable>() {
@@ -418,6 +425,9 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
                     override fun onLoadCleared(placeholder: Drawable?) {}
                 })
+
+            binding.loadingAnimation.visibility = View.GONE
+            binding.ivImage.visibility = View.VISIBLE
         }
 
     }
@@ -431,7 +441,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.clearRePhoto()
-        clearBinding()
+        viewModel.clearPhoto()
     }
 
     companion object {

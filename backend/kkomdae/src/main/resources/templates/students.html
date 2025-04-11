@@ -134,7 +134,7 @@
             <div class="col-md-2">
                 <input type="number"
                        class="form-control"
-                       name="classNum"
+                       name="className"
                        id="classNumInput"
                        min="1"
                        placeholder="숫자만 입력">
@@ -144,7 +144,7 @@
             <div class="col-md-2">
                 <select class="form-select" name="searchType" th:field="${studentWithRentCond.searchType}">
                     <option value="">선택</option>
-                    <option value="학번">학번</option>
+                    <option value="학생고유번호">학생고유번호</option>
                     <option value="이름">이름</option>
                 </select>
             </div>
@@ -174,7 +174,7 @@
                     <span class="checkmark"></span>
                 </label>
             </th>
-            <th>학번</th>
+            <th>학생고유번호</th>
             <th>이름</th>
             <th>지역</th>
             <th>반</th>
@@ -218,7 +218,8 @@
                                         <th>장비 유형</th>
                                         <th>모델 코드</th>
                                         <th>일련번호</th>
-                                        <th></th>
+                                        <th>대여 상태</th>
+                                        <th>상세</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -226,6 +227,7 @@
                                         <td th:text="${device.type}"></td>
                                         <td th:text="${device.modelCode}"></td>
                                         <td th:text="${device.serialNum}"></td>
+                                        <td th:text="${student.status} ? '반납' : '대여 중'"></td>
                                         <td>
                                             <a th:href="@{/api/admin/test-results(studentId=${student.getStudentId()},deviceId=${device.getDeviceId()},deviceType=${device.getType()})}" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-info-circle"></i> 상세

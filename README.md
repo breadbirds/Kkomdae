@@ -1,8 +1,8 @@
-# 🔧 꼼대 (꼼꼼하게 대신 점검해드려요)
+# <img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d5d2bccfa0bf52e5c1d03fa8509c32d3/%EB%A1%9C%EA%B3%A0.png" width="15" alt="로고"> 꼼대 (꼼꼼하게 대신 점검해드립니다)
 
-<!-- [<img src="https://lab.ssafy.com/s12-webmobile4-sub1/S12P11D107/-/wikis/uploads/ba9b25834b6a7cf148924e4a0a34d6c2/%EB%95%A1%EA%B7%B8%EB%9E%91_%EC%86%8C%EA%B0%9C.png">](https://youtu.be/ZU994x_80P4) -->
+[<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/056910973b87435ca5dfbf76a139962e/Group_34003.png">](https://j12d101.p.ssafy.io/)
 
-<!-- ### 👆 위 이미지 클릭하면 `앱 소개 영상` 감상 가능합니다 👆 -->
+#### 👆 위 이미지 클릭하면 `랜딩페이지로` 이동합니다 👆
 
 <br/>
 
@@ -22,11 +22,11 @@
 
 # ✨ 개요
 
-#### 서비스명 : 꼼대 ( 꼼꼼하게 대신 점검해드려요 )
+#### 서비스명 : 꼼대 ( 꼼꼼하게 대신 점검해드립니다 )
 
 #### 한줄 설명 : `AI 모델을 활용한 장비 상태 관리 서비스`
 
-#### 프로젝트 기간 : 2025.03.03 ~ 2025.04.10
+#### 프로젝트 기간 : 2025.03.03 ~ 2025.04.11
 
 <br/>
 
@@ -34,13 +34,17 @@
 
 # ✨ 주요 기능
 
--   서비스 설명 : SSAFY에서 관리하는 노트북 및 장비 점검 절차를 간편화하고 체계적으로 관리하도록 돕는 서비스
--   주요 기능 :
-    -   AI를 통한 외관 결함 확인
-    -   맞춤형 점검 소프트웨어를 통한 하드웨어 동작 유무 확인
-    -   OCR을 통한 시리얼번호, 바코드번호 인식 간편화
-    -   장비 대여, 반납시 장비 상태 점검 문서화 및 제출 절차 자동화
-    -   관리자웹을 통한 체계적 장비 관리 및 담당자 트래킹
+#### 서비스 설명
+
+-   SSAFY에서 대여하는 노트북을 체계적으로 관리할 수 있는 서비스입니다. 노트북 수령 및 반납시 필요한 수령확인서 작성 절차를 앱 하나로 간편화했습니다. AI가 외관 결함을 자동으로 탐지하며 기기성능을 점검하는 기능도 제공합니다.
+
+#### 주요 기능
+
+-   AI를 통한 외관 결함 확인
+-   맞춤형 점검 소프트웨어를 통한 하드웨어 자가점검
+-   OCR을 통한 시리얼번호, 바코드번호 인식 간편화
+-   장비 대여, 반납시 장비 상태 점검 문서화 및 제출 절차 자동화
+-   관리자웹을 통한 체계적 장비 관리 및 담당 교육생 트래킹
 
 <br/>
 
@@ -56,38 +60,55 @@
 
 # 📚 기술 스택
 
-### Backend & AI
+### Backend
 
 <div align=left> 
   <img src="https://img.shields.io/badge/java-007396?style=flat-square&logo=java&logoColor=white">
-  <img src="https://img.shields.io/badge/mysql-4479A1?style=flat-square&logo=mysql&logoColor=white"> 
-  <img src="https://img.shields.io/badge/firebase-FFCA28?style=flat-square&logo=firebase&logoColor=white">
+  <img src="https://img.shields.io/badge/postgresql-4169E1?style=flat-square&logo=postgresql&logoColor=white"> 
+  <img src="https://img.shields.io/badge/swagger-85EA2D?style=flat-square&logo=swagger&logoColor=white">
+  <img src="https://img.shields.io/badge/postman-FF6C37?style=flat-square&logo=postman&logoColor=white">
   <img src="https://img.shields.io/badge/intellijidea-000000?style=flat-square&logo=intellijidea&logoColor=white">
   <img src="https://img.shields.io/badge/spring-6DB33F?style=flat-square&logo=spring&logoColor=white">
   <img src="https://img.shields.io/badge/springboot-6DB33F?style=flat-square&logo=springboot&logoColor=white">
+   <img src="https://img.shields.io/badge/springsecurity-6DB33F?style=flat-square&logo=springsecurity&logoColor=white">
   <img src="https://img.shields.io/badge/jitpack-000000?style=flat-square&logo=jitpack&logoColor=white">
-  <!-- <img src="https://img.shields.io/badge/redis-FF4438?style=flat-square&logo=redis&logoColor=white"> -->
   <img src="https://img.shields.io/badge/openjdk-000000?style=flat-square&logo=openjdk&logoColor=white">
-  <img src="https://img.shields.io/badge/fastapi-009688?style=flat-square&logo=fastapi&logoColor=white">
-
-  <img src="https://img.shields.io/badge/java-007396?style=flat-square&logo=java&logoColor=white">
-  <img src="https://img.shields.io/badge/python-3776AB?style=flat-square&logo=python&logoColor=white">
-  <img src="https://img.shields.io/badge/openai-412991?style=flat-square&logo=openai&logoColor=white">
+  <img src="https://img.shields.io/badge/bootstrap-7952B3?style=flat-square&logo=bootstrap&logoColor=white">
+  <img src="https://img.shields.io/badge/thymeleaf-005F0F?style=flat-square&logo=thymeleaf&logoColor=white">
 
 </div>
 
-### FrontEnd
+### Frontend
 
 <div align=left> 
-  <img src="https://img.shields.io/badge/firebase-FFCA28?style=flat-square&logo=firebase&logoColor=white">
   <img src="https://img.shields.io/badge/gradle-02303A?style=flat-square&logo=gradle&logoColor=white">
   <img src="https://img.shields.io/badge/kotlin-7F52FF?style=flat-square&logo=kotlin&logoColor=white">
   <img src="https://img.shields.io/badge/openjdk-000000?style=flat-square&logo=openjdk&logoColor=white">
   <img src="https://img.shields.io/badge/lottiefiles-00DDB3?style=flat-square&logo=lottiefiles&logoColor=white">
+  <img src="https://img.shields.io/badge/react-61DAFB?style=flat-square&logo=react&logoColor=white">
   <img src="https://img.shields.io/badge/android-34A853?style=flat-square&logo=android&logoColor=white">
   <img src="https://img.shields.io/badge/androidstudio-3DDC84?style=flat-square&logo=androidstudio&logoColor=white">
   <img src="https://img.shields.io/badge/xml-005FAD?style=flat-square&logo=xml&logoColor=white">
   <img src="https://img.shields.io/badge/jitpack-000000?style=flat-square&logo=jitpack&logoColor=white">
+  <img src="https://img.shields.io/badge/Hilt-008FC7?style=flat-square&logo=Hilt&logoColor=white">
+  <img src="https://img.shields.io/badge/googlecloud-4285F4?style=flat-square&logo=googlecloud&logoColor=white">
+
+</div>
+
+### AI
+
+<div align=left> 
+  <img src="https://img.shields.io/badge/fastapi-009688?style=flat-square&logo=fastapi&logoColor=white">
+  <img src="https://img.shields.io/badge/python-3776AB?style=flat-square&logo=python&logoColor=white">
+  <img src="https://img.shields.io/badge/yolo-111F68?style=flat-square&logo=yolo&logoColor=white">
+  <img src="https://img.shields.io/badge/fasterrcnn-0A9EDC?style=flat-square&logo=fasterrcnn&logoColor=white">
+  <img src="https://img.shields.io/badge/opencv-5C3EE8?style=flat-square&logo=opencv&logoColor=white">
+  <img src="https://img.shields.io/badge/tensorflow-FF6F00?style=flat-square&logo=tensorflow&logoColor=white">
+  <img src="https://img.shields.io/badge/pytorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white">
+  <img src="https://img.shields.io/badge/kotlin-7F52FF?style=flat-square&logo=kotlin&logoColor=white">
+  <img src="https://img.shields.io/badge/jupyter-F37626?style=flat-square&logo=jupyter&logoColor=white">
+  <img src="https://img.shields.io/badge/googlecolab-F9AB00?style=flat-square&logo=googlecolab&logoColor=white">
+  <img src="https://img.shields.io/badge/googleforms-7248B9?style=flat-square&logo=googleforms&logoColor=white">
 
 </div>
 
@@ -98,8 +119,10 @@
   <img src="https://img.shields.io/badge/jenkins-D24939?style=flat-square&logo=jenkins&logoColor=white">
   <img src="https://img.shields.io/badge/nginx-009639?style=flat-square&logo=nginx&logoColor=white">
   <img src="https://img.shields.io/badge/letsencrypt-003A70?style=flat-square&logo=letsencrypt&logoColor=white">
-  <img src="https://img.shields.io/badge/flydotio-24175B?style=flat-square&logo=flydotio&logoColor=white">
   <img src="https://img.shields.io/badge/amazonec2-FF9900?style=flat-square&logo=amazonec2&logoColor=white">
+  <img src="https://img.shields.io/badge/amazons3-569A31?style=flat-square&logo=amazons3&logoColor=white">
+  <img src="https://img.shields.io/badge/django-092E20?style=flat-square&logo=django&logoColor=white">
+  <img src="https://img.shields.io/badge/python-3776AB?style=flat-square&logo=python&logoColor=white">
 
 </div>
 
@@ -111,12 +134,16 @@
   <img src="https://img.shields.io/badge/mattermost-0058CC?style=flat-square&logo=mattermost&logoColor=white">
   <img src="https://img.shields.io/badge/notion-000000?style=flat-square&logo=notion&logoColor=white">
   <img src="https://img.shields.io/badge/jira-0052CC?style=flat-square&logo=jira&logoColor=white">
+  <img src="https://img.shields.io/badge/discord-5865F2?style=flat-square&logo=discord&logoColor=white">
+  <img src="https://img.shields.io/badge/googledrive-4285F4?style=flat-square&logo=googledrive&logoColor=white">
  
 </div>
 
 ## 기술적 특징
 
 ## 서비스 아키텍처
+
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/76774816955d653a73dcfee4ce820d00/%EC%84%9C%EB%B9%84%EC%8A%A4_%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png">
 
 <br/>
 
@@ -128,7 +155,11 @@
 
 ## API 명세서
 
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/5f3bc1f9560ac42559c0435b7155b303/api_%EB%AA%85%EC%84%B8%EC%84%9C.png">
+
 ## ERD
+
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/2bbe33e7bb7cb7c5f0d948160d24fc24/erd.png">
 
 ## Git
 
@@ -141,10 +172,19 @@
 
 # 👨‍👩‍👧‍👦 개발 멤버 및 역할분담
 
+<<<<<<< HEAD
 |                                                                           정유진                                                                            |                                                                           김성수                                                                            |                                                      김정언 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                                      |                                                   도승국 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                                   |                                                                           이상혁                                                                            |                                                                           이송희                                                                            |
 | :---------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | <img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d133ed351edaa7dcc1fa7e2c2d38826d/%EC%A0%95%EC%9C%A0%EC%A7%84.png" width="800"> | <img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/8530717db2391c0185e8e20df9f3c8af/%EA%B9%80%EC%84%B1%EC%88%98.png" width="800"> | <img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/eadaad75c6a97002348a7ce31c94271d/%EA%B9%80%EC%A0%95%EC%96%B8.png" width="800"> | <img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/82b7121599bcc7b174aedb3600f6ce2b/%EB%8F%84%EC%8A%B9%EA%B5%AD.png" width="800"> | <img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d8fe9aca9307af2d17c50f5181a481b2/%EC%9D%B4%EC%83%81%ED%98%81.png" width="800"> | <img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d524386635e6548591ff1eaa50b459f0/%EC%9D%B4%EC%86%A1%ED%9D%AC.png" width="800"> |
 |                                                                   Leader & Frontend & AI                                                                    |                                                                           Backend                                                                           |                                                                             AI                                                                              |                                                                            Infra                                                                            |                                                                          Frontend                                                                           |                                                                          Frontend                                                                           |
+=======
+|                                               <div align="center">[**정유진**](https://github.com/breadbirds)</div>                                                |                                                                <div align="center">**김성수**</div>                                                                |                                                                <div align="center">**김정언**</div>                                                                |                                                                <div align="center">**도승국**</div>                                                                |                                                                <div align="center">**이상혁**</div>                                                                |                                                                <div align="center">**이송희**</div>                                                                |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d133ed351edaa7dcc1fa7e2c2d38826d/%EC%A0%95%EC%9C%A0%EC%A7%84.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/8530717db2391c0185e8e20df9f3c8af/%EA%B9%80%EC%84%B1%EC%88%98.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/eadaad75c6a97002348a7ce31c94271d/%EA%B9%80%EC%A0%95%EC%96%B8.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/82b7121599bcc7b174aedb3600f6ce2b/%EB%8F%84%EC%8A%B9%EA%B5%AD.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d8fe9aca9307af2d17c50f5181a481b2/%EC%9D%B4%EC%83%81%ED%98%81.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d524386635e6548591ff1eaa50b459f0/%EC%9D%B4%EC%86%A1%ED%9D%AC.png){width="800" height="800"} |
+|                                                                       Leader & AI Developer                                                                        |                                                                        &nbsp;Backend&nbsp;                                                                         |                                                                      &nbsp;AI Engineer&nbsp;                                                                       |                                                                    &nbsp;Infra & Backend&nbsp;                                                                     |                                                                        &nbsp;Frontend&nbsp;                                                                        |                                                                        &nbsp;Frontend&nbsp;                                                                        |
+
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/c91b455112206bb2d078056bb080e8f1/%EC%97%AD%ED%95%A0%EB%B6%84%EB%8B%B4.png">
+>>>>>>> develop
 
 <br/>
 
@@ -155,5 +195,3 @@
 -   [포팅메뉴얼]
 -   [Git](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/Git)
 -   [화면 설계서]
--   [ERD]
--   [API 명세서]

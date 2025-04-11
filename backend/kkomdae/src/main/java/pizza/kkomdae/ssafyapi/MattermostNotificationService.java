@@ -48,7 +48,8 @@ public class MattermostNotificationService {
                 "### :one: 꼼대 `애플리케이션`을 다운받아 노트북을 촬영해주세요.\n" +
                 "### :two: 꼼대 `노트북 검사 프로그램`을 통해 노트북을 검사해주세요.\n" +
                 "### :three: 제출을 완료하고 PDF를 확인해 보세요! \n" +
-                "## ** [ :kkomdae_write:  꼼대 다운 받으러 가기 :kkomdae_go: ](https://j12d101.p.ssafy.io)**";  // 발송할 메시지 내용
+                "## ** [ :kkomdae_write:  꼼대 다운 받으러 가기 :kkomdae_go: ](https://j12d101.p.ssafy.io)**\n" +
+                "@s12d101user2";  // 발송할 메시지 내용
 
         putUserToChannel(channelId, nicknames);
         sendMessage(channelId, message);
@@ -108,6 +109,7 @@ public class MattermostNotificationService {
                     HttpMethod.POST, request,
                     PutUserRtn.class);
             log.info(response.getBody().getChannel_id());
+            log.info("postId : {}" , response.getBody().getId());
         } catch (HttpClientErrorException e) {
             // 4xx 오류 시 자동 throw
             String responseBody = e.getResponseBodyAsString(); // 본문 추출

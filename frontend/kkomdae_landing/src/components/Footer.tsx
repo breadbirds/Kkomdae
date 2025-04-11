@@ -1,6 +1,7 @@
 import "../styles/Footer.css";
 import { useState } from "react";
-import qrCodeImage from "../assets/qr-code.png";
+// import qrCodeImage from "../assets/qr-code.png";
+import qrCodeApplication from "../assets/qr_onestore.png";
 import Modal from "./Modal";
 
 const Footer: React.FC = () => {
@@ -84,7 +85,8 @@ const Footer: React.FC = () => {
               </button>
             </div>
             <div className="qr-modal-content">
-              <img src={qrCodeImage} alt="꼼대 앱 QR 코드" className="qr-code-image" />
+              {/* <img src={qrCodeImage} alt="꼼대 앱 QR 코드" className="qr-code-image" /> */}
+              <img src={qrCodeApplication} alt="꼼대 앱 QR 코드" className="qr-code-image" />
               <p>QR 코드를 스캔하여 꼼대 앱을 설치하세요.</p>
               <p className="modal-note">* 모바일 기기에서만 이용 가능합니다.</p>
             </div>
@@ -93,11 +95,7 @@ const Footer: React.FC = () => {
       )}
 
       {/* Download Modal */}
-      <Modal 
-        isOpen={showDownloadModal} 
-        onClose={() => setShowDownloadModal(false)}
-        overlayClose={true}
-      />
+      <Modal isOpen={showDownloadModal} onClose={() => setShowDownloadModal(false)} overlayClose={true} />
     </footer>
   );
 };
