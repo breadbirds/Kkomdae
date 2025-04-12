@@ -243,7 +243,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider_step2">
 
             <TextView
@@ -285,7 +284,6 @@
 
     <Button
         android:id="@+id/btn_pass"
-        android:visibility="gone"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:backgroundTint="@color/gray500"

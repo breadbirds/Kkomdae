@@ -325,9 +325,9 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
         // 다음 버튼
         binding.btnConfirm.setOnClickListener {
+            viewModel.clearPhoto()
             val transaction = requireActivity().supportFragmentManager.beginTransaction()
             transaction.replace(R.id.fl_main, NoteFragment ())
-            transaction.addToBackStack(null)
             transaction.commit()
         }
 
@@ -441,7 +441,6 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.clearRePhoto()
-        viewModel.clearPhoto()
     }
 
     companion object {

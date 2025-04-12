@@ -62,12 +62,12 @@ class CameraActivity : BaseActivity() {
         }
 
 
-//        // 상태바 뒤로가기 처리를 위한 콜백 등록 로직
-//        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-//            override fun handleOnBackPressed() {
-//                showStopCameraDialog()
-//            }
-//        })
+        // 상태바 뒤로가기 처리를 위한 콜백 등록 로직
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                showStopCameraDialog()
+            }
+        })
 
     }
 
