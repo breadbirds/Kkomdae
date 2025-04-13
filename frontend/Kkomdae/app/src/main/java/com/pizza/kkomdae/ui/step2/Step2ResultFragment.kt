@@ -123,7 +123,6 @@ class Step2ResultFragment : BaseFragment<FragmentStep2ResultBinding>(
                     if (it.success){
                         val transaction = requireActivity().supportFragmentManager.beginTransaction()
                         transaction.replace(R.id.fl_main, LaptopInfoInputFragment())
-                        transaction.addToBackStack(null)
                         transaction.commit()
                     }else{
                         // todo 에러 다이얼로그 추가

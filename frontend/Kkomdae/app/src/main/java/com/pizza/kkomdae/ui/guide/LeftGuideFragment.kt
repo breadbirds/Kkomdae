@@ -66,7 +66,7 @@ private var cameraProvider: ProcessCameraProvider? = null
 private var camera: Camera? = null
 private var cameraExecutor: ExecutorService? = null
 private lateinit var cameraActivity: CameraActivity
-private var autoCamera = true
+private var autoCamera = false
 /**
  * A simple [Fragment] subclass.
  * Use the [LeftGuideFragment.newInstance] factory method to

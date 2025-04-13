@@ -67,7 +67,7 @@ private var cameraProvider: ProcessCameraProvider? = null
 private var camera: Camera? = null
 private var cameraExecutor: ExecutorService? = null
 private lateinit var cameraActivity: CameraActivity
-private var autoCamera = true
+private var autoCamera = false
 
 /**
  * A simple [Fragment] subclass.
@@ -447,7 +447,7 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
                         Handler(Looper.getMainLooper()).post {
                             Log.d("CameraFragment", "사진 저장됨: $savedUri")
                             viewModel.setScreen(savedUri)
-                            viewModel.setStep(5)
+                            viewModel.setStep(4)
 
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE

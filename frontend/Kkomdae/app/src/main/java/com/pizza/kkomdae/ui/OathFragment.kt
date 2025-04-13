@@ -177,7 +177,6 @@ class OathFragment : BaseFragment<FragmentOathBinding>(
             if (isOath1Checked && isOath2Checked && isOath3Checked && isOath4Checked) {
                 val transaction = requireActivity().supportFragmentManager.beginTransaction()
                 transaction.replace(R.id.fl_main, AllStepOnboardingFragment())
-                transaction.addToBackStack(null)
                 transaction.commit()
             }
         }

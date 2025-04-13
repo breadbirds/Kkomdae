@@ -67,7 +67,7 @@ private var imageCapture: ImageCapture? = null
 private var cameraProvider: ProcessCameraProvider? = null
 private var camera: Camera? = null
 private var cameraExecutor: ExecutorService? = null
-private var autoCamera = true
+private var autoCamera = false
 
 
 private lateinit var cameraActivity: CameraActivity

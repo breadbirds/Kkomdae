@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -23,6 +24,8 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
     private var param2: String? = null
     private var isTextEntered = false   // 텍스트 입력 여부를 추적하는 변수
     private val viewModel : FinalViewModel by activityViewModels()
+    // 시스템 백 버튼 콜백 선언
+    private lateinit var backPressedCallback: OnBackPressedCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +33,14 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+        // 시스템 백 버튼 동작 설정
+        backPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                showQuitBottomSheet()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, backPressedCallback)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -101,7 +112,6 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
 
         val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fl_main, FinalResultFragment())
-        transaction.addToBackStack(null)
         transaction.commit()
     }
 

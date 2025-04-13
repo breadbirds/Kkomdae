@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -30,9 +31,23 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
 
     // ViewModel 연결
     private val viewModel : FinalViewModel by activityViewModels()
+    // 시스템 백 버튼 콜백 선언
+    private lateinit var backPressedCallback: OnBackPressedCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 시스템 백 버튼 동작 설정
+        backPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // 시스템 백 버튼 클릭 시 바텀시트 동작
+                showQuitBottomSheet()
+            }
+        }
+
+
+        // 콜백 등록
+        requireActivity().onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
     }
 
@@ -166,11 +181,10 @@ class FinalResultFragment : BaseFragment<FragmentFinalResultBinding>(
         viewModel.pdfName.observe(viewLifecycleOwner) {
             it ?: return@observe
             // 제출완료 화면으로 전환
-            val submitCompleteFragment = SubmitCompleteFragment.newInstance("", "")
+            val submitCompleteFragment = SubmitCompleteFragment()
 
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fl_main, submitCompleteFragment)
-                .addToBackStack(null)
                 .commit()
         }
     }

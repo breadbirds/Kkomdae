@@ -222,7 +222,6 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
             val transaction = mainActivity.supportFragmentManager.beginTransaction()
             mainActivity.supportFragmentManager.popBackStack()
             transaction.replace(R.id.fl_main, Step2GuideFragment())
-                .addToBackStack("")
             transaction.commit()
         } else {
             // 촬영 단계가 완료되지 않았으면 촬영 계속

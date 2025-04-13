@@ -116,7 +116,6 @@ class Step2GuideFragment : BaseFragment<FragmentStep2GuideBinding>(
                     if (it.success){
                         val transaction = requireActivity().supportFragmentManager.beginTransaction()
                         transaction.replace(R.id.fl_main, LaptopInfoInputFragment())
-                        transaction.addToBackStack(null)
                         transaction.commit()
                     }
                 }
@@ -135,7 +134,6 @@ class Step2GuideFragment : BaseFragment<FragmentStep2GuideBinding>(
                         // 자가진단 완료
                         val transaction = requireActivity().supportFragmentManager.beginTransaction()
                         transaction.replace(R.id.fl_main, Step2ResultFragment())
-                        transaction.addToBackStack(null)
                         transaction.commit()
                     }else{
                         var data = ""

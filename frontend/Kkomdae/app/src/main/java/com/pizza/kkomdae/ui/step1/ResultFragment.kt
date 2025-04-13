@@ -78,17 +78,17 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
         Log.d(TAG, "onViewCreated: ${viewModel.frontUri.value}")
         Log.d(TAG, "onViewCreated stage: ${viewModel.step.value}")
         var url :Uri? = null
-        if(viewModel.step.value ==1){
+        if(viewModel.step.value == 1){
             url = viewModel.frontUri.value
-        }else if (viewModel.step.value ==2){
+        }else if (viewModel.step.value == 2){
             url = viewModel.backUri.value
-        }else if (viewModel.step.value ==3){
+        }else if (viewModel.step.value == 3){
             url = viewModel.leftUri.value
-        }else if (viewModel.step.value ==4){
+        }else if (viewModel.step.value == 4){
             url = viewModel.rightUri.value
-        }else if (viewModel.step.value ==5){
+        }else if (viewModel.step.value == 5){
             url = viewModel.screenUri.value
-        }else if (viewModel.step.value ==6){
+        }else if (viewModel.step.value == 6){
             url = viewModel.keypadUri.value
         }
         binding.ivProduct?.let {
