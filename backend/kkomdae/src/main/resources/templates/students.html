@@ -227,7 +227,7 @@
                                         <td th:text="${device.type}"></td>
                                         <td th:text="${device.modelCode}"></td>
                                         <td th:text="${device.serialNum}"></td>
-                                        <td th:text="${student.status} ? '반납' : '대여 중'"></td>
+                                        <td th:text="${device.status} ? '반납' : '대여 중'"></td>
                                         <td>
                                             <a th:href="@{/api/admin/test-results(studentId=${student.getStudentId()},deviceId=${device.getDeviceId()},deviceType=${device.getType()})}" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-info-circle"></i> 상세
