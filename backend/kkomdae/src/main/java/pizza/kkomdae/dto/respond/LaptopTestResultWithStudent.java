@@ -15,6 +15,7 @@ public class LaptopTestResultWithStudent {
     private final String studentRegion;
     private final String studentName;
     private final String studentNum;
+    private final String studentGisu;
     private String failedKeys = "";
     private String failedPorts = "";
     private final boolean cameraStatus;
@@ -29,6 +30,7 @@ public class LaptopTestResultWithStudent {
         this.studentRegion = laptopTestResult.getStudent().getRegion();
         this.studentName = laptopTestResult.getStudent().getName();
         this.studentNum = laptopTestResult.getStudent().getStudentNum();
+        this.studentGisu = laptopTestResult.getStudent().getEdu();
         this.release = laptopTestResult.getRelease();
         if (laptopTestResult.getFailedKeys() != null) this.failedKeys = laptopTestResult.getFailedKeys();
         if (laptopTestResult.getFailedPorts() != null) this.failedPorts = laptopTestResult.getFailedPorts();

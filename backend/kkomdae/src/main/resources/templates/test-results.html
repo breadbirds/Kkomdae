@@ -88,7 +88,7 @@
     </style>
 </head>
 <body>
-<div class="container mt-4">
+<div class="container mt-5">
     <div class="header-section">
         <div class="d-flex align-items-center">
             <a th:href="@{/api/admin/students}">
@@ -111,6 +111,7 @@
                 <th>대여/반납</th>
                 <th>지역</th>
                 <th>교육생 이름</th>
+                <th>기수</th>
                 <th>실패한 키</th>
                 <th>실패한 포트</th>
                 <th>카메라 상태</th>
@@ -128,6 +129,7 @@
                 <td th:text="${result.release ? '반납' : '대여'}">대여/반납</td>
                 <td th:text="${result.studentRegion}">지역</td>
                 <td th:text="${result.studentName}">교육생 이름</td>
+                <td th:text="${result.getStudentGisu()}">기수</td>
                 <td th:text="${!#strings.isEmpty(result.failedKeys) ? result.failedKeys : '정상'}">실패한 키</td>
                 <td th:text="${!#strings.isEmpty(result.failedPorts) ? result.failedPorts : '정상'}">실패한 포트</td>
                 <td>
@@ -138,7 +140,7 @@
                 <td>
                     <a th:if="${not #strings.isEmpty(result.batteryPdfUrl)}"
                        th:href="${result.batteryPdfUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-file-pdf me-1"></i> 보기
+                        <i class="fas fa-file-pdf me-1"></i>
                     </a>
                     <span th:unless="${not #strings.isEmpty(result.batteryPdfUrl)}">-</span>
                 </td>
@@ -146,14 +148,15 @@
                 <td>
                     <a th:if="${not #strings.isEmpty(result.resultPdfUrl)}"
                        th:href="${result.resultPdfUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-file-pdf me-1"></i> 보기
+                        <i class="fas fa-file-pdf me-1"></i>
                     </a>
                     <span th:unless="${not #strings.isEmpty(result.resultPdfUrl)}">-</span>
                 </td>
                 <td th:text="${#temporals.format(result.date, 'yyyy-MM-dd')}">날짜</td>
                 <td>
                     <a class="btn btn-sm btn-outline-primary" th:href="@{/api/admin/photos(testResultId=${result.laptopTestId})}" role="button">
-                        <i class="fas fa-images me-1"></i> 보기
+<!--                        <i class="fas fa-images me-1"></i> 보기-->
+                        보기
                     </a>
                 </td>
             </tr>
