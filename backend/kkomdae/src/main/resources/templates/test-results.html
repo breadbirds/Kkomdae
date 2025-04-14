@@ -116,6 +116,7 @@
                 <th>카메라 상태</th>
                 <th>AI 흠집 갯수</th>
                 <th>배터리 PDF</th>
+                <th>배터리 수명</th>
                 <th>결과 PDF</th>
                 <th>날짜</th>
                 <th>사진 상세</th>
@@ -141,6 +142,7 @@
                     </a>
                     <span th:unless="${not #strings.isEmpty(result.batteryPdfUrl)}">-</span>
                 </td>
+                <td th:text="${result.getBatteryStatus()}">배터리 수명</td>
                 <td>
                     <a th:if="${not #strings.isEmpty(result.resultPdfUrl)}"
                        th:href="${result.resultPdfUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
