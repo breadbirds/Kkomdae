@@ -1,13 +1,11 @@
-import "../styles/HowItWorks.css";
-// import step1 from "../assets/step1.png";
-import step1_gif from "../assets/step1.gif";
-// import step2 from "../assets/step2.png";
-import step2_gif from "../assets/step2.gif";
-// import step3 from "../assets/step3.png";
-import step3_gif from "../assets/step3.gif";
 import { useEffect } from "react";
+import "../styles/HowItWorks.css";
+import mobileFrame from "../assets/mobile-frame.png";
+import step1_gif from "../assets/step1.gif";
+import step2_gif from "../assets/step2.gif";
+import step3_gif from "../assets/step3.gif";
 
-const HowItWorks: React.FC = () => {
+const HowItWorks = () => { 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -45,12 +43,22 @@ const HowItWorks: React.FC = () => {
                 <h3 className="step-title">노트북 외관 촬영</h3>
               </div>
               <div className="step-content">
-                <p className="step-description">노트북의 상태를 정확하게 진단하기 위해 꼼대 앱에서 안내하는 각도와 방법에 따라 노트북의 상판, 하판, 측면, 모니터, 키보드 등을 꼼꼼하게 촬영해주세요.</p>
+                <p className="step-description">
+                  노트북의 상태를 정확하게 진단하기 위해 꼼대 앱에서 안내하는 각도와 방법에 따라 노트북의 상판, 하판, 측면, 모니터, 키보드 등을 꼼꼼하게 촬영해주세요. 자동 촬영 기능을 활용하여 최적의
+                  각도와 거리에서 촬영하세요.
+                </p>
               </div>
             </div>
             <div className="step-image-wrapper">
-              <div className="step-image-container">
-                <img src={step1_gif} alt="노트북 사진 촬영 화면" className="step-image" />
+              <div className="mobile-device-container">
+                {/* 모바일 프레임 (고정 백그라운드) */}
+                <div className="mobile-frame">
+                  <img src={mobileFrame} alt="모바일 디바이스 프레임" className="device-frame" />
+                </div>
+                {/* GIF를 화면 내부에 오버레이 */}
+                <div className="screen-content">
+                  <img src={step1_gif} alt="노트북 사진 촬영 화면" className="screen-gif" />
+                </div>
               </div>
             </div>
           </div>
@@ -68,8 +76,15 @@ const HowItWorks: React.FC = () => {
               </div>
             </div>
             <div className="step-image-wrapper">
-              <div className="step-image-container">
-                <img src={step2_gif} alt="자가진단 프로그램 실행 화면" className="step-image" />
+              <div className="mobile-device-container">
+                {/* 모바일 프레임 (고정 백그라운드) */}
+                <div className="mobile-frame">
+                  <img src={mobileFrame} alt="모바일 디바이스 프레임" className="device-frame" />
+                </div>
+                {/* GIF를 화면 내부에 오버레이 */}
+                <div className="screen-content">
+                  <img src={step2_gif} alt="자가진단 프로그램 실행 화면" className="screen-gif" />
+                </div>
               </div>
             </div>
           </div>
@@ -81,12 +96,22 @@ const HowItWorks: React.FC = () => {
                 <h3 className="step-title">AI 분석 및 보고서 생성</h3>
               </div>
               <div className="step-content">
-                <p className="step-description">입력하신 노트북 정보와 촬영된 사진을 AI가 분석하여 노트북의 상태를 정확하게 진단하고, 상세한 내용이 담긴 PDF 보고서를 자동으로 생성해드려요.</p>
+                <p className="step-description">
+                  입력하신 노트북 정보와 촬영된 사진을 AI가 분석하여 노트북의 상태를 정확하게 진단하고, 상세한 내용이 담긴 PDF 보고서를 자동으로 생성해드려요. 분석된 결과는 언제든지 재촬영하여 더
+                  정확한 진단을 받으실 수 있습니다.
+                </p>
               </div>
             </div>
             <div className="step-image-wrapper">
-              <div className="step-image-container">
-                <img src={step3_gif} alt="AI 분석 및 보고서 생성 화면" className="step-image" />
+              <div className="mobile-device-container">
+                {/* 모바일 프레임 (고정 백그라운드) */}
+                <div className="mobile-frame">
+                  <img src={mobileFrame} alt="모바일 디바이스 프레임" className="device-frame" />
+                </div>
+                {/* GIF를 화면 내부에 오버레이 */}
+                <div className="screen-content">
+                  <img src={step3_gif} alt="AI 분석 및 보고서 생성 화면" className="screen-gif" />
+                </div>
               </div>
             </div>
           </div>

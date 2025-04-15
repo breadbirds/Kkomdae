@@ -7,6 +7,101 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
+        @font-face {
+            font-family: 'Pretendard-Regular';
+            src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+            font-weight: 200;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Pretendard-Regular', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            padding-top: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: auto;
+        }
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .header-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        .header-buttons .btn, .header-buttons form {
+            margin-left: 0.5rem;
+        }
+
+        .filter-form label {
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            display: block;
+            font-size: 0.875rem;
+            color: #495057;
+        }
+        .filter-form .row {
+            align-items: flex-end;
+        }
+        .filter-form .form-select, .filter-form .form-control {
+            font-size: 0.9rem;
+            height: 38px;
+        }
+        .filter-form .btn {
+            height: 38px;
+            padding: 0.375rem 1.25rem;
+        }
+
+        .table {
+            border: 1px solid #dee2e6;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+            font-size: 0.9rem;
+            padding: 0.75rem;
+            border-top: 1px solid #dee2e6;
+        }
+        .table thead th {
+            background-color: #e9ecef;
+            color: #495057;
+            font-weight: 600;
+            border-bottom-width: 2px;
+            white-space: nowrap;
+        }
+        .table-hover > tbody > tr:hover > * {
+            background-color: #f8f9fa;
+        }
+        .table .badge {
+            font-size: 0.8em;
+            font-weight: 500;
+            padding: 0.4em 0.8em;
+            border-radius: 4px;
+        }
+        .badge-warning { background-color: #ffc107; color: #333; }
+        .badge-success { background-color: #198754; color: white; }
+
+        .btn-sm {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.6rem;
+        }
+
         .form-select, .form-control {
             height: 38px;
         }
@@ -30,50 +125,46 @@
     </style>
 </head>
 <body>
-<div class="container mt-3">
-    <a th:href="@{/api/admin/students}">
-        <img th:src="@{/image/ssafy.svg}" style="width: 120px; height: 90px;" alt="이미지 설명" />
-    </a>
-</div>
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">기기 목록 페이지</h2>
-        <div>
-            <div class="col-md-12 mb-3">
-                <a href="/api/admin/students" class="btn btn-secondary me-2">
-                    <i class="fas fa-users me-1"></i> 학생 목록
-                </a>
-                <form action="/api/admin/logout" method="post" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-sign-out-alt me-1"></i> 로그아웃
-                    </button>
-                </form>
-            </div>
+<div class="container mt-4">
+    <div class="header-section">
+        <div class="d-flex align-items-center">
+            <a th:href="@{/api/admin/students}">
+                <img th:src="@{/image/ssafy.svg}" style="width: 100px; height: auto; margin-right: 15px;" alt="SSAFY Logo" />
+            </a>
+            <h2 class="header-title">기기 목록</h2>
+        </div>
+        <div class="header-buttons d-flex align-items-center">
+            <a href="/api/admin/students" class="btn btn-outline-secondary">
+                <i class="fas fa-users me-1"></i> 학생 목록
+            </a>
+            <form action="/api/admin/logout" method="post" class="d-inline">
+                <button type="submit" class="btn btn-outline-danger">
+                    <i class="fas fa-sign-out-alt me-1"></i> 로그아웃
+                </button>
+            </form>
         </div>
     </div>
 
-    <!-- 검색 필터 섹션 -->
-    <form th:action="@{/api/admin/devices}" method="get" class="mb-4" id="searchForm">
+    <form th:action="@{/api/admin/devices}" method="get" class="filter-form mb-4 p-3 bg-light border rounded" id="searchForm">
         <div class="row g-3 align-items-end">
-            <!-- 검색 유형 선택 -->
-            <div class="col-md-2">
-                <select class="form-select" name="searchType" id="selectedSearchType">
+            <div class="col-md-3">
+                <label for="selectedSearchType" class="form-label">검색 기준</label>
+                <select class="form-select" name="searchType" id="selectedSearchType" th:field="*{deviceCond.searchType}">
+                    <option value="">전체</option>
                     <option value="시리얼 번호">시리얼 번호</option>
                     <option value="모델코드">모델코드</option>
                 </select>
             </div>
 
-            <!-- 키워드 입력 -->
-            <div class="col-md-8">
+            <div class="col-md-7">
+                <label for="searchKeyword" class="form-label">검색어</label>
                 <input type="text" class="form-control"
                        name="searchKeyword"
                        id="searchKeyword"
-                       placeholder="검색어 입력"
+                       placeholder="검색어를 입력하세요"
                        oninput="validateSearch()">
             </div>
 
-
-            <!-- 검색 버튼 -->
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary w-100" id="searchButton" disabled>
                     <i class="fas fa-search"></i> 검색
@@ -82,7 +173,7 @@
         </div>
     </form>
 
-    <table class="table table-hover">
+    <table class="table table-hover border">
         <thead class="table-light">
         <tr>
             <th>기기 ID</th>
@@ -90,74 +181,65 @@
             <th>바코드 번호</th>
             <th>모델코드</th>
             <th>대여 상태</th>
-            <th></th>
+            <th>테스트 결과</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="device, deviceStat : ${deviceList}">
-            <td th:text="${device.getDeviceId()}">기기 ID</td>
+        <tr th:each="device : ${deviceList}">
+            <td th:text="${device.deviceId}">기기 ID</td>
+            <td th:text="${device.serialNum}">시리얼 번호</td>
+            <td th:text="${device.deviceType == 'Laptop' ? device.barcodeNum : '-'}">바코드 번호</td>
+            <td th:text="${device.modelCode}">모델코드</td>
             <td>
-                <div class="d-flex align-items-center">
-                    <span th:text="${device.getSerialNum()}">시리얼 번호</span>
-                </div>
-            </td>
-            <td th:if="${device.getDeviceType().equals('Laptop')}" th:text="${device.getBarcodeNum()}">바코드 번호</td>
-            <td th:unless="${device.getDeviceType().equals('Laptop')}" th:text='X'>바코드 번호</td>
-            <td th:text="${device.getModelCode()}">모델코드</td>
-            <td>
-                <span th:if="${device.isRelease() == false}" class="badge bg-warning">대여 중</span>
-                <span th:if="${device.isRelease() == true}" class="badge bg-success">사용 가능</span>
+                <span th:if="${!device.release}" class="badge badge-warning">대여 중</span>
+                <span th:if="${device.release}" class="badge badge-success">사용 가능</span>
             </td>
             <td>
-                <a th:href="@{/api/admin/test-results(deviceId=${device.getDeviceId()},deviceType=${device.getDeviceType()})}" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-info-circle"></i> 상세
+                <a th:if="${device.deviceType == 'Laptop'}"
+                   th:href="@{/api/admin/test-results(deviceId=${device.deviceId},deviceType=${device.deviceType})}"
+                   class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-clipboard-list me-1"></i> 보기
                 </a>
+                <span th:unless="${device.deviceType == 'Laptop'}" class="text-muted">-</span>
             </td>
         </tr>
-        <!-- 데이터가 없는 경우 -->
         <tr th:if="${#lists.isEmpty(deviceList)}">
-            <td colspan="6" class="text-center">조회 결과가 없습니다</td>
+            <td colspan="6" class="text-center py-5 text-muted">
+                <i class="fas fa-folder-open fa-2x mb-3"></i><br>
+                조회된 기기 정보가 없습니다.
+            </td>
         </tr>
         </tbody>
     </table>
-
-    <!-- 페이지네이션 -->
-<!--    <nav aria-label="Page navigation">-->
-<!--        <ul class="pagination justify-content-center">-->
-<!--            <li class="page-item">-->
-<!--                <a class="page-link" href="#" aria-label="Previous">-->
-<!--                    <span aria-hidden="true"><i class="fa fa-chevron-left"></i></span>-->
-<!--                </a>-->
-<!--            </li>-->
-<!--            <li class="page-item active"><a class="page-link" href="#">1</a></li>-->
-<!--            <li class="page-item"><a class="page-link" href="#">2</a></li>-->
-<!--            <li class="page-item"><a class="page-link" href="#">3</a></li>-->
-<!--            <li class="page-item">-->
-<!--                <a class="page-link" href="#" aria-label="Next">-->
-<!--                    <span aria-hidden="true"><i class="fa fa-chevron-right"></i></span>-->
-<!--                </a>-->
-<!--            </li>-->
-<!--        </ul>-->
-<!--    </nav>-->
-<!--</div>-->
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function validateSearch() {
         const searchInput = document.getElementById('searchKeyword');
         const searchButton = document.getElementById('searchButton');
-
-        // 입력값이 없거나 공백만 있는 경우 버튼 비활성화
-        if (searchInput.value.trim() === '') {
-            searchButton.disabled = true;
-        } else {
-            searchButton.disabled = false;
-        }
+        searchButton.disabled = searchInput.value.trim() === '';
     }
 
-    // 페이지 로드 시 초기 검증
     document.addEventListener('DOMContentLoaded', function() {
         validateSearch();
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchTypeParam = urlParams.get('searchType');
+        const keywordParam = urlParams.get('keyword');
+        if (searchTypeParam) {
+            document.getElementById('selectedSearchType').value = searchTypeParam;
+        }
+        if (keywordParam) {
+            document.getElementById('searchKeyword').value = keywordParam;
+            validateSearch();
+        }
+
+        document.getElementById('searchForm').addEventListener('submit', function() {
+            const searchButton = document.getElementById('searchButton');
+            if (searchButton.disabled) {
+                searchButton.disabled = false;
+            }
+        });
     });
 </script>
 </body>
