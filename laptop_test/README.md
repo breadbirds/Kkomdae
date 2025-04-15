@@ -54,26 +54,14 @@
 
 ##  pyinstaller 빌드 명령 예시
 ### port의 수를 인식
-```bash
-python -m PyInstaller --onefile --windowed \
---add-data "./resource/image/ssafy_logo.png;resource/image/" \
---add-data "./resource/image/keyboard.png;resource/image" \
---add-data "./resource/image/camera.png;resource/image" \
---add-data "./resource/image/usb.png;resource/image" \
---add-data "./resource/image/charging.png;resource/image" \
---add-data "./resource/image/battery.png;resource/image" \
---add-data "./resource/image/qrcode.png;resource/image" \
---add-data "./resource/font/SamsungSharpSans-Bold.ttf;resource/font" \
---add-data "./resource/font/SamsungOne-400.ttf;resource/font" \
---add-data "./resource/font/SamsungOne-700.ttf;resource/font" \
---add-data "./resource/font/NotoSansKR-VariableFont_wght.ttf;resource/font" \
-kkomdae_diagnostics.py
-```
+
 ---
 ### port 3개
 ```bash
 python -m PyInstaller --onefile --windowed \
+--icon "./resource/image/kkomdae.ico" \
 --add-data "./resource/image/ssafy_logo.png;resource/image/" \
+--add-data "./resource/image/kkomdae.ico;resource/image" \
 --add-data "./resource/image/keyboard.png;resource/image" \
 --add-data "./resource/image/camera.png;resource/image" \
 --add-data "./resource/image/usb.png;resource/image" \
@@ -90,7 +78,9 @@ kkomdae_random_port3.py
 ### port 1개
 ```bash
 python -m PyInstaller --onefile --windowed \
+--icon "./resource/image/kkomdae.ico" \
 --add-data "./resource/image/ssafy_logo.png;resource/image/" \
+--add-data "./resource/image/kkomdae.ico;resource/image" \
 --add-data "./resource/image/keyboard.png;resource/image" \
 --add-data "./resource/image/camera.png;resource/image" \
 --add-data "./resource/image/usb.png;resource/image" \

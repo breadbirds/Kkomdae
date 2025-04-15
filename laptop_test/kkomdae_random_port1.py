@@ -13,6 +13,7 @@ import json
 from datetime import datetime
 import requests
 # 외부 라이브러리
+import tkinter as tk
 from tkinter import messagebox
 import ttkbootstrap as ttkb
 from ttkbootstrap.constants import *
@@ -224,8 +225,24 @@ class TestApp(ttkb.Window):
         setup_debugging_log()  # 디버깅 로그 설정
         super().__init__(themename="flatly")
         self.title("KkomDae Diagnostics")
-        self.geometry("1700x950")
-        self.resizable(False, False)
+        # self.geometry("1700x950")
+        # self.resizable(False, False)
+
+        # 전체화면 설정
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        self.geometry(f"{screen_width}x{screen_height}")
+        self.state('zoomed')  # Windows에서 최대화
+        self.resizable(True, True)  # 크기 조절 가능하도록 변경
+
+        # self.iconbitmap(resource_path("resource/image/kkomdae.ico")) 
+
+        # 아이콘 설정 수정
+        icon_path = resource_path("resource/image/kkomdae.ico")
+        icon_image = Image.open(icon_path)
+        photo = ImageTk.PhotoImage(icon_image)
+        self.iconphoto(False, photo)
+
         self._style = ttkb.Style()
 
         # 변수 및 상태 초기화
@@ -250,7 +267,12 @@ class TestApp(ttkb.Window):
         key_window.geometry("500x300")
         key_window.resizable(False, False)
 
-        # 모달로 설정하여 부모 창과의 상호작용을 막음
+        # Toplevel 창의 아이콘 설정을 메인 창과 동일하게 변경
+        icon_path = resource_path("resource/image/kkomdae.ico")
+        icon_image = Image.open(icon_path)
+        photo = ImageTk.PhotoImage(icon_image)
+        key_window.iconphoto(False, photo)       
+        
         key_window.grab_set()
         key_window.transient(self)
         
@@ -376,17 +398,17 @@ class TestApp(ttkb.Window):
 
         # 각 테스트 상태에 따른 이미지 생성
         self.status_images = {
-            "테스트 전": self.create_text_image("테스트 전", (120, 30), self.notosans_path, 16, (255, 0, 0), align_left=True),
+            "테스트 전": self.create_text_image("테스트 전", (120, 30), self.notosans_path, 16, (64, 64, 64), align_left=True),  # (255,0,0) -> (64,64,64)로 변경
             "테스트 중": self.create_text_image("테스트 중", (120, 30), self.notosans_path, 16, (255, 165, 0), align_left=True),
             "테스트 완료": self.create_text_image("테스트 완료", (120, 30), self.notosans_path, 16, (0, 128, 0), align_left=True),
-            "생성 전": self.create_text_image("생성 전", (120, 30), self.notosans_path, 16, (255, 0, 0), align_left=True),
+            "생성 전": self.create_text_image("생성 전", (120, 30), self.notosans_path, 16, (64, 64, 64), align_left=True),  # (255,0,0) -> (64,64,64)로 변경
             "생성 중": self.create_text_image("생성 중", (120, 30), self.notosans_path, 16, (255, 165, 0), align_left=True),
             "생성 완료": self.create_text_image("생성 완료", (120, 30), self.notosans_path, 16, (0, 128, 0), align_left=True),
             "오류 발생": self.create_text_image("오류 발생", (120, 30), self.notosans_path, 16, (255, 0, 0), align_left=True),
-            "USB테스트 전":{
-                1:self.create_text_image("① 연결 필요", (120, 30), self.notosans_path, 16, (255, 0, 0), align_left=False),
-                2:self.create_text_image("② 연결 필요", (120, 30), self.notosans_path, 16, (255, 0, 0), align_left=False),
-                3:self.create_text_image("③ 연결 필요", (120, 30), self.notosans_path, 16, (255, 0, 0), align_left=False)
+            "USB테스트 전": {
+                1: self.create_text_image("① 연결 필요", (120, 30), self.notosans_path, 16, (64, 64, 64), align_left=False),  # 여기도 변경
+                2: self.create_text_image("② 연결 필요", (120, 30), self.notosans_path, 16, (64, 64, 64), align_left=False),  # 여기도 변경
+                3: self.create_text_image("③ 연결 필요", (120, 30), self.notosans_path, 16, (64, 64, 64), align_left=False)   # 여기도 변경
             },
             "USB테스트 완료":{
                 1:self.create_text_image("① 연결 확인", (120, 30), self.notosans_path, 16, (0, 128, 0), align_left=True),
@@ -394,6 +416,21 @@ class TestApp(ttkb.Window):
                 3:self.create_text_image("③ 연결 확인", (120, 30), self.notosans_path, 16, (0, 128, 0), align_left=True)
             },
         }
+
+        # 각 테스트 상태에 따른 아이콘 배경 색상 설정
+        self.test_status_colors = {
+            "테스트 전": "#404040",  # 진한 회색
+            "테스트 중": "#FFA500",  # 주황색
+            "테스트 완료": "#008000",  # 초록색
+            "생성 전": "#404040",    # 진한 회색
+            "생성 중": "#FFA500",  # 주황색
+            "생성 완료": "#008000",  # 초록색
+            "오류 발생": "#FF0000",  # 빨간색
+            "USB테스트 전": "#404040",  # 진한 회색
+            "USB테스트 중": "#FFA500",  # 주황색
+            "USB테스트 완료": "#008000",  # 초록색
+        }
+
         # 버튼 이미지 생성
         self.button_images = {
             "누르지 못한 키 보기": {
@@ -483,7 +520,7 @@ class TestApp(ttkb.Window):
         # 🔹 Frame 스타일 설정
         self._style.configure("Blue.TFrame", background="#0078D7")   # 타이틀 배경 파란색
         self._style.configure("White.TFrame", background="white")   # 테스트 영역 배경 흰색
-
+        self._style.configure("IconFrame.TFrame", background="#404040")  # 원하는 색상 코드
 
     def create_text_image(self, text: str, size: tuple, font_path: str, font_size: int, color: tuple, align_left: bool = False) -> ImageTk.PhotoImage:
         """
@@ -554,11 +591,18 @@ class TestApp(ttkb.Window):
             self.send_test_result(test_name, False, self.detail)
 
         # 테스트 결과 이미지 변경
-        if test_name in ["키보드", "카메라", "충전", "배터리"]:
-            status_label = self.test_status_labels[test_name]
-            new_img = self.status_images[new_status]
-            status_label.config(image=new_img)
-            status_label.image = new_img  # 이미지 참조 유지
+        status_label = self.test_status_labels[test_name]
+        new_img = self.status_images[new_status]
+        status_label.config(image=new_img)
+        status_label.image = new_img  # 이미지 참조 유지
+
+        # 아이콘 백그라운드 색상 변경
+        bg_color = self.test_status_colors[new_status]
+        for name, icon_frame in self.icons.items():  # icons 딕셔너리에 아이콘 프레임 저장
+            if name == test_name:
+                icon_frame.configure(style=f"{new_status}.TFrame")
+                icon_label = icon_frame.winfo_children()[0]  # 첫 번째 자식 위젯(라벨)
+                icon_label.configure(background=bg_color)
 
     def create_title_section(self) -> None:
         """
@@ -629,18 +673,50 @@ class TestApp(ttkb.Window):
         frame.grid(row=row, column=col, padx=10, pady=10, sticky="nsew") # sticky 옵션 추가로 전체 격자 채우기
 
         # [Row 0] 아이콘 전용 프레임 (고정 크기, 최상단에 배치)
-        icon_frame = ttkb.Frame(frame, width=55, height=55)
-        icon_frame.grid(row=0, column=0,sticky= "n", pady=(0, 5), padx=10)
-
-        # 아이콘 이미지 로드 및 명암(채도) 낮추기
+        self.icon_frame = ttkb.Frame(frame, width=340, height=55, style="IconFrame.TFrame")
+        self.icon_frame.grid(row=0, column=0,sticky= "n", pady=(0, 5), padx=10)
+        self.icon_frame.grid_propagate(False)  # 프레임 크기 고정
+        
+        if not hasattr(self, 'icons'):
+            self.icons = {}
+        self.icons[name] = self.icon_frame  # 아이콘 프레임 저장
+        # 상태별 스타일 설정
+        self._style.configure(f"테스트 전.TFrame", background="#404040")
+        self._style.configure(f"테스트 중.TFrame", background="#FFA500")
+        self._style.configure(f"테스트 완료.TFrame", background="#008000")
+        self._style.configure(f"오류 발생.TFrame", background="#FF0000")
+        self._style.configure(f"생성 전.TFrame", background="#404040")
+        self._style.configure(f"생성 중.TFrame", background="#FFA500")
+        self._style.configure(f"생성 완료.TFrame", background="#008000")
+        self._style.configure(f"USB테스트 전.TFrame", background="#404040")
+        self._style.configure(f"USB테스트 중.TFrame", background="#FFA500")
+        self._style.configure(f"USB테스트 완료.TFrame", background="#008000")
         icon_path = self.test_icons.get(name, "default.png")
-        icon_img = Image.open(icon_path).resize((50, 50), Image.LANCZOS)
-        enhancer = ImageEnhance.Color(icon_img)
-        icon_img = enhancer.enhance(0)  # 채도를 0으로 낮춰 흑백 효과
-        icon_photo = ImageTk.PhotoImage(icon_img)
-        icon_label = ttkb.Label(icon_frame, image=icon_photo,justify='center')
-        icon_label.image = icon_photo  # 이미지 참조 유지
-        icon_label.pack(expand=True, fill="both") # grid 에서 pack으로 수정해줍니다.
+    
+        # 원본 아이콘 이미지 로드
+        # 아이콘 이미지를 50x50 크기로 조정
+        if name in ["카메라"]:
+            icon_img = Image.open(icon_path).resize((35, 35), Image.LANCZOS)
+        else:
+            icon_img = Image.open(icon_path).resize((50, 50), Image.LANCZOS)
+        # enhancer = ImageEnhance.Color(icon_img)
+        # icon_img = enhancer.enhance(1)  # 채도를 0으로 낮춰 흑백 효과
+
+        # 이미지를 흰색으로 변경
+        white_img = Image.new('RGBA', icon_img.size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(white_img)
+        white_img.paste(icon_img, (0, 0))
+        for x in range(white_img.width):
+            for y in range(white_img.height):
+                r, g, b, a = white_img.getpixel((x, y))
+                if a != 0:  # 투명하지 않은 픽셀만 처리
+                    white_img.putpixel((x, y), (255, 255, 255, a))  # RGB를 흰색으로, 알파값 유지
+
+        icon_photo = ImageTk.PhotoImage(white_img)
+        self.icon_label = ttkb.Label(self.icon_frame, image=icon_photo, justify='center', background=self.test_status_colors["테스트 전"])
+        self.icon_label.image = icon_photo  # 이미지 참조 유지
+        # self.icon_label.pack(expand=True, fill="both")
+        self.icon_label.place(relx=0.5, rely=0.5, anchor="center")
 
         # 타이틀을 이미지로 변경
         title_img = self.create_text_image(
@@ -670,19 +746,19 @@ class TestApp(ttkb.Window):
 
         # 테스트 상태를 이미지로 변경
         status_img = self.status_images[self.test_status.get(name, "테스트 전")]
+
         # 이미지를 라벨로 관리
         status_label = ttkb.Label(frame, image=status_img)
         status_label.image = status_img
         status_label.grid(row=3, column=0, sticky="ew", pady=(5, 0))
         self.test_status_labels[name] = status_label
 
-
         if name == "키보드":
             self.failed_keys_button = ttkb.Button(
                 frame,
                 image=self.button_images["누르지 못한 키 보기"]["disabled"],
                 state="disabled",
-                bootstyle=WARNING,
+                bootstyle=SECONDARY,
                 command=self.show_failed_keys
             )
             self.failed_keys_button.grid(row=4, column=0, sticky="ew", pady=(5, 0))
@@ -718,15 +794,16 @@ class TestApp(ttkb.Window):
         elif name == "배터리":
             self.battery_report_button = ttkb.Button(
                 frame,
-                image=self.button_images["리포트 확인하기"]["normal"],
+                image=self.button_images["리포트 확인하기"]["disabled"],
                 bootstyle=SECONDARY,
-                command=self.view_battery_report
+                command=self.view_battery_report,
+                state='disabled'
             )
             self.battery_report_button.grid(row=4, column=0, sticky="ew", pady=(5, 0))
 
         # 항목 전체를 클릭하면 해당 테스트 시작 (아이콘 레이블 등에도 이벤트 바인딩)
         frame.bind("<Button-1>", lambda e: self.start_test(name))
-        icon_label.bind("<Button-1>", lambda e: self.start_test(name))
+        self.icon_label.bind("<Button-1>", lambda e: self.start_test(name))
 
     # -------------------------------
     # 테스트 시작 및 완료 처리 메서드
@@ -810,7 +887,6 @@ class TestApp(ttkb.Window):
         register_raw_input(hwnd)
         kb_window.protocol("WM_DELETE_WINDOW", self.on_close_keyboard_window)
         self.set_raw_input_proc(hwnd, kb_window)
-
 
     def create_keyboard_window(self) -> ttkb.Toplevel:
         """
@@ -949,7 +1025,6 @@ class TestApp(ttkb.Window):
                             # Key Down 이벤트만 처리
                             if (raw.u.keyboard.Flags & RI_KEY_BREAK) == 0:
                                 vkey = raw.u.keyboard.VKey
-                                make_code = raw.u.keyboard.MakeCode
                                 flags = raw.u.keyboard.Flags
                                 current_time = time.time()
 
@@ -1179,7 +1254,7 @@ class TestApp(ttkb.Window):
                     if match:
                         port_number = int(match.group(1))
                         if port_number in [1, 2, 3]:
-                            key = f"port{port_number}"
+                            key = f"port1"
 
                             # 해당 포트의 연결 상태를 업데이트
                             self.usb_ports[key] = True
@@ -1207,6 +1282,7 @@ class TestApp(ttkb.Window):
                 self.usb_test_complete = True
                 self.usb_refresh_button.config(state="disabled")
                 self.mark_test_complete("USB")
+                self.update_status("USB", "테스트 완료")
                 messagebox.showinfo("USB Test", "모든 USB 포트 테스트 완료!")
             else:
                 self.update_status("USB", "오류 발생")
@@ -1217,14 +1293,171 @@ class TestApp(ttkb.Window):
     # -------------------------------
     # 카메라 테스트 관련 메서드
     # -------------------------------
-
-
-
+    def find_integrated_camera(self):
+        """
+        시스템에 연결된 카메라 중 내장 카메라를 찾습니다.
+        PowerShell을 통해 DirectShow 장치 정보를 가져와 더 정확히 식별합니다.
+        """
+        # 1. PowerShell을 통한 카메라 식별 시도
+        integrated_camera_idx = self.find_integrated_camera_via_powershell()
+        if integrated_camera_idx >= 0:
+            print(f"PowerShell로 내장 카메라 식별 성공: 카메라 {integrated_camera_idx}")
+            return integrated_camera_idx
+            
+        # 2. 기존 방식으로 폴백 (PowerShell이 실패한 경우)
+        print("PowerShell 방식 실패, 기존 방식으로 내장 카메라 식별 시도 중...")
+        return self.find_integrated_camera_fallback()
+        
+    def find_integrated_camera_via_powershell(self):
+        """
+        PowerShell을 사용하여 DirectShow 카메라 장치 목록을 가져오고 내장 카메라를 식별합니다.
+        """
+        try:
+            # PowerShell 명령어 실행
+            command = [
+                "powershell",
+                "Get-WmiObject Win32_PnPEntity | Where-Object { $_.Name -like '*Camera*' -or $_.Name -like '*Webcam*' -or $_.Name -like '*cam*' } | Select-Object Name, DeviceID"
+            ]
+            print("PowerShell 명령 실행 중...")
+            output = subprocess.check_output(command, shell=True, encoding='cp949')
+            print(f"PowerShell 명령 출력: {output}")
+            
+            # 결과 파싱
+            cameras = []
+            lines = output.strip().split('\n')
+            current_name = None
+            current_id = None
+            
+            for line in lines:
+                line = line.strip()
+                if not line or "----" in line:
+                    continue
+                    
+                if line.startswith("Name"):
+                    continue
+                    
+                if current_name is None:
+                    current_name = line
+                elif current_id is None:
+                    current_id = line
+                    cameras.append((current_name, current_id))
+                    current_name = None
+                    current_id = None
+            
+            # 내장 카메라 키워드 확인
+            integrated_keywords = ["integrated", "internal", "builtin", "built-in", 
+                                "laptop", "노트북", "내장", "hd webcam", "integrated_webcam"]
+            
+            print(f"발견된 카메라 목록: {cameras}")
+            
+            # OpenCV 카메라 인덱스와 매핑하기 위한 테스트
+            for i in range(10):
+                cap = cv2.VideoCapture(i, cv2.CAP_DSHOW)
+                if cap.isOpened():
+                    print(f"OpenCV 카메라 {i} 열림")
+                    # 이 카메라의 이름이 내장 카메라 키워드를 포함하는지 확인
+                    for name, device_id in cameras:
+                        name_lower = name.lower()
+                        if any(keyword in name_lower for keyword in integrated_keywords):
+                            print(f"내장 카메라 발견: {name}")
+                            cap.release()
+                            return i
+                    cap.release()
+            
+            # 내장 카메라를 명확히 식별하지 못했지만 카메라가 있으면 첫 번째 카메라 반환
+            if cameras:
+                return 0
+                
+        except Exception as e:
+            print(f"PowerShell을 통한 카메라 검색 중 오류: {e}")
+        
+        # 식별 실패 시 -1 반환
+        return -1
+        
+    def find_integrated_camera_fallback(self):
+        """
+        기존 방식을 사용한 내장 카메라 식별 (해상도, FPS 기반)
+        """
+        available_cameras = []
+        integrated_camera_idx = -1
+        first_camera_idx = -1
+        
+        # OpenCV 버전 확인 (디버깅용)
+        print(f"OpenCV 버전: {cv2.__version__}")
+        
+        # 카메라 검사 (0~9)
+        for i in range(10):
+            try:
+                print(f"카메라 {i} 검사 중...")
+                cap = cv2.VideoCapture(i, cv2.CAP_DSHOW)
+                
+                if not cap.isOpened():
+                    print(f"카메라 {i} 열기 실패")
+                    continue
+                    
+                print(f"카메라 {i} 열림")
+                
+                # 첫 번째로 찾은 카메라의 인덱스 저장
+                if first_camera_idx == -1:
+                    first_camera_idx = i
+                
+                # 프레임 읽기 시도
+                ret, frame = cap.read()
+                if not ret:
+                    print(f"카메라 {i} 프레임 읽기 실패")
+                    cap.release()
+                    continue
+                    
+                # 프레임 크기 확인
+                height, width = frame.shape[:2]
+                print(f"카메라 {i} 해상도: {width}x{height}")
+                
+                # 장치명 및 세부 정보
+                camera_info = {"index": i, "width": width, "height": height}
+                
+                # 프레임 크기 기반 내장 카메라 추정
+                # 많은 노트북 내장 카메라는 720p(1280x720) 또는 480p(640x480) 해상도를 가짐
+                if (width == 640 and height == 480) or (width == 1280 and height == 720):
+                    print(f"카메라 {i}는 일반적인 내장 카메라 해상도를 가짐")
+                    if integrated_camera_idx == -1:  # 아직 내장 카메라를 찾지 못했다면
+                        integrated_camera_idx = i
+                
+                # FPS 정보 (더 낮은 FPS는 내장 카메라일 가능성 높음)
+                try:
+                    if hasattr(cv2, 'CAP_PROP_FPS'):
+                        fps = cap.get(cv2.CAP_PROP_FPS)
+                        camera_info["fps"] = fps
+                        print(f"카메라 {i} FPS: {fps}")
+                        # 내장 카메라는 대개 30fps 이하
+                        if fps > 0 and fps <= 30 and integrated_camera_idx == -1:
+                            integrated_camera_idx = i
+                except Exception as e:
+                    print(f"FPS 정보 가져오기 실패: {e}")
+                
+                available_cameras.append(camera_info)
+                
+            except Exception as e:
+                print(f"카메라 {i} 검사 중 오류: {e}")
+            finally:
+                if 'cap' in locals() and cap is not None:
+                    cap.release()
+                    print(f"카메라 {i} 자원 해제됨")
+        
+        # 내장 카메라를 찾았으면 해당 인덱스 반환, 아니면 첫 번째 카메라 반환
+        if integrated_camera_idx != -1:
+            print(f"내장 카메라로 추정되는 카메라 {integrated_camera_idx}을(를) 사용합니다.")
+            return integrated_camera_idx
+        elif first_camera_idx != -1:
+            print(f"내장 카메라를 찾지 못해 첫 번째 카메라 {first_camera_idx}을(를) 사용합니다.")
+            return first_camera_idx
+        else:
+            print("사용 가능한 카메라가 없습니다.")
+            return 0  # 기본값으로 0 반환
+        
     def open_camera_test(self) -> None:
         """
         카메라(웹캠) 테스트 창을 열어 프레임을 표시합니다.
         """
-        # 카메라 flage 설정
         # 이미 카메라 테스트가 실행 중인지 확인
         if getattr(self, "camera_test_running", False) or getattr(self, "cap", None) is not None:
             messagebox.showinfo("정보", "카메라 테스트가 이미 실행 중입니다.")
@@ -1240,8 +1473,14 @@ class TestApp(ttkb.Window):
         self.camera_closing = False
 
         try:
-            # 기본 카메라(인덱스 0)를 CAP_DSHOW 옵션으로 열기
-            self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+            # 내장 카메라를 자동으로 찾기
+            camera_idx = self.find_integrated_camera()
+            
+            # 선택한 카메라 열기
+            self.cap = cv2.VideoCapture(camera_idx, cv2.CAP_DSHOW)
+            if not self.cap.isOpened():
+                raise Exception(f"선택한 카메라(인덱스: {camera_idx})를 열 수 없습니다.")
+                
             self.window_name = "Camera Test - ESC to exit"
             cv2.namedWindow(self.window_name)
             # 카메라 프레임 업데이트 시작
@@ -1424,18 +1663,22 @@ class TestApp(ttkb.Window):
         except Exception as e:
             self.after(0, lambda: self._on_battery_report_error(f"오류 발생:\n{e}"))
 
-
     def _on_battery_report_generated(self) -> None:
         """
         배터리 리포트 생성 완료 후 실행되는 콜백 메서드 (메인 스레드에서 실행)
         """
         messagebox.showinfo("배터리 리포트", f"배터리 리포트가 생성되었습니다.\n파일 경로:\n{self.report_path}")
-        self.battery_report_button.config(bootstyle="info")
         self.mark_test_complete("배터리")
         # 리포트 이름을 문자열로 저장
         self.report = os.path.basename(self.report_path) if self.report_path else None
         # Django 서버 업로드는 백그라운드에서 진행
         threading.Thread(target=self.upload_battery_report, args=(self.report_path,)).start()
+
+        # 배터리 리포트 버튼 활성화
+        self.battery_report_button.config(
+            state="normal",
+            image=self.button_images["리포트 확인하기"]["normal"]
+        )
 
     def _on_battery_report_error(self, error_message: str) -> None:
         """
