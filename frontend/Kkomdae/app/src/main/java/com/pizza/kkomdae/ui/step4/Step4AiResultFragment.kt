@@ -48,7 +48,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     private val viewModel : FinalViewModel by activityViewModels()
 
     // 기기 화면 선택(전면부, 후면부, 좌측면, 우측면, 모니터, 키보드)
-    private var adaterIndex =0
+    private var adaterIndex =0  // 선택된 리사이클러뷰 항목 인덱스
 
     private var currentToast: Toast? = null
 
@@ -56,10 +56,10 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
 
     private var param1: String? = null
     private var param2: String? = null
-    private var count =0
+    private var count =0    // 서버에서 ai 이미지 데이터를 받아왔는지 체크용
 
     // 재촬영 하기 위한 step 저장( 1: 전면부, 2: 후면부, 3: 좌측면, 4: 우측면, 5: 모니터, 6: 키보드)
-    private var step = 0
+    private var step = 0    // 현재 화면(전면~키보드) 위치
 
     // 누끼 딴 이미지 선택 리사이클러뷰 데이터 리스트
     val data = listOf(
@@ -181,6 +181,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
     // 재촬영 설정
     private fun initRePhoto(adapter: Step4AiResultAdapter) {
         Log.d(TAG, "onViewCreated: reCameraUri")
+
         // 재촬영 이미지 uri 서버로 보내기
         viewModel.reCameraUri.observe(viewLifecycleOwner) {
             it ?: return@observe
@@ -201,6 +202,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             viewModel.clearReCameraUri()
         }
 
+        // 전면부 재촬영 결과 서버 수신시
         viewModel.rePhoto1.observe(viewLifecycleOwner) {
             it ?: return@observe
             adapter.hideTextAt(0)
@@ -215,6 +217,7 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             showToast("전면부 사진이 재분석되었습니다.")
         }
 
+        // 후면부 재촬영 결과 서버 수신시
         viewModel.rePhoto2.observe(viewLifecycleOwner) {
             it ?: return@observe
             adapter.hideTextAt(1)
@@ -227,6 +230,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             // 토스트 메시지 표시
             showToast("후면부 사진이 재분석되었습니다.")
         }
+
+        // 좌측면 재촬영 결과 서버 수신시
         viewModel.rePhoto3.observe(viewLifecycleOwner) {
             it ?: return@observe
             adapter.hideTextAt(2)
@@ -239,6 +244,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             // 토스트 메시지 표시
             showToast("좌측면 사진이 재분석되었습니다.")
         }
+
+        // 우측면 재촬영 결과 서버 수신시
         viewModel.rePhoto4.observe(viewLifecycleOwner) {
             it ?: return@observe
             adapter.hideTextAt(3)
@@ -251,6 +258,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             // 토스트 메시지 표시
             showToast("우측면 사진이 재분석되었습니다.")
         }
+
+        // 모니터 재촬영 결과 서버 수신시
         viewModel.rePhoto5.observe(viewLifecycleOwner) {
             it ?: return@observe
             adapter.hideTextAt(4)
@@ -263,6 +272,8 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             // 토스트 메시지 표시
             showToast("모니터 사진이 재분석되었습니다.")
         }
+
+        // 키보드 재촬영 결과 서버 수신시
         viewModel.rePhoto6.observe(viewLifecycleOwner) {
             it ?: return@observe
 
