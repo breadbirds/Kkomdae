@@ -44,73 +44,95 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
     FragmentFontResultBinding::bind,
     R.layout.fragment_font_result
 ){
+
+    // 뷰모델
     private val viewModel: CameraViewModel by activityViewModels()
 
-
-    // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        cameraActivity = context as CameraActivity
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.ivLoading?.let {
-            Glide.with(this)
-                .asGif()
-                .load(R.drawable.skeleton_ui) // 🔁 로딩용 GIF 리소스
-                .into(it)
-        }
 
 
-        Log.d(TAG, "onViewCreated: ${viewModel.frontUri.value}")
-        Log.d(TAG, "onViewCreated stage: ${viewModel.step.value}")
         var url :Uri? = null
-        if(viewModel.step.value == 1){
-            url = viewModel.frontUri.value
-        }else if (viewModel.step.value == 2){
-            url = viewModel.backUri.value
-        }else if (viewModel.step.value == 3){
-            url = viewModel.leftUri.value
-        }else if (viewModel.step.value == 4){
-            url = viewModel.rightUri.value
-        }else if (viewModel.step.value == 5){
-            url = viewModel.screenUri.value
-        }else if (viewModel.step.value == 6){
-            url = viewModel.keypadUri.value
-        }
-        binding.ivProduct?.let {
-            Log.d(TAG, "CameraFragment uri: $it")
-            Glide.with(it)
-                .load(url)
-                .into(object : CustomTarget<Drawable>() {
-                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                        binding.ivProduct?.setImageDrawable(resource)
-                        binding.ivProduct?.visibility = View.VISIBLE
-                        binding.ivLoading?.visibility = View.GONE
-                    }
+        // uri 설정
+        url = uri(url)
 
-                    override fun onLoadCleared(placeholder: Drawable?) {}
-                })
-        }
+        // 이미지 설정
+        initImage(url)
 
-        binding.btnBack?.setOnClickListener {
-            cameraActivity.changeFragment((viewModel.step.value?:-1))
-        }
+        // 버튼 설정
+        settingButton()
 
-        // 체크 버튼
+        // 옵져버 설정
+        observe()
+    }
+
+    private fun settingButton() {
+        // 재촬영 버튼 눌렀을 때
+        clickRePhotoBtn()
+
+        // 체크 버튼 눌렀을 때
+        clickCheckBtn()
+
+        // X 버튼 눌렀을 때
+        clickCloseBtn()
+    }
+
+    private fun observe() {
+        // 통신 결과
+        postResultObserve()
+
+        //통신 실패시
+        failResultObserve()
+
+        // 재촬영 url
+        rePhotoObserve()
+    }
+
+    private fun rePhotoObserve() {
+        viewModel.reCameraUri.observe(viewLifecycleOwner) {
+            it ?: return@observe
+            cameraActivity.moveToBackReCamera(it)
+        }
+    }
+
+    private fun failResultObserve() {
+        viewModel.failResult.observe(viewLifecycleOwner) {
+            it ?: return@observe
+            Log.d(TAG, "onViewCreated: $it")
+            showNetworkErrorDialog()
+            viewModel.clearFail()
+            Log.d(TAG, "onViewCreated: $it")
+        }
+    }
+
+    private fun postResultObserve() {
+        viewModel.postResult.observe(viewLifecycleOwner) {
+            it ?: return@observe
+            if (it?.success == true) {
+                // 서버에 사진 전송 성공시에만 프론트에 단계 저장
+                viewModel.confirmPhoto(viewModel.step.value ?: 0)
+                // 다음 단계로 이동
+                Log.d("imageBug", "postResultStep: ${viewModel.step.value}")
+                cameraActivity.changeFragment((viewModel.step.value ?: -1) + 1)
+                viewModel.clearResult()
+            } else {
+                showNetworkErrorDialog()
+            }
+        }
+    }
+
+    private fun clickCloseBtn() {
+        binding.btnCancel?.setOnClickListener {
+            showStopCameraDialog()
+        }
+    }
+
+    private fun clickCheckBtn() {
         binding.btnCheck?.setOnClickListener {
             // ✅ step 2 하판인 경우 OCR 호출
             if (viewModel.step.value == 2) {
@@ -124,43 +146,62 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
                     }
                 }
             }
-
-
-
             viewModel.postPhoto()
         }
+    }
 
-        // X 버튼 눌렀을 때
-        binding.btnCancel?.setOnClickListener {
-            showStopCameraDialog()
+    private fun clickRePhotoBtn() {
+        binding.btnBack?.setOnClickListener {
+            cameraActivity.changeFragment((viewModel.step.value ?: -1))
         }
+    }
 
-        viewModel.postResult.observe(viewLifecycleOwner){
-            it?: return@observe
-            if(it?.success == true){
-                // 서버에 사진 전송 성공시에만 프론트에 단계 저장
-                viewModel.confirmPhoto(viewModel.step.value ?: 0)
-                // 다음 단계로 이동
-                cameraActivity.changeFragment((viewModel.step.value?:-1)+1)
-                viewModel.clearResult()
-            } else {
-                showNetworkErrorDialog()
-            }
+    private fun initImage(url: Uri?) {
+        // 로딩 이미지 설정
+        loadingImage()
+        binding.ivProduct?.let {
+            Log.d(TAG, "CameraFragment uri: $it")
+            Glide.with(it)
+                .load(url)
+                .into(object : CustomTarget<Drawable>() {
+                    override fun onResourceReady(
+                        resource: Drawable,
+                        transition: Transition<in Drawable>?,
+                    ) {
+                        binding.ivProduct?.setImageDrawable(resource)
+                        binding.ivProduct?.visibility = View.VISIBLE
+                        binding.ivLoading?.visibility = View.GONE
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {}
+                })
         }
+    }
 
-        //실패시
-        viewModel.failResult.observe(viewLifecycleOwner){
-            it?: return@observe
-            Log.d(TAG, "onViewCreated: $it")
-            showNetworkErrorDialog()
-            viewModel.clearFail()
-            Log.d(TAG, "onViewCreated: $it")
+    private fun uri(url: Uri?): Uri? {
+        var url1 = url
+        if (viewModel.step.value == 1) {
+            url1 = viewModel.frontUri.value
+        } else if (viewModel.step.value == 2) {
+            url1 = viewModel.backUri.value
+        } else if (viewModel.step.value == 3) {
+            url1 = viewModel.leftUri.value
+        } else if (viewModel.step.value == 4) {
+            url1 = viewModel.rightUri.value
+        } else if (viewModel.step.value == 5) {
+            url1 = viewModel.screenUri.value
+        } else if (viewModel.step.value == 6) {
+            url1 = viewModel.keypadUri.value
         }
+        return url1
+    }
 
-        // 재촬영 url
-        viewModel.reCameraUri.observe(viewLifecycleOwner){
-            it?: return@observe
-            cameraActivity.moveToBackReCamera(it)
+    private fun loadingImage() {
+        binding.ivLoading?.let {
+            Glide.with(this)
+                .asGif()
+                .load(R.drawable.skeleton_ui) // 🔁 로딩용 GIF 리소스
+                .into(it)
         }
     }
 
@@ -223,15 +264,6 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Step1GuideFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             Step1GuideFragment().apply {
@@ -245,6 +277,19 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
     override fun onResume() {
         super.onResume()
         cameraActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        cameraActivity = context as CameraActivity
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            param1 = it.getString(ARG_PARAM1)
+            param2 = it.getString(ARG_PARAM2)
+        }
     }
 
 

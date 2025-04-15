@@ -71,48 +71,41 @@ private var imageCapture: ImageCapture? = null
 private var cameraProvider: ProcessCameraProvider? = null
 private var camera: Camera? = null
 private var cameraExecutor: ExecutorService? = null
+
+// 액티비티
 private lateinit var cameraActivity: CameraActivity
+
+// 자동촬영 스위치 on/off
 private var autoCamera = false
 
-/**
- * A simple [Fragment] subclass.
- * Use the [FrontShotGuideFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
     FragmentFontShotGuideBinding::bind,
     R.layout.fragment_font_shot_guide
 ) {
-    // TODO: Rename and change types of parameters
+
     private var param1: String? = null
     private var param2: String? = null
-    private var autoCaptureEnabled = true
 
+    // 뷰 모델
     private val viewModel: CameraViewModel by activityViewModels()
 
     // AutoCapture 변수
     private lateinit var tflite: Interpreter // tflite 모델을 불러오기 위한 변수
     private var lastCapturedBox: BBox? = null // crop을 위해 best box를 저장하는 변수
     private var isCapturing = false // 중복 캡처 방지
+
     // 이전 프레임과 비교를 위한 상태
     private var lastBox: BBox? = null
     private var stableFrameCount = 0
     private val requiredStableFrames = 3
+
     // Bitmap Pool (비트맵 재사용) 기법
     private val MAX_CANDIDATE_FRAMES = 3   // 후보 프레임 최대 개수 제한
     private val candidateBitmaps = ArrayDeque<Bitmap>() // → 큐 자료구조 사용
     private var preview: Preview? = null
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FontShotGuideFragment.
-         */
-        // TODO: Rename and change types and number of parameters
+
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             FrontShotGuideFragment().apply {
@@ -123,18 +116,6 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             }
     }
 
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        cameraActivity = context as CameraActivity
-    }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
@@ -147,40 +128,30 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
             startCamera()
         }
 
+        // 버튼 설정
+        settingButton()
+    }
+
+    // 버튼 설정
+    private fun settingButton() {
         // 가이드 닫기 버튼 눌렀을 때
-        binding.btnCancel?.setOnClickListener {
-            binding.clGuide?.isVisible = false
-            binding.overlayView?.isVisible=true
-            binding.btnBack?.isVisible = true
-            binding.btnShot?.isVisible = true
-            binding?.btnGuide?.isVisible = true
-            binding.swAuto?.isVisible=true
-            binding.tvSwAuto?.isVisible=true
-        }
+        clickGuideClose()
 
         // 가이드 보기 버튼 눌렀을 떄
-        binding.btnGuide?.setOnClickListener {
-            binding.clGuide?.isVisible = true
-            binding.overlayView?.isVisible=false
-            binding.btnBack?.isVisible = false
-            binding.btnShot?.isVisible = false
-            binding?.btnGuide?.isVisible = false
-            binding.swAuto?.isVisible=false
-            binding.tvSwAuto?.isVisible=false
-        }
+        clickGuideOpen()
 
         // X 버튼 눌렀을 때
-        binding.btnBack?.setOnClickListener {
-            showStopCameraDialog()
-        }
+        clickClose()
 
-
-
-        binding.btnShot?.setOnClickListener {
-            takePhoto()
-        }
+        // 촬영 버튼 클릭
+        clickShotBtn()
 
         // 자동촬영 on/off 스위치 버튼
+        clickAutoSwitch()
+    }
+
+    // 자동촬영 on/off 스위치 버튼
+    private fun clickAutoSwitch() {
         binding.swAuto?.setOnCheckedChangeListener { _, isChecked ->
             autoCamera = isChecked
             if (!isChecked) {
@@ -193,6 +164,46 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
         }
     }
 
+    // 촬영 버튼 클릭
+    private fun clickShotBtn() {
+        binding.btnShot?.setOnClickListener {
+            Log.d("imageBug", "btn_shot_frontShot")
+            takePhoto()
+        }
+    }
+
+    // X 버튼 눌렀을 때
+    private fun clickClose() {
+        binding.btnBack?.setOnClickListener {
+            showStopCameraDialog()
+        }
+    }
+
+    // 가이드 보기 버튼 눌렀을 떄
+    private fun clickGuideOpen() {
+        binding.btnGuide?.setOnClickListener {
+            binding.clGuide?.isVisible = true
+            binding.overlayView?.isVisible = false
+            binding.btnBack?.isVisible = false
+            binding.btnShot?.isVisible = false
+            binding?.btnGuide?.isVisible = false
+            binding.swAuto?.isVisible = false
+            binding.tvSwAuto?.isVisible = false
+        }
+    }
+
+    // 가이드 닫기 버튼 눌렀을 때
+    private fun clickGuideClose() {
+        binding.btnCancel?.setOnClickListener {
+            binding.clGuide?.isVisible = false
+            binding.overlayView?.isVisible = true
+            binding.btnBack?.isVisible = true
+            binding.btnShot?.isVisible = true
+            binding?.btnGuide?.isVisible = true
+            binding.swAuto?.isVisible = true
+            binding.tvSwAuto?.isVisible = true
+        }
+    }
 
 
     private fun showStopCameraDialog() {
@@ -224,6 +235,8 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
     }
 
     private fun startCamera() {
+
+        Log.d("imageBug", "startCamera")
         // CameraX를 사용하기 위해 카메라 제공자(CameraProvider)를 비동기로 가져오는 중.
         // getInstance()는 앱의 생명주기에 맞춰 카메라를 관리해주는 객체를 반환
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
@@ -284,6 +297,7 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
 
     // 촬영 버튼 눌러서 촬영 함수
     private fun takePhoto() {
+        Log.d("imageBug", "takePhoto_frontShot")
         val imageCapture = imageCapture ?: return
 
         val photoFile = File(requireContext().externalMediaDirs.firstOrNull(),
@@ -367,7 +381,9 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
                         Handler(Looper.getMainLooper()).post {
                             Log.d("CameraFragment", "최종 크롭된 사진 저장됨: $savedUri")
                             viewModel.setFront(savedUri)
+                            Log.d("imageBug", "setFront: $savedUri")
                             viewModel.setStep(1)
+
 
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE
@@ -488,14 +504,13 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
     // 이미지를 분석하는 함수
     private fun analyzeImage(imageProxy: ImageProxy) {
 
+
         if (!autoCamera) {
             imageProxy.close()
             return
         }
-        if (!autoCaptureEnabled) {
-            imageProxy.close()
-            return
-        }
+
+        Log.d("imageBug", "analyzeImage_frontShot")
         // ImageProxy에서 가져온 카메라 프레임을 Bitmap으로 변환 (YOLO 입력용)
         val bitmap = imageProxyToBitmap(imageProxy)
         // YOLOv8 TFLite 모델에 넣기 위한 전처리 작업 (640x640 크기, float 정규화 등)
@@ -855,5 +870,19 @@ class FrontShotGuideFragment : BaseFragment<FragmentFontShotGuideBinding>(
         )
 
         Log.d("MainActivity", "✅ YOLO 디버그 이미지 저장됨: ${debugFile.absolutePath}")
+    }
+
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        cameraActivity = context as CameraActivity
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            param1 = it.getString(ARG_PARAM1)
+            param2 = it.getString(ARG_PARAM2)
+        }
     }
 }

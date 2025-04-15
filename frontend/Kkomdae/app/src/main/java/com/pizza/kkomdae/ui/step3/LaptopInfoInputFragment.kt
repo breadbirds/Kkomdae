@@ -58,6 +58,7 @@ import com.pizza.kkomdae.presenter.viewmodel.Step3ViewModel
 import com.pizza.kkomdae.ui.LoadingFragment
 import com.pizza.kkomdae.di.GoogleVisionApi
 import com.pizza.kkomdae.presenter.viewmodel.CameraViewModel
+import com.pizza.kkomdae.ui.MainFragment
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
@@ -94,13 +95,9 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
 
     // 시스템 백 버튼 콜백 선언
     private lateinit var backPressedCallback: OnBackPressedCallback
-    private val REQUEST_IMAGE_CAPTURE = 1
     private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
     private val cameraViewModel: CameraViewModel by activityViewModels()
     private lateinit var imageFile: File
-    private var introDialog: Dialog? = null
-    private var confirmDialog: Dialog? = null
-    private var endDialog: Dialog? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -371,8 +368,9 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
         btnQuit.setOnClickListener {
             bottomSheetDialog.dismiss()
             // 메인 화면으로 이동
-            val mainActivity = requireActivity() as MainActivity
-            mainActivity.supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            val transaction = requireActivity().supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.fl_main, MainFragment())
+            transaction.commit()
         }
 
         bottomSheetDialog.setContentView(bottomSheetView)

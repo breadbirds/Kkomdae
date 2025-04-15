@@ -62,27 +62,26 @@ import kotlin.collections.ArrayDeque
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
+
 private var imageCapture: ImageCapture? = null
 private var cameraProvider: ProcessCameraProvider? = null
 private var camera: Camera? = null
 private var cameraExecutor: ExecutorService? = null
+
+// 자동촬영 스위치 on/off
 private var autoCamera = false
 
+// 액티비티
 private lateinit var cameraActivity: CameraActivity
 
-/**
- * A simple [Fragment] subclass.
- * Use the [KeypadGuideFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
     FragmentKeypadGuideBinding::bind,
     R.layout.fragment_keypad_guide
 ) {
-    // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    private var autoCaptureEnabled = true
+
+    // 뷰모델 설정
     private val viewModel: CameraViewModel by activityViewModels()
 
     // AutoCapture 변수
@@ -99,15 +98,6 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
     private var preview: Preview? = null
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment KeypadGuideFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             KeypadGuideFragment().apply {
@@ -118,17 +108,7 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
             }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        cameraActivity = context as CameraActivity
-    }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -139,38 +119,31 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
         cameraExecutor = Executors.newSingleThreadExecutor()
         startCamera()
 
+        // 버튼 설정
+        settingButton()
 
+    }
+
+    // 버튼 설정
+    private fun settingButton() {
         // 가이드 닫기 버튼 눌렀을 때
-        binding.btnCancel?.setOnClickListener {
-            binding.clGuide?.isVisible = false
-            binding.overlayView?.isVisible=true
-            binding.btnBack?.isVisible = true
-            binding.btnShot?.isVisible = true
-            binding?.btnGuide?.isVisible = true
-            binding.swAuto?.isVisible=true
-            binding.tvSwAuto?.isVisible=true
-        }
+        clickGuideClose()
 
         // 가이드 보기 버튼 눌렀을 떄
-        binding.btnGuide?.setOnClickListener {
-            binding.clGuide?.isVisible = true
-            binding.overlayView?.isVisible=false
-            binding.btnBack?.isVisible = false
-            binding.btnShot?.isVisible = false
-            binding?.btnGuide?.isVisible = false
-            binding.swAuto?.isVisible=false
-            binding.tvSwAuto?.isVisible=false
-        }
-        // 뒤로 가기 버튼 눌렀을 때
-        binding.btnBack?.setOnClickListener {
-            showStopCameraDialog()
-        }
+        clickGuideOpen()
 
-        binding.btnShot?.setOnClickListener {
-            takePhoto()
-        }
+        // 뒤로 가기 버튼 눌렀을 때
+        clickBackBtn()
+
+        // 촬영 버튼 눌렀을 때
+        clickShotBtn()
 
         // 자동촬영 on/off 스위치 버튼
+        clickAutoBtn()
+    }
+
+    // 자동촬영 on/off 스위치 버튼
+    private fun clickAutoBtn() {
         binding.swAuto?.setOnCheckedChangeListener { _, isChecked ->
             autoCamera = isChecked
             if (!isChecked) {
@@ -181,7 +154,43 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
                 candidateBitmaps.clear()
             }
         }
+    }
 
+    private fun clickShotBtn() {
+        binding.btnShot?.setOnClickListener {
+            takePhoto()
+        }
+    }
+
+    private fun clickBackBtn() {
+        binding.btnBack?.setOnClickListener {
+            showStopCameraDialog()
+        }
+    }
+
+    private fun clickGuideOpen() {
+        binding.btnGuide?.setOnClickListener {
+            binding.clGuide?.isVisible = true
+            binding.overlayView?.isVisible = false
+            binding.btnBack?.isVisible = false
+            binding.btnShot?.isVisible = false
+            binding?.btnGuide?.isVisible = false
+            binding.swAuto?.isVisible = false
+            binding.tvSwAuto?.isVisible = false
+        }
+    }
+
+    // 가이드 닫기 버튼 눌렀을 때
+    private fun clickGuideClose() {
+        binding.btnCancel?.setOnClickListener {
+            binding.clGuide?.isVisible = false
+            binding.overlayView?.isVisible = true
+            binding.btnBack?.isVisible = true
+            binding.btnShot?.isVisible = true
+            binding?.btnGuide?.isVisible = true
+            binding.swAuto?.isVisible = true
+            binding.tvSwAuto?.isVisible = true
+        }
     }
 
     private fun showStopCameraDialog() {
@@ -213,6 +222,8 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
     }
 
     private fun startCamera() {
+
+        Log.d("iamgeBug", "startCamera_keyboard")
         // CameraX를 사용하기 위해 카메라 제공자(CameraProvider)를 비동기로 가져오는 중.
         // getInstance()는 앱의 생명주기에 맞춰 카메라를 관리해주는 객체를 반환
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
@@ -274,6 +285,9 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
 
     // 촬영 버튼 눌러서 촬영 함수
     private fun takePhoto() {
+
+        Log.d("imageBug", "takePhoto_Keyboard ")
+
         val imageCapture = imageCapture ?: return
 
         val photoFile = File(requireContext().externalMediaDirs.firstOrNull(),
@@ -478,10 +492,12 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
 
     // 이미지를 분석하는 함수
     private fun analyzeImage(imageProxy: ImageProxy) {
+
         if (!autoCamera) {
             imageProxy.close()
             return
         }
+        Log.d("imageBug", "analyzeImage_Keyboard")
         // ImageProxy에서 가져온 카메라 프레임을 Bitmap으로 변환 (YOLO 입력용)
         val bitmap = imageProxyToBitmap(imageProxy)
         // YOLOv8 TFLite 모델에 넣기 위한 전처리 작업 (640x640 크기, float 정규화 등)
@@ -821,5 +837,17 @@ class KeypadGuideFragment : BaseFragment<FragmentKeypadGuideBinding>(
         )
 
         Log.d("MainActivity", "✅ YOLO 디버그 이미지 저장됨: ${debugFile.absolutePath}")
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        cameraActivity = context as CameraActivity
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            param1 = it.getString(ARG_PARAM1)
+            param2 = it.getString(ARG_PARAM2)
+        }
     }
 }

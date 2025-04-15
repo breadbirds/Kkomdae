@@ -44,19 +44,5 @@
         app:layout_constraintTop_toTopOf="@id/tv_model_number"
         app:layout_constraintBottom_toBottomOf="@id/tv_model_number"/>
 
-    <TextView
-        android:id="@+id/tv_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="보기"
-        style="@style/Label3"
-        android:textColor="@color/gray300"
-        android:layout_marginEnd="20dp"
-        tools:visibility="visible"
-        android:visibility="gone"
-        android:background="@drawable/underline_background"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

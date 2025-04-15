@@ -204,11 +204,12 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             it ?: return@observe
             adapter.hideTextAt(1)
             // 로딩 애니메이션 숨기기
+            data[1].damage=it.data.photo_ai_damage
             changeImage(adaterIndex)
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
-            data[1].damage=it.data.photo_ai_damage
+
 
 
 
@@ -220,11 +221,12 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             it ?: return@observe
             adapter.hideTextAt(2)
             // 로딩 애니메이션 숨기기
+            data[2].damage=it.data.photo_ai_damage
             changeImage(adaterIndex)
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
-            data[2].damage=it.data.photo_ai_damage
+
 
 
 
@@ -236,11 +238,12 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             it ?: return@observe
             adapter.hideTextAt(3)
             // 로딩 애니메이션 숨기기
+            data[3].damage=it.data.photo_ai_damage
             changeImage(adaterIndex)
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
-            data[3].damage=it.data.photo_ai_damage
+
 
 
 
@@ -252,11 +255,12 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
             it ?: return@observe
             adapter.hideTextAt(4)
             // 로딩 애니메이션 숨기기
+            data[4].damage=it.data.photo_ai_damage
             changeImage(adaterIndex)
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
 
-            data[4].damage=it.data.photo_ai_damage
+
 
 
 
@@ -267,18 +271,13 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         viewModel.rePhoto6.observe(viewLifecycleOwner){
             it ?: return@observe
 
-
             adapter.hideTextAt(5)
             // 로딩 애니메이션 숨기기
 
+            data[5].damage=it.data.photo_ai_damage
             changeImage(adaterIndex)
             binding.loadingAnimation.visibility = View.GONE
             binding.ivImage.visibility = View.VISIBLE
-
-            data[5].damage=it.data.photo_ai_damage
-
-
-
 
             // 토스트 메시지 표시
             showToast("키보드 사진이 재분석되었습니다.")
@@ -448,15 +447,6 @@ class Step4AiResultFragment : BaseFragment<FragmentStep4AiResultBinding>(
         private const val ARG_PARAM1 = "param1"
         private const val ARG_PARAM2 = "param2"
 
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Step1ResultFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             Step4AiResultFragment().apply {

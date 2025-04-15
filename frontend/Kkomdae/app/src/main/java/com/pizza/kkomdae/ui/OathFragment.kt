@@ -16,8 +16,11 @@ import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentOathBinding
 import androidx.core.widget.ImageViewCompat
 import android.content.res.ColorStateList
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
+import com.pizza.kkomdae.presenter.viewmodel.OathViewModel
 import com.pizza.kkomdae.ui.guide.AllStepGuideFragment
 import com.pizza.kkomdae.ui.guide.AllStepOnboardingFragment
 
@@ -26,15 +29,13 @@ import com.pizza.kkomdae.ui.guide.AllStepOnboardingFragment
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [OathFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+
 class OathFragment : BaseFragment<FragmentOathBinding>(
     FragmentOathBinding::bind,
     R.layout.fragment_oath
 ) {
+
+    private val viewModel: OathViewModel by viewModels()
 
     private var isOath1Checked = false
     private var isOath2Checked = false
@@ -51,15 +52,20 @@ class OathFragment : BaseFragment<FragmentOathBinding>(
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+        viewModel.setIsOath1Checked(false)
+        viewModel.setIsOath2Checked(false)
+        viewModel.setIsOath3Checked(false)
+        viewModel.setIsOath4Checked(false)
+
     }
 
-    override fun onResume() {
-        super.onResume()
-        isOath1Checked = false
-        isOath2Checked = false
-        isOath3Checked = false
-        isOath4Checked = false
-    }
+//    override fun onResume() {
+//        super.onResume()
+//        isOath1Checked = false
+//        isOath2Checked = false
+//        isOath3Checked = false
+//        isOath4Checked = false
+//    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -91,86 +97,38 @@ class OathFragment : BaseFragment<FragmentOathBinding>(
         // 서약서 항목 클릭 이벤트
         binding.cardAgreement1.setOnClickListener {
             toggleOathSelection(it, R.id.oath_title1)
-            isOath1Checked = !isOath1Checked
+            isOath1Checked = !(viewModel.isOath1Checked.value?:false)
+            Log.d("TAG", "onViewCreated: $isOath1Checked")
+            viewModel.setIsOath1Checked(isOath1Checked)
             updateCompleteButtonState()
-            binding.cardAgreement1.isClickable=false
-            binding.oathContent1.isVisible=false
-            binding.oathTitle1.tvView.isVisible=true
+            binding.oathContent1.isVisible=!isOath1Checked
         }
+
         binding.cardAgreement2.setOnClickListener {
             toggleOathSelection(it, R.id.oath_title2)
-            isOath2Checked = !isOath2Checked
+            isOath2Checked = !(viewModel.isOath2Checked.value?:false)
+            Log.d("TAG", "onViewCreated: $isOath2Checked")
+            viewModel.setIsOath2Checked(isOath2Checked)
             updateCompleteButtonState()
-            binding.cardAgreement2.isClickable=false
-            binding.oathContent2.isVisible=false
-            binding.oathTitle2.tvView.isVisible=true
+            binding.oathContent2.isVisible=!isOath2Checked
         }
         binding.cardAgreement3.setOnClickListener {
             toggleOathSelection(it, R.id.oath_title3)
-            isOath3Checked = !isOath3Checked
-            binding.cardAgreement3.isClickable=false
+            isOath3Checked = !(viewModel.isOath3Checked.value?:false)
+            Log.d("TAG", "onViewCreated: $isOath3Checked")
+            viewModel.setIsOath3Checked(isOath3Checked)
             updateCompleteButtonState()
-            binding.cardAgreement3.isClickable=false
-            binding.oathContent3.isVisible=false
-            binding.oathTitle3.tvView.isVisible=true
+            binding.oathContent3.isVisible=!isOath3Checked
         }
         binding.cardAgreement4.setOnClickListener {
             toggleOathSelection(it, R.id.oath_title4)
-            isOath4Checked = !isOath4Checked
+            isOath4Checked = !(viewModel.isOath4Checked.value?:false)
+            Log.d("TAG", "onViewCreated: $isOath4Checked")
+            viewModel.setIsOath4Checked(isOath4Checked)
             updateCompleteButtonState()
-            binding.cardAgreement4.isClickable=false
-            binding.oathContent4.isVisible=false
-            binding.oathTitle4.tvView.isVisible=true
-        }
-        
-        // 서약서 내용 보기/닫기
-        binding.oathTitle1.tvView.setOnClickListener {
-            if ( binding.oathTitle1.tvView.text=="보기"){
-                binding.oathContent1.isVisible=true
-                binding.oathTitle1.tvView.text="닫기"
-            }
-            else {
-                binding.oathContent1.isVisible=false
-                binding.oathTitle1.tvView.text="보기"
-            }
-            
+            binding.oathContent4.isVisible=!isOath4Checked
         }
 
-        binding.oathTitle2.tvView.setOnClickListener {
-            if ( binding.oathTitle2.tvView.text=="보기"){
-                binding.oathContent2.isVisible=true
-                binding.oathTitle2.tvView.text="닫기"
-            }
-            else {
-                binding.oathContent2.isVisible=false
-                binding.oathTitle2.tvView.text="보기"
-            }
-
-        }
-
-        binding.oathTitle3.tvView.setOnClickListener {
-            if ( binding.oathTitle3.tvView.text=="보기"){
-                binding.oathContent3.isVisible=true
-                binding.oathTitle3.tvView.text="닫기"
-            }
-            else {
-                binding.oathContent3.isVisible=false
-                binding.oathTitle3.tvView.text="보기"
-            }
-
-        }
-
-        binding.oathTitle4.tvView.setOnClickListener {
-            if ( binding.oathTitle4.tvView.text=="보기"){
-                binding.oathContent4.isVisible=true
-                binding.oathTitle4.tvView.text="닫기"
-            }
-            else {
-                binding.oathContent4.isVisible=false
-                binding.oathTitle4.tvView.text="보기"
-            }
-
-        }
 
         // 다음 기기등록 화면으로 넘어가기
         binding.btnNext.setOnClickListener {
@@ -227,6 +185,7 @@ class OathFragment : BaseFragment<FragmentOathBinding>(
     // 버튼 상태 업데이트 함수
     private fun updateCompleteButtonState() {
         val allChecked = isOath1Checked && isOath2Checked && isOath3Checked && isOath4Checked
+        Log.d("TAG", "updateCompleteButtonState: $allChecked")
         if (allChecked) {
             binding.btnNext.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue500))
         } else {
@@ -235,15 +194,6 @@ class OathFragment : BaseFragment<FragmentOathBinding>(
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment OathFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             OathFragment().apply {

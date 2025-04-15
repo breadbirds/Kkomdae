@@ -11,8 +11,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentNoteBinding
+import com.pizza.kkomdae.presenter.model.Step4AiResult
 import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.ui.step3.FinalResultFragment
+import com.pizza.kkomdae.ui.step4.Step4AiResultFragment
 
 
 class NoteFragment : BaseFragment<FragmentNoteBinding>(
@@ -37,7 +39,8 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
         // 시스템 백 버튼 동작 설정
         backPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                showQuitBottomSheet()
+                // ai분석 결과
+                moveToAiResultFragment()
             }
         }
         requireActivity().onBackPressedDispatcher.addCallback(this, backPressedCallback)
@@ -76,7 +79,9 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
 
         // 뒤로가기 버튼
         binding.topBar.backButtonContainer.setOnClickListener {
-            requireActivity().onBackPressed()
+
+            // ai분석 결과
+            moveToAiResultFragment()
         }
 
         // X 버튼
@@ -96,6 +101,12 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
         // 초기 버튼 상태 설정
         updateSaveButtonState()
 
+    }
+
+    private fun moveToAiResultFragment() {
+        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fl_main, Step4AiResultFragment())
+        transaction.commit()
     }
 
     // 저장하기 버튼 상태 업데이트

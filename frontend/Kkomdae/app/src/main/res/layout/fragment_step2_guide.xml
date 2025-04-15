@@ -290,6 +290,7 @@
         android:textColor="@color/white"
         android:text="건너뛰기"
         android:layout_margin="24dp"
+        android:visibility="gone"
         style="@style/Title1"
         app:layout_constraintBottom_toTopOf="@id/btn_next"
         app:layout_constraintStart_toStartOf="parent"
