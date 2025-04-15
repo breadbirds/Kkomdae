@@ -197,6 +197,7 @@ class LaptopInfoInputFragment : BaseFragment<FragmentLaptopInfoInputBinding>(
             if(it.success && it.status=="OK"){ // 통신 성공
                 showEndDialog()
             }else{ // todo 통신 실패시
+
             }
         }
 
