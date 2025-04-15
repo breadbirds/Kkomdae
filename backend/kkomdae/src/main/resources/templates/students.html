@@ -16,12 +16,12 @@
         }
 
 
-
         body {
             font-family: 'Pretendard-Regular', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
             padding-top: 20px; /* Add padding to the top */
             background-color: #f8f9fa; /* Light background for the whole page */
         }
+
         .container {
             background-color: #ffffff; /* White background for main content */
             padding: 30px;
@@ -29,6 +29,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
             max-width: 1200px; /* Limit container width */
         }
+
         .hiddenRow {
             padding: 0 !important;
         }
@@ -52,6 +53,7 @@
         input[type=checkbox] {
             display: none;
         }
+
         .checkbox-wrap {
             position: relative;
             padding-left: 25px;
@@ -61,6 +63,7 @@
             vertical-align: middle;
             line-height: normal;
         }
+
         .checkbox-wrap .checkmark {
             position: absolute;
             top: 50%;
@@ -73,18 +76,22 @@
             border-radius: 3px;
             transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out; /* Smooth transition */
         }
+
         .checkbox-wrap:hover .checkmark {
             background-color: #f0f0f0;
         }
+
         .checkbox-wrap input:checked ~ .checkmark {
             background-color: #0d6efd;
             border-color: #0d6efd;
         }
+
         .checkbox-wrap .checkmark:after {
             content: "";
             position: absolute;
             display: none;
         }
+
         .checkbox-wrap input:checked ~ .checkmark:after {
             display: block;
             left: 7px;
@@ -100,16 +107,20 @@
         .table th, .table td {
             vertical-align: middle; /* Center content vertically */
         }
+
         .table thead th {
             background-color: #e9ecef; /* Light grey header */
             border-bottom-width: 1px; /* Thinner bottom border */
         }
+
         .table-hover > tbody > tr:hover > * {
             background-color: #f8f9fa; /* Subtle hover effect */
         }
+
         .accordion-toggle {
             cursor: pointer; /* Indicate clickable rows */
         }
+
         .accordion-toggle .fa-chevron-down,
         .accordion-toggle .fa-chevron-up {
             transition: transform 0.2s ease-in-out; /* Smooth icon rotation */
@@ -124,9 +135,11 @@
             padding-bottom: 1rem;
             border-bottom: 1px solid #dee2e6;
         }
+
         .header-title {
             margin-bottom: 0; /* Remove default margin */
         }
+
         .header-buttons .btn, .header-buttons form {
             margin-left: 0.5rem; /* Spacing between buttons */
         }
@@ -137,12 +150,15 @@
             margin-bottom: 0.3rem;
             display: block;
         }
+
         .filter-form .row {
             align-items: flex-end; /* Align items to the bottom */
         }
+
         .filter-form .btn {
             height: calc(2.25rem + 2px); /* Match input height */
         }
+
         .badge {
             font-size: 0.85em; /* Slightly larger badge */
             padding: 0.4em 0.7em;
@@ -167,7 +183,8 @@
     <div class="header-section">
         <div class="d-flex align-items-center">
             <a th:href="@{/api/admin/students}">
-                <img th:src="@{/image/ssafy.svg}" style="width: 100px; height: auto; margin-right: 15px;" alt="SSAFY Logo" />
+                <img th:src="@{/image/ssafy.svg}" style="width: 100px; height: auto; margin-right: 15px;"
+                     alt="SSAFY Logo"/>
             </a>
             <h2 class="header-title">학생 장비 대여 현황</h2>
         </div>
@@ -222,7 +239,8 @@
             <div class="col-md-2">
                 <label for="searchTypeSelect" class="form-label">검색 유형</label>
                 <!-- IMPORTANT: The 'value' attributes below MUST match the strings expected by the backend logic for searchType -->
-                <select class="form-select" id="searchTypeSelect" name="searchType" th:field="*{studentWithRentCond.searchType}">
+                <select class="form-select" id="searchTypeSelect" name="searchType"
+                        th:field="*{studentWithRentCond.searchType}">
                     <option value="">선택</option>
                     <option value="학생고유번호">학생고유번호</option> <!-- Value set to "학생고유번호" -->
                     <option value="이름">이름</option> <!-- Value set to "이름" -->
@@ -273,7 +291,8 @@
                 th:classappend="${iterStat.odd} ? 'bg-white' : 'bg-light'"> <!-- Alternating row colors -->
                 <td>
                     <label class="checkbox-wrap">
-                        <input type="checkbox" name="selectedStudents" th:value="${student.getName()}"> <!-- Use nickname for notification -->
+                        <input type="checkbox" name="selectedStudents" th:value="${student.getName()}">
+                        <!-- Use nickname for notification -->
                         <span class="checkmark"></span>
                     </label>
                 </td>
@@ -282,9 +301,8 @@
                 <td th:text="${student.region}"></td>
                 <td th:text="${student.classNum}"></td>
                 <td>
-                    <span th:if="${#lists.isEmpty(student.deviceRentHistory)}" class="badge bg-success">대여 장비 없음</span>
-                    <span th:unless="${#lists.isEmpty(student.deviceRentHistory)}" class="badge bg-warning text-dark">장비 대여 중</span>
-                    <!-- Updated logic based on deviceRentHistory -->
+                    <span th:class="${student.status} ? 'badge bg-success' : 'badge bg-warning'"
+                          th:text="${student.status} ? '대여 장비 없음' : '장비 대여 중'"></span>
                 </td>
                 <td class="text-center">
                     <i class="fas fa-chevron-down"></i>
@@ -309,7 +327,8 @@
                                     </thead>
                                     <tbody>
                                     <tr th:each="device : ${student.deviceRentHistory}">
-                                        <td th:text="${#strings.toUpperCase(device.type == 'Laptop' ? '노트북' : device.type == 'mouse' ? '마우스' : device.type == 'keyboard' ? '키보드' : device.type)}"></td> <!-- Display Korean names -->
+                                        <td th:text="${#strings.toUpperCase(device.type == 'Laptop' ? '노트북' : device.type == 'mouse' ? '마우스' : device.type == 'keyboard' ? '키보드' : device.type)}"></td>
+                                        <!-- Display Korean names -->
                                         <td th:text="${device.modelCode}"></td>
                                         <td th:text="${device.serialNum}"></td>
                                         <td>
@@ -320,7 +339,8 @@
                                             <a th:if="${device.type == 'Laptop'}"
                                                th:href="@{/api/admin/test-results(studentId=${student.studentId},deviceId=${device.deviceId},deviceType=${device.type})}"
                                                class="btn btn-sm btn-outline-primary"> <!-- Adjusted style slightly -->
-                                                <i class="fas fa-clipboard-list me-1"></i> 상세 <!-- Changed text back to 상세 -->
+                                                <i class="fas fa-clipboard-list me-1"></i> 상세
+                                                <!-- Changed text back to 상세 -->
                                             </a>
                                             <span th:unless="${device.type == 'Laptop'}" class="text-muted">-</span>
                                         </td>
@@ -328,7 +348,8 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div th:if="${#lists.isEmpty(student.deviceRentHistory)}" class="text-center text-muted py-3"> <!-- Added padding and muted text -->
+                            <div th:if="${#lists.isEmpty(student.deviceRentHistory)}"
+                                 class="text-center text-muted py-3"> <!-- Added padding and muted text -->
                                 <p>현재 대여 중인 장비가 없습니다.</p>
                             </div>
                         </div>
@@ -407,14 +428,14 @@
 
                 collapseEl.addEventListener('hidden.bs.collapse', () => {
                     contentRow.style.display = 'none'; // Hide the content row after animation
-                     if (icon) icon.classList.replace('fa-chevron-up', 'fa-chevron-down'); // Reset icon
+                    if (icon) icon.classList.replace('fa-chevron-up', 'fa-chevron-down'); // Reset icon
                 });
 
                 // Ensure icon is correct on initial load if already shown (e.g., page refresh)
-                 if (collapseEl.classList.contains('show')) {
-                     contentRow.style.display = 'table-row';
-                     if (icon) icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
-                 }
+                if (collapseEl.classList.contains('show')) {
+                    contentRow.style.display = 'table-row';
+                    if (icon) icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                }
             }
         });
 
