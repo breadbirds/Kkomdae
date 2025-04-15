@@ -36,6 +36,7 @@ faster_threshold = 0.5
 yolo_threshold = 0.7
 class_names = ["background", "damage_bbox"]
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+logger.info(f"Using device: {device}")
 num_classes = 2
 
 # 모델 캐싱용 전역 변수
