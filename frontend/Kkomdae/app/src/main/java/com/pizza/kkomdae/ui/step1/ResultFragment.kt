@@ -30,15 +30,12 @@ import com.pizza.kkomdae.databinding.FragmentFontResultBinding
 import com.pizza.kkomdae.presenter.viewmodel.CameraViewModel
 import com.pizza.kkomdae.ui.guide.Step1GuideFragment
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ResultFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 private const val TAG = "ResultFragment"
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 private lateinit var cameraActivity: CameraActivity
+
+private var stopCameraDialog: Dialog? = null
 
 class ResultFragment : BaseFragment<FragmentFontResultBinding>(
     FragmentFontResultBinding::bind,
@@ -217,31 +214,32 @@ class ResultFragment : BaseFragment<FragmentFontResultBinding>(
 
 
     private fun showStopCameraDialog() {
+        if (stopCameraDialog?.isShowing == true) return
         // 다이얼로그 생성
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.layout_stop_camera_dialog)
+        stopCameraDialog = Dialog(requireContext())
+        stopCameraDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        stopCameraDialog?.setContentView(R.layout.layout_stop_camera_dialog)
 
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        stopCameraDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val width = (resources.displayMetrics.widthPixels * 0.5).toInt()
-        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        stopCameraDialog?.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
 
         // 취소 버튼
-        val btnCancel = dialog.findViewById<TextView>(R.id.btn_cancel)
-        btnCancel.setOnClickListener {
-            dialog.dismiss()
+        val btnCancel = stopCameraDialog?.findViewById<TextView>(R.id.btn_cancel)
+        btnCancel?.setOnClickListener {
+            stopCameraDialog?.dismiss()
         }
 
         // 그만하기 버튼
-        val btnConfirm = dialog.findViewById<TextView>(R.id.btn_confirm)
-        btnConfirm.setOnClickListener {
+        val btnConfirm = stopCameraDialog?.findViewById<TextView>(R.id.btn_confirm)
+        btnConfirm?.setOnClickListener {
             // 다이얼로그 닫기
-            dialog.dismiss()
+            stopCameraDialog?.dismiss()
             cameraActivity.moveToBack()
         }
 
-        dialog.show()
+        stopCameraDialog?.show()
     }
 
     private fun showNetworkErrorDialog() {

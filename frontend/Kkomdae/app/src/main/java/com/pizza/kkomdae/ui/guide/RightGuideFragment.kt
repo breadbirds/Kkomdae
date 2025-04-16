@@ -68,6 +68,9 @@ private var camera: Camera? = null
 private var cameraExecutor: ExecutorService? = null
 private lateinit var cameraActivity: CameraActivity
 
+// 다이얼로그 띄워져있는지 여부
+private var stopCameraDialog: Dialog? = null
+
 // 촬영 스위치 on/off
 private var autoCamera = false
 
@@ -187,31 +190,33 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
     }
 
     private fun showStopCameraDialog() {
+        // 이미 다이얼로그가 열려 있으면 리턴
+        if (stopCameraDialog?.isShowing == true) return
         // 다이얼로그 생성
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.layout_stop_camera_dialog)
+        stopCameraDialog = Dialog(requireContext())
+        stopCameraDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        stopCameraDialog?.setContentView(R.layout.layout_stop_camera_dialog)
 
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        stopCameraDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val width = (resources.displayMetrics.widthPixels * 0.5).toInt()
-        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        stopCameraDialog?.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
 
         // 취소 버튼
-        val btnCancel = dialog.findViewById<TextView>(R.id.btn_cancel)
-        btnCancel.setOnClickListener {
-            dialog.dismiss()
+        val btnCancel = stopCameraDialog?.findViewById<TextView>(R.id.btn_cancel)
+        btnCancel?.setOnClickListener {
+            stopCameraDialog?.dismiss()
         }
 
         // 그만하기 버튼
-        val btnConfirm = dialog.findViewById<TextView>(R.id.btn_confirm)
-        btnConfirm.setOnClickListener {
+        val btnConfirm = stopCameraDialog?.findViewById<TextView>(R.id.btn_confirm)
+        btnConfirm?.setOnClickListener {
             // 다이얼로그 닫기
-            dialog.dismiss()
+            stopCameraDialog?.dismiss()
             cameraActivity.moveToBack()
         }
 
-        dialog.show()
+        stopCameraDialog?.show()
     }
 
     private fun startCamera() {
@@ -839,5 +844,12 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        stopCameraDialog?.dismiss()
+        stopCameraDialog = null
+        clearBinding()
     }
 }

@@ -49,11 +49,8 @@ private val cameraFunction = "사진 찍기"
 private var cameraPermissionGranted = false
 private var step =0
 
-/**
- * A simple [Fragment] subclass.
- * Use the [Step1GuideFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+private var quitBottomSheetDialog: BottomSheetDialog? = null
+
 class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
     FragmentStep1GuideBinding::bind,
     R.layout.fragment_step1_guide
@@ -205,9 +202,6 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
                 }
 
             }
-
-
-
 
         }
 
