@@ -18,6 +18,7 @@ import pizza.kkomdae.s3.S3Service;
 import pizza.kkomdae.security.dto.CustomUserDetails;
 import pizza.kkomdae.service.*;
 import pizza.kkomdae.ssafyapi.MattermostNotificationService;
+
 import java.util.*;
 
 @Slf4j
@@ -66,7 +67,7 @@ public class ApiController {
             photoReq.setTestId(testId);
             Photo photo = photoService.uploadPhotoSync(photoReq, image);
             photoService.analyzePhoto(photo.getPhotoId());
-            return new ApiResponse(true, "사진 업로드 및 저장 성공");
+            return new ApiResponse(true, "사진 업로드 및 저장 성공", photoType);
         }
     }
 
@@ -77,20 +78,20 @@ public class ApiController {
             @RequestParam("testId") long testId,
             @RequestPart(value = "image", required = false) MultipartFile image) {
 
-            PhotoReq photoReq = new PhotoReq();
-            photoReq.setPhotoType(photoType);
-            photoReq.setTestId(testId);
-            Photo photo = photoService.uploadPhotoSync(photoReq, image);
-            photoService.analyzeRePhoto(photo.getPhotoId());
+        PhotoReq photoReq = new PhotoReq();
+        photoReq.setPhotoType(photoType);
+        photoReq.setTestId(testId);
+        Photo photo = photoService.uploadPhotoSync(photoReq, image);
+        photoService.analyzeRePhoto(photo.getPhotoId());
 
-            AiPhotoWithUrl photo1 = testResultService.getAiPhoto(testId, photoType);
+        AiPhotoWithUrl photo1 = testResultService.getAiPhoto(testId, photoType);
 
-            Map<String, Object> result = new HashMap<>();
-            result.put("photo_ai_name", photo1.getAiName());
-            result.put("photo_ai_url", photo1.getUrl());
-            result.put("photo_ai_damage", photo1.getDamage());
+        Map<String, Object> result = new HashMap<>();
+        result.put("photo_ai_name", photo1.getAiName());
+        result.put("photo_ai_url", photo1.getUrl());
+        result.put("photo_ai_damage", photo1.getDamage());
 
-            return new ApiResponse(true, "사진 업로드 및 저장 성공", result);
+        return new ApiResponse(true, "사진 업로드 및 저장 성공", result);
     }
 
 
@@ -108,8 +109,8 @@ public class ApiController {
         // 4) 각 사진마다 매핑
         for (PhotoWithUrl photo : photoList) {
             int type = photo.getType();
-            resultList.put("photo" + type +"_name", photo.getName());
-            resultList.put("photo" + type +"_url", photo.getUrl());
+            resultList.put("photo" + type + "_name", photo.getName());
+            resultList.put("photo" + type + "_url", photo.getUrl());
         }
 
         return new ApiResponse(true, "사진 url 반환 완료", resultList);
@@ -129,9 +130,9 @@ public class ApiController {
         // 4) 각 사진 매핑
         for (AiPhotoWithUrl photo : photoList) {
             int type = photo.getType();
-            resultList.put("photo" + type +"_ai_name", photo.getAiName());
-            resultList.put("photo" + type +"_ai_url", photo.getUrl());
-            resultList.put("photo" + type +"_ai_damage", photo.getDamage());
+            resultList.put("photo" + type + "_ai_name", photo.getAiName());
+            resultList.put("photo" + type + "_ai_url", photo.getUrl());
+            resultList.put("photo" + type + "_ai_damage", photo.getDamage());
         }
         return new ApiResponse(true, "분석 사진 url 반환 완료", resultList);
     }
@@ -149,7 +150,7 @@ public class ApiController {
     @PostMapping("/secondStage")
     public ApiResponse secondStage(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody SecondStageReq secondStageReq) {
         testResultService.secondStage(userDetails, secondStageReq);
-        return new ApiResponse(true,"qr 정보 입력 성공");
+        return new ApiResponse(true, "qr 정보 입력 성공");
     }
 
     @Operation(summary = "기기 정보 입력", description = "기기 모델명, 시리얼 넘버 등의 정보를 받는 api")
@@ -159,7 +160,7 @@ public class ApiController {
         return new ApiResponse(true, "기기 정보 입력 성공");
     }
 
-    @Operation(summary = "비고 입력",description = "기타 적고 싶은 사항을 적는 곳")
+    @Operation(summary = "비고 입력", description = "기타 적고 싶은 사항을 적는 곳")
     @PostMapping("/fourthStage")
     public ApiResponse fourthStage(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody ForthStageReq forthStageReq) {
         testResultService.fourthStage(forthStageReq);
@@ -188,7 +189,7 @@ public class ApiController {
         boolean isValid = testResultService.verifyRandomKey(key);
         Map<String, String> result = new HashMap<>();
         result.put("isValid", isValid + "");
-        return new ApiResponse(isValid, isValid ? "유효한 키입니다" : "유효하지 않은 키입니다",result);
+        return new ApiResponse(isValid, isValid ? "유효한 키입니다" : "유효하지 않은 키입니다", result);
     }
 
     @PostMapping("/test-result")
@@ -220,13 +221,13 @@ public class ApiController {
 
     @Operation(summary = "테스트 최종 결과", description = "테스트 최종 결과를 반환")
     @GetMapping("/laptopTotalResult")
-    public LaptopTotalResultRes laptopTotalResult(@RequestParam long testId ) {
+    public LaptopTotalResultRes laptopTotalResult(@RequestParam long testId) {
         return testResultService.laptopTotalResult(testId);
     }
 
     @Operation(summary = "관리자 페이지 정보 알림 테스트용", description = "리스트에 교육생 이름을 넣으면 그룹을 만들어서 알림 발송")
     @PostMapping("/notification")
-    public void notification(@RequestBody List<String>names) {
+    public void notification(@RequestBody List<String> names) {
         mattermostNotificationService.sendGroupInfoMessage(names);
     }
 

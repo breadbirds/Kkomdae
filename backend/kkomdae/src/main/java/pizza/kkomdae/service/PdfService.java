@@ -481,10 +481,10 @@ public class PdfService {
 
         // 두 번째 페이지 후 페이지 나누기
         document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-        addPhotoItem(document, font, "[우측 사진]", s3Service.generatePresignedUrl(photos.get(2).getName()));
+        addPhotoItem(document, font, "[좌측 사진]", s3Service.generatePresignedUrl(photos.get(2).getName()));
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
-        addPhotoItem(document, font, "[좌측 사진]", s3Service.generatePresignedUrl(photos.get(3).getName()));
+        addPhotoItem(document, font, "[우측 사진]", s3Service.generatePresignedUrl(photos.get(3).getName()));
         // 세 번째 페이지 후 페이지 나누기
         document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
         // 세 번째 페이지: 액정과 키판 사진
@@ -533,10 +533,10 @@ public class PdfService {
 
         // 두 번째 페이지 후 페이지 나누기
         document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-        addPhotoItem(document, font, "[우측 사진]", s3Service.generatePresignedUrl(photos.get(2).getAiName()));
+        addPhotoItem(document, font, "[좌측 사진]", s3Service.generatePresignedUrl(photos.get(2).getAiName()));
         document.add(new Paragraph("\n"));
         document.add(new Paragraph("\n"));
-        addPhotoItem(document, font, "[좌측 사진]", s3Service.generatePresignedUrl(photos.get(3).getAiName()));
+        addPhotoItem(document, font, "[우측 사진]", s3Service.generatePresignedUrl(photos.get(3).getAiName()));
         // 세 번째 페이지 후 페이지 나누기
         document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
         // 세 번째 페이지: 액정과 키판 사진

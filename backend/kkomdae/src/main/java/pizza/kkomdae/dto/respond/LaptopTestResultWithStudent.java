@@ -4,6 +4,9 @@ import lombok.Getter;
 import pizza.kkomdae.entity.LaptopTestResult;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 @Getter
 public class LaptopTestResultWithStudent {
@@ -12,6 +15,7 @@ public class LaptopTestResultWithStudent {
     private final String studentRegion;
     private final String studentName;
     private final String studentNum;
+    private final String studentGisu;
     private String failedKeys = "";
     private String failedPorts = "";
     private final boolean cameraStatus;
@@ -19,12 +23,14 @@ public class LaptopTestResultWithStudent {
     private String resultPdfUrl;
     private final LocalDate date;
     private String sumOfDamages;
+    private String batteryStatus;
 
     public LaptopTestResultWithStudent(LaptopTestResult laptopTestResult) {
         this.laptopTestId = laptopTestResult.getLaptopTestResultId();
         this.studentRegion = laptopTestResult.getStudent().getRegion();
         this.studentName = laptopTestResult.getStudent().getName();
         this.studentNum = laptopTestResult.getStudent().getStudentNum();
+        this.studentGisu = laptopTestResult.getStudent().getEdu();
         this.release = laptopTestResult.getRelease();
         if (laptopTestResult.getFailedKeys() != null) this.failedKeys = laptopTestResult.getFailedKeys();
         if (laptopTestResult.getFailedPorts() != null) this.failedPorts = laptopTestResult.getFailedPorts();
@@ -35,6 +41,18 @@ public class LaptopTestResultWithStudent {
         } else {
             this.sumOfDamages = "테스트 중";
         }
+        this.batteryStatus = abstractLife(laptopTestResult.getBatteryReportSummary());
+
+    }
+
+    private String abstractLife(String summary) {
+        StringTokenizer s = new StringTokenizer(summary);
+        List<String> list = new ArrayList<>();
+        while (s.hasMoreTokens()) {
+            String token = s.nextToken();
+            list.add(token);
+        }
+        return list.get(13);
     }
 
     public void setResultPdfUrl(String resultPdfUrl) {
