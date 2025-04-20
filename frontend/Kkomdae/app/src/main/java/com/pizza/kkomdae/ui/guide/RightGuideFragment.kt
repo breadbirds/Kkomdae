@@ -67,22 +67,21 @@ private var cameraProvider: ProcessCameraProvider? = null
 private var camera: Camera? = null
 private var cameraExecutor: ExecutorService? = null
 private lateinit var cameraActivity: CameraActivity
-private var autoCamera = true
 
-/**
- * A simple [Fragment] subclass.
- * Use the [RightGuideFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+// 다이얼로그 띄워져있는지 여부
+private var stopCameraDialog: Dialog? = null
+
+// 촬영 스위치 on/off
+private var autoCamera = false
+
 private const val TAG = "RightGuideFragment"
 class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
     FragmentRightGuideBinding::bind,
     R.layout.fragment_right_guide
 )  {
-    // TODO: Rename and change types of parameters
+
     private var param1: String? = null
     private var param2: String? = null
-    private var autoCaptureEnabled = true
     private val viewModel: CameraViewModel by activityViewModels()
 
     // AutoCapture 변수
@@ -99,15 +98,6 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
     private var preview: Preview? = null
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment RightGuideFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             RightGuideFragment().apply {
@@ -118,57 +108,39 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
             }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        cameraActivity = context as CameraActivity
-    }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         // 모델 불러오기
         tflite = Interpreter(loadModelFile())
 
-// 카메라 초기화
+        // 카메라 초기화
         cameraExecutor = Executors.newSingleThreadExecutor()
         startCamera()
 
-        binding.btnCancel?.setOnClickListener {
-            binding.clGuide?.isVisible = false
-            binding.overlayView?.isVisible=true
-            binding.btnBack?.isVisible = true
-            binding.btnShot?.isVisible = true
-            binding?.btnGuide?.isVisible = true
-            binding.swAuto?.isVisible=true
-            binding.tvSwAuto?.isVisible=true
-        }
+        // 버튼 설정
+        settingButton()
+    }
+
+    private fun settingButton() {
+        // 가이드 닫기 버튼 눌렀을 떄
+        clickGuideClose()
 
         // 가이드 보기 버튼 눌렀을 떄
-        binding.btnGuide?.setOnClickListener {
-            binding.clGuide?.isVisible = true
-            binding.overlayView?.isVisible=false
-            binding.btnBack?.isVisible = false
-            binding.btnShot?.isVisible = false
-            binding?.btnGuide?.isVisible = false
-            binding.swAuto?.isVisible=false
-            binding.tvSwAuto?.isVisible=false
-        }
+        clickGuideOpen()
 
         // 뒤로 가기 버튼 눌렀을 때
-        binding.btnBack?.setOnClickListener {
-            showStopCameraDialog()
-        }
+        clickBackBtn()
 
-        binding.btnShot.setOnClickListener {
-            takePhoto()
-        }
+        // 촬영 버튼 눌렀을 때
+        clickShotBtn()
+
         // 자동촬영 on/off 스위치 버튼
+        clickAutoSwitchBtn()
+    }
+
+    private fun clickAutoSwitchBtn() {
         binding.swAuto?.setOnCheckedChangeListener { _, isChecked ->
             autoCamera = isChecked
             if (!isChecked) {
@@ -181,35 +153,75 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
         }
     }
 
-    private fun showStopCameraDialog() {
-        // 다이얼로그 생성
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.layout_stop_camera_dialog)
+    private fun clickShotBtn() {
+        binding.btnShot.setOnClickListener {
+            takePhoto()
+        }
+    }
 
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    private fun clickBackBtn() {
+        binding.btnBack?.setOnClickListener {
+            showStopCameraDialog()
+        }
+    }
+
+    private fun clickGuideOpen() {
+        binding.btnGuide?.setOnClickListener {
+            binding.clGuide?.isVisible = true
+            binding.overlayView?.isVisible = false
+            binding.btnBack?.isVisible = false
+            binding.btnShot?.isVisible = false
+            binding?.btnGuide?.isVisible = false
+            binding.swAuto?.isVisible = false
+            binding.tvSwAuto?.isVisible = false
+        }
+    }
+
+    private fun clickGuideClose() {
+        binding.btnCancel?.setOnClickListener {
+            binding.clGuide?.isVisible = false
+            binding.overlayView?.isVisible = true
+            binding.btnBack?.isVisible = true
+            binding.btnShot?.isVisible = true
+            binding?.btnGuide?.isVisible = true
+            binding.swAuto?.isVisible = true
+            binding.tvSwAuto?.isVisible = true
+        }
+    }
+
+    private fun showStopCameraDialog() {
+        // 이미 다이얼로그가 열려 있으면 리턴
+        if (stopCameraDialog?.isShowing == true) return
+        // 다이얼로그 생성
+        stopCameraDialog = Dialog(requireContext())
+        stopCameraDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        stopCameraDialog?.setContentView(R.layout.layout_stop_camera_dialog)
+
+        stopCameraDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val width = (resources.displayMetrics.widthPixels * 0.5).toInt()
-        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        stopCameraDialog?.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
 
         // 취소 버튼
-        val btnCancel = dialog.findViewById<TextView>(R.id.btn_cancel)
-        btnCancel.setOnClickListener {
-            dialog.dismiss()
+        val btnCancel = stopCameraDialog?.findViewById<TextView>(R.id.btn_cancel)
+        btnCancel?.setOnClickListener {
+            stopCameraDialog?.dismiss()
         }
 
         // 그만하기 버튼
-        val btnConfirm = dialog.findViewById<TextView>(R.id.btn_confirm)
-        btnConfirm.setOnClickListener {
+        val btnConfirm = stopCameraDialog?.findViewById<TextView>(R.id.btn_confirm)
+        btnConfirm?.setOnClickListener {
             // 다이얼로그 닫기
-            dialog.dismiss()
+            stopCameraDialog?.dismiss()
             cameraActivity.moveToBack()
         }
 
-        dialog.show()
+        stopCameraDialog?.show()
     }
 
     private fun startCamera() {
+        Log.d("imageBug", "startCamera_RightGuide ")
+
         // CameraX를 사용하기 위해 카메라 제공자(CameraProvider)를 비동기로 가져오는 중.
         // getInstance()는 앱의 생명주기에 맞춰 카메라를 관리해주는 객체를 반환
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
@@ -270,6 +282,8 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
 
     // 촬영 버튼 눌러서 촬영 함수
     private fun takePhoto() {
+        Log.d("imageBug", "takePhoto_RightGuide")
+
         val imageCapture = imageCapture ?: return
 
         val photoFile = File(requireContext().externalMediaDirs.firstOrNull(),
@@ -447,7 +461,7 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
                         Handler(Looper.getMainLooper()).post {
                             Log.d("CameraFragment", "사진 저장됨: $savedUri")
                             viewModel.setScreen(savedUri)
-                            viewModel.setStep(5)
+                            viewModel.setStep(4)
 
                             binding.loadingLottie?.cancelAnimation()
                             binding.loadingLottie?.visibility = View.GONE
@@ -478,6 +492,7 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
             imageProxy.close()
             return
         }
+        Log.d("imageBug", "analyzeImage_RightGuide")
         // ImageProxy에서 가져온 카메라 프레임을 Bitmap으로 변환 (YOLO 입력용)
         val bitmap = imageProxyToBitmap(imageProxy)
         // YOLOv8 TFLite 모델에 넣기 위한 전처리 작업 (640x640 크기, float 정규화 등)
@@ -817,5 +832,24 @@ class RightGuideFragment : BaseFragment<FragmentRightGuideBinding>(
         )
 
         Log.d("MainActivity", "✅ YOLO 디버그 이미지 저장됨: ${debugFile.absolutePath}")
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        cameraActivity = context as CameraActivity
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            param1 = it.getString(ARG_PARAM1)
+            param2 = it.getString(ARG_PARAM2)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        stopCameraDialog?.dismiss()
+        stopCameraDialog = null
+        clearBinding()
     }
 }

@@ -49,11 +49,8 @@ private val cameraFunction = "사진 찍기"
 private var cameraPermissionGranted = false
 private var step =0
 
-/**
- * A simple [Fragment] subclass.
- * Use the [Step1GuideFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+private var quitBottomSheetDialog: BottomSheetDialog? = null
+
 class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
     FragmentStep1GuideBinding::bind,
     R.layout.fragment_step1_guide
@@ -206,9 +203,6 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
 
             }
 
-
-
-
         }
 
         if (step == 0) {
@@ -222,7 +216,6 @@ class Step1GuideFragment : BaseFragment<FragmentStep1GuideBinding>(
             val transaction = mainActivity.supportFragmentManager.beginTransaction()
             mainActivity.supportFragmentManager.popBackStack()
             transaction.replace(R.id.fl_main, Step2GuideFragment())
-                .addToBackStack("")
             transaction.commit()
         } else {
             // 촬영 단계가 완료되지 않았으면 촬영 계속

@@ -94,13 +94,13 @@
                     android:id="@+id/tv_keyboard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_rounded_blue_light"
                     android:paddingStart="18dp"
                     android:paddingTop="4dp"
                     android:paddingEnd="18dp"
                     android:paddingBottom="4dp"
-                    android:text="통과"
-                    android:textColor="#485B78"
+                    android:text="실패"
+                    android:textColor="#E4614F"
+                    android:background="@drawable/bg_rounded_red_light"
                     style="@style/Title3" />
             </LinearLayout>
 
@@ -174,13 +174,13 @@
                     android:id="@+id/tv_usb"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_rounded_blue_light"
                     android:paddingStart="18dp"
                     android:paddingTop="4dp"
                     android:paddingEnd="18dp"
                     android:paddingBottom="4dp"
-                    android:text="통과"
-                    android:textColor="#485B78"
+                    android:text="실패"
+                    android:textColor="#E4614F"
+                    android:background="@drawable/bg_rounded_red_light"
                     style="@style/Title3" />
             </LinearLayout>
 
@@ -214,13 +214,14 @@
                     android:id="@+id/tv_charger"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="실패"
+                    android:textColor="#E4614F"
                     android:background="@drawable/bg_rounded_red_light"
                     android:paddingStart="18dp"
                     android:paddingTop="4dp"
                     android:paddingEnd="18dp"
                     android:paddingBottom="4dp"
-                    android:text="실패"
-                    android:textColor="#E4614F"
+
                     style="@style/Title3"/>
             </LinearLayout>
 

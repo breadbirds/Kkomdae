@@ -222,6 +222,7 @@ class FinalViewModel @Inject constructor(
 
     fun postRePhoto(){
         val stage = reCameraStage.value?:1
+        Log.d("TAG", "postRePhoto: $stage")
 
         val loadingUrl = ""
         when(stage){
@@ -229,19 +230,15 @@ class FinalViewModel @Inject constructor(
                 _frontUri.postValue(loadingUrl)
             }
             2->{
-
                 _backUri.postValue(loadingUrl)
             }
             3->{
-
                 _leftUri.postValue(loadingUrl)
             }
             4->{
-
                 _rightUri.postValue(loadingUrl)
             }
             5->{
-
                 _screenUri.postValue(loadingUrl)
             }
             6->{

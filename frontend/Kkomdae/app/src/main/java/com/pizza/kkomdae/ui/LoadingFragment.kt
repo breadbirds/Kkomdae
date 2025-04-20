@@ -63,7 +63,7 @@ class LoadingFragment : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
 
     // 진행 속도 설정 (ms 단위)
-    private val updateInterval = 100L
+    private val updateInterval = 45L
 
     // 이전 진행 단계 추적
     private var previousStage = 0
@@ -120,7 +120,6 @@ class LoadingFragment : Fragment() {
 
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fl_main, resultFragment)
-                .addToBackStack(null)
                 .commit()
         }
 
@@ -147,25 +146,25 @@ class LoadingFragment : Fragment() {
 
         // 단계별 처리
         when {
-            // 첫 번째 단계 (0-35%)
-            currentProgress <= 35 -> {
+            // 첫 번째 단계 (0-30%)
+            currentProgress <= 30 -> {
                 tv_progress_percent.text = "${currentProgress}%"
                 tv_progress_time.text = " (3분 소요 예상)"
 
                 // 35%에 도달하면 첫 번째 항목 체크 및 단계 변경
-                if (currentProgress == 35) {
+                if (currentProgress == 30) {
                     setCheckComplete(1)
                     moveToNextStage()
                 }
             }
 
             // 두 번째 단계 (36-70%)
-            currentProgress <= 70 -> {
+            currentProgress <= 75 -> {
                 tv_progress_percent.text = "${currentProgress}%"
                 tv_progress_time.text = " (2분 소요 예상)"
 
                 // 70%에 도달하면 두 번째 항목 체크 및 단계 변경
-                if (currentProgress == 70) {
+                if (currentProgress == 75) {
                     setCheckComplete(2)
                     moveToNextStage()
                 }

@@ -67,24 +67,26 @@ private var imageCapture: ImageCapture? = null
 private var cameraProvider: ProcessCameraProvider? = null
 private var camera: Camera? = null
 private var cameraExecutor: ExecutorService? = null
-private var autoCamera = true
 
+// 자동촬영 스위치
+private var autoCamera = false
 
+// 액티비티
 private lateinit var cameraActivity: CameraActivity
 
-/**
- * A simple [Fragment] subclass.
- * Use the [BackShotGuideFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+// 다이얼로그 띄워져있는지 여부
+private var stopCameraDialog: Dialog? = null
+
+
+
 class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
     FragmentBackShotGuideBinding::bind,
     R.layout.fragment_back_shot_guide
 ) {
-    // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
 
+    // 뷰모델
     private val viewModel: CameraViewModel by activityViewModels()
 
     // AutoCapture 변수
@@ -101,15 +103,6 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
     private var preview: Preview? = null
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment BackShotGuideFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             BackShotGuideFragment().apply {
@@ -120,17 +113,7 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
             }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        cameraActivity = context as CameraActivity
-    }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -141,38 +124,32 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
         cameraExecutor = Executors.newSingleThreadExecutor()
         startCamera()
 
+        // 버튼 설정
+        settingBtn()
+
+    }
+
+    // 버튼 설정
+    private fun settingBtn() {
 
         // 가이드 닫기 버튼 눌렀을 때
-        binding.btnCancel?.setOnClickListener {
-            binding.clGuide?.isVisible = false
-            binding.overlayView?.isVisible=true
-            binding.btnBack?.isVisible = true
-            binding.btnShot?.isVisible = true
-            binding.btnGuide?.isVisible = true
-            binding.swAuto?.isVisible=true
-            binding.tvSwAuto?.isVisible=true
-        }
+        clickGuideCloseBtn()
 
         // 가이드 보기 버튼 눌렀을 떄
-        binding.btnGuide?.setOnClickListener {
-            binding.clGuide?.isVisible = true
-            binding.overlayView?.isVisible=false
-            binding.btnBack?.isVisible = false
-            binding.btnShot?.isVisible = false
-            binding?.btnGuide?.isVisible = false
-            binding.swAuto?.isVisible=false
-            binding.tvSwAuto?.isVisible=false
-        }
-        // 뒤로 가기 버튼 눌렀을 때
-        binding.btnBack?.setOnClickListener {
-            showStopCameraDialog()
-        }
+        clickGuideOpen()
 
-        binding.btnShot?.setOnClickListener {
-            takePhoto()
-        }
+        // 뒤로 가기 버튼 눌렀을 때
+        clickBackBtn()
+
+        // 촬영 버튼 눌렀을 때
+        clickShotBtn()
 
         // 자동촬영 on/off 스위치 버튼
+        clickAutoSwitchBtn()
+    }
+
+    // 자동촬영 on/off 스위치 버튼
+    private fun clickAutoSwitchBtn() {
         binding.swAuto?.setOnCheckedChangeListener { _, isChecked ->
             autoCamera = isChecked
             if (!isChecked) {
@@ -183,38 +160,84 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
                 candidateBitmaps.clear()
             }
         }
+    }
 
+    // 촬영 버튼 눌렀을 때
+    private fun clickShotBtn() {
+        binding.btnShot?.setOnClickListener {
+            takePhoto()
+        }
+    }
+
+    // 뒤로 가기 버튼 눌렀을 때
+    private fun clickBackBtn() {
+        binding.btnBack?.setOnClickListener {
+            showStopCameraDialog()
+        }
+    }
+
+    // 가이드 보기 버튼 눌렀을 떄
+    private fun clickGuideOpen() {
+        binding.btnGuide?.setOnClickListener {
+            binding.clGuide?.isVisible = true
+            binding.overlayView?.isVisible = false
+            binding.btnBack?.isVisible = false
+            binding.btnShot?.isVisible = false
+            binding?.btnGuide?.isVisible = false
+            binding.swAuto?.isVisible = false
+            binding.tvSwAuto?.isVisible = false
+        }
+    }
+
+    // 가이드 닫기 버튼 눌렀을 때
+    private fun clickGuideCloseBtn() {
+        binding.btnCancel?.setOnClickListener {
+            binding.clGuide?.isVisible = false
+            binding.overlayView?.isVisible = true
+            binding.btnBack?.isVisible = true
+            binding.btnShot?.isVisible = true
+            binding.btnGuide?.isVisible = true
+            binding.swAuto?.isVisible = true
+            binding.tvSwAuto?.isVisible = true
+        }
     }
 
     private fun showStopCameraDialog() {
-        // 다이얼로그 생성
-        val dialog = Dialog(requireContext())
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.layout_stop_camera_dialog)
 
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        // 이미 다이얼로그가 열려 있으면 리턴
+        if (stopCameraDialog?.isShowing == true) return
+
+        // 다이얼로그 생성
+        stopCameraDialog = Dialog(requireContext())
+        stopCameraDialog?.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        stopCameraDialog?.setContentView(R.layout.layout_stop_camera_dialog)
+
+        stopCameraDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val width = (resources.displayMetrics.widthPixels * 0.5).toInt()
-        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        stopCameraDialog?.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
 
         // 취소 버튼
-        val btnCancel = dialog.findViewById<TextView>(R.id.btn_cancel)
-        btnCancel.setOnClickListener {
-            dialog.dismiss()
+        val btnCancel = stopCameraDialog?.findViewById<TextView>(R.id.btn_cancel)
+        btnCancel?.setOnClickListener {
+            stopCameraDialog?.dismiss()
         }
 
         // 그만하기 버튼
-        val btnConfirm = dialog.findViewById<TextView>(R.id.btn_confirm)
-        btnConfirm.setOnClickListener {
+        val btnConfirm = stopCameraDialog?.findViewById<TextView>(R.id.btn_confirm)
+        btnConfirm?.setOnClickListener {
             // 다이얼로그 닫기
-            dialog.dismiss()
+            stopCameraDialog?.dismiss()
             cameraActivity.moveToBack()
         }
 
-        dialog.show()
+        stopCameraDialog?.show()
     }
 
     private fun startCamera() {
+
+        Log.d("imageBug", "startCamera_BackShotGuide ")
+
         // CameraX를 사용하기 위해 카메라 제공자(CameraProvider)를 비동기로 가져오는 중.
         // getInstance()는 앱의 생명주기에 맞춰 카메라를 관리해주는 객체를 반환
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
@@ -276,6 +299,7 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
 
     // 촬영 버튼 눌러서 촬영 함수
     private fun takePhoto() {
+        Log.d("ImageBug", "takePhoto_BackShotGuide")
         val imageCapture = imageCapture ?: return
 
         val photoFile = File(requireContext().externalMediaDirs.firstOrNull(),
@@ -480,10 +504,13 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
 
     // 이미지를 분석하는 함수
     private fun analyzeImage(imageProxy: ImageProxy) {
+
+
         if (!autoCamera) {
             imageProxy.close()
             return
         }
+        Log.d("imageBug", "analyzeImage_backShotBug")
         // ImageProxy에서 가져온 카메라 프레임을 Bitmap으로 변환 (YOLO 입력용)
         val bitmap = imageProxyToBitmap(imageProxy)
         // YOLOv8 TFLite 모델에 넣기 위한 전처리 작업 (640x640 크기, float 정규화 등)
@@ -828,5 +855,24 @@ class BackShotGuideFragment :  BaseFragment<FragmentBackShotGuideBinding>(
         )
 
         Log.d("MainActivity", "✅ YOLO 디버그 이미지 저장됨: ${debugFile.absolutePath}")
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        cameraActivity = context as CameraActivity
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            param1 = it.getString(ARG_PARAM1)
+            param2 = it.getString(ARG_PARAM2)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        stopCameraDialog?.dismiss()
+        stopCameraDialog = null
+        clearBinding()
     }
 }

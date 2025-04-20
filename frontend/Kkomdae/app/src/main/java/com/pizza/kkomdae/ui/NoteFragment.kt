@@ -4,14 +4,17 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentNoteBinding
+import com.pizza.kkomdae.presenter.model.Step4AiResult
 import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.ui.step3.FinalResultFragment
+import com.pizza.kkomdae.ui.step4.Step4AiResultFragment
 
 
 class NoteFragment : BaseFragment<FragmentNoteBinding>(
@@ -23,6 +26,8 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
     private var param2: String? = null
     private var isTextEntered = false   // 텍스트 입력 여부를 추적하는 변수
     private val viewModel : FinalViewModel by activityViewModels()
+    // 시스템 백 버튼 콜백 선언
+    private lateinit var backPressedCallback: OnBackPressedCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +35,15 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+        // 시스템 백 버튼 동작 설정
+        backPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // ai분석 결과
+                moveToAiResultFragment()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, backPressedCallback)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -65,7 +79,9 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
 
         // 뒤로가기 버튼
         binding.topBar.backButtonContainer.setOnClickListener {
-            requireActivity().onBackPressed()
+
+            // ai분석 결과
+            moveToAiResultFragment()
         }
 
         // X 버튼
@@ -87,6 +103,12 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
 
     }
 
+    private fun moveToAiResultFragment() {
+        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fl_main, Step4AiResultFragment())
+        transaction.commit()
+    }
+
     // 저장하기 버튼 상태 업데이트
     private fun updateSaveButtonState() {
         if (isTextEntered) {
@@ -101,7 +123,6 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>(
 
         val transaction = requireActivity().supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fl_main, FinalResultFragment())
-        transaction.addToBackStack(null)
         transaction.commit()
     }
 

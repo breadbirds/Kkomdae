@@ -9,16 +9,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.replace
 import androidx.lifecycle.lifecycleScope
+import com.pizza.kkomdae.MainActivity
 import com.pizza.kkomdae.R
 import com.pizza.kkomdae.base.BaseFragment
 import com.pizza.kkomdae.databinding.FragmentOathBinding
 import com.pizza.kkomdae.databinding.FragmentSubmitCompleteBinding
 import com.pizza.kkomdae.presenter.viewmodel.FinalViewModel
 import com.pizza.kkomdae.presenter.viewmodel.MainViewModel
+import com.pizza.kkomdae.ui.step3.FinalResultFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,13 +49,19 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
     private val viewModel : MainViewModel by activityViewModels()
     private val finalViewModel : FinalViewModel by activityViewModels()
 
+    // 시스템 백 버튼 콜백 선언
+    private lateinit var backPressedCallback: OnBackPressedCallback
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
 
-            finalViewModel.pdfName.value?.let {
+
+        }
+
+        finalViewModel.pdfName.value?.let {
             lifecycleScope.launch {
                 val result = finalViewModel.getPdfUrl(it)
                 result.onSuccess {
@@ -60,8 +70,15 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
                     // todo 에러 다이얼 로그 띄우기
                 }
             }
-                }
         }
+
+        // 시스템 백 버튼 동작 설정
+        backPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                goHome()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(this, backPressedCallback)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -84,6 +101,8 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
             }
 
         }
+
+
 
         binding.btnShare.setOnClickListener {
             val url = viewModel.getPdfUrl()
@@ -144,7 +163,7 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
     private fun setupButtonListeners() {
         // 닫기 버튼
         binding.btnClose.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            goHome()
         }
 
         // PDF 다운로드 버튼
@@ -156,6 +175,13 @@ class SubmitCompleteFragment : BaseFragment<FragmentSubmitCompleteBinding>(
         binding.btnShare.setOnClickListener {
             // 공유 로직 구현
         }
+    }
+
+    private fun goHome() {
+        val transaction = requireActivity().supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fl_main, MainFragment())
+        transaction.disallowAddToBackStack()
+        transaction.commit()
     }
 
     override fun onDestroyView() {

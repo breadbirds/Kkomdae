@@ -110,7 +110,6 @@ class AllStepOnboardingFragment : BaseFragment<FragmentAllStepOnboardingBinding>
 
                     val transaction = requireActivity().supportFragmentManager.beginTransaction()
                     transaction.replace(R.id.fl_main, Step1GuideFragment())
-                    transaction.addToBackStack(null)
                     transaction.commit()
                 }.onFailure {
 
