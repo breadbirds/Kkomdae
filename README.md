@@ -179,7 +179,7 @@
 -   [Git Convention 노션](https://thinkable-bear-51d.notion.site/1a4c2f3f4a77815299c7feb0724d372c?pvs=4)
 -   [Git Wiki](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/Git)
 
-<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/a346ec25f97ab77fc9a721c486630031/git.gif" width="800">
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/b902805fc21e7a2f495a3cecccd1fde1/git.webp" width="800">
 
 ## 이슈관리
 
