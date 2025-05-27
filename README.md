@@ -1,6 +1,6 @@
 # <img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d5d2bccfa0bf52e5c1d03fa8509c32d3/%EB%A1%9C%EA%B3%A0.png" width="15" alt="로고"> 꼼대 (꼼꼼하게 대신 점검해드립니다)
 
-[<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/056910973b87435ca5dfbf76a139962e/Group_34003.png">](https://j12d101.p.ssafy.io/)
+[<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/056910973b87435ca5dfbf76a139962e/Group_34003.png">](https://kkomdae01.ssafyapp.com/)
 
 #### 👆 위 이미지 클릭하면 `랜딩페이지로` 이동합니다 👆
 
