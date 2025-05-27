@@ -1,6 +1,6 @@
 # <img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d5d2bccfa0bf52e5c1d03fa8509c32d3/%EB%A1%9C%EA%B3%A0.png" width="15" alt="로고"> 꼼대 (꼼꼼하게 대신 점검해드립니다)
 
-[<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/056910973b87435ca5dfbf76a139962e/Group_34003.png">](https://kkomdae01.ssafyapp.com/)
+[<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/056910973b87435ca5dfbf76a139962e/Group_34003.png" width="800">](https://kkomdae01.ssafyapp.com/)
 
 #### 👆 위 이미지 클릭하면 `랜딩페이지로` 이동합니다 👆
 
@@ -22,15 +22,15 @@
 
 # ✨ 개요
 
+#### 🥇 SSAFY 특화 PJT 1등 🥇
+
+#### [🥈영상 포트폴리오 2등 🥈](https://www.youtube.com/watch?v=AIQsZd09HSc)
+
 #### 서비스명 : 꼼대 ( 꼼꼼하게 대신 점검해드립니다 )
 
 #### 한줄 설명 : `AI 모델을 활용한 장비 상태 관리 서비스`
 
 #### 프로젝트 기간 : 2025.03.03 ~ 2025.04.11
-
-#### 🥇 SSAFY 특화 PJT 1등 🥇
-
-#### [영상 포트폴리오 보러가기 ▶️](https://www.youtube.com/watch?v=AIQsZd09HSc)
 
 <br/>
 
@@ -151,7 +151,7 @@
 
 ## 서비스 아키텍처
 
-<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/76774816955d653a73dcfee4ce820d00/%EC%84%9C%EB%B9%84%EC%8A%A4_%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png">
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/76774816955d653a73dcfee4ce820d00/%EC%84%9C%EB%B9%84%EC%8A%A4_%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png" width="800">
 
 <br/>
 
@@ -163,25 +163,27 @@
 
 #### [피그마 바로가기 🔗](https://www.figma.com/design/AIiFPAqQm2lnhzPqaZdz5Z/%EA%BC%BC%EB%8C%80?node-id=1941-2278)
 
-<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/c9fb2a6599080846affabd517ec97c03/%ED%99%94%EB%A9%B4%EC%84%A4%EA%B3%84_2.png">
-<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/c77cf7fe9b658a6bd347befc2797e84c/Section_1.png">
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/c9fb2a6599080846affabd517ec97c03/%ED%99%94%EB%A9%B4%EC%84%A4%EA%B3%84_2.png" width="800">
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/c77cf7fe9b658a6bd347befc2797e84c/Section_1.png" width="800">
 
 ## API 명세서
 
-<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/5f3bc1f9560ac42559c0435b7155b303/api_%EB%AA%85%EC%84%B8%EC%84%9C.png">
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/5f3bc1f9560ac42559c0435b7155b303/api_%EB%AA%85%EC%84%B8%EC%84%9C.png" width="800">
 
 ## ERD
 
-<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/2bbe33e7bb7cb7c5f0d948160d24fc24/erd.png">
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/2bbe33e7bb7cb7c5f0d948160d24fc24/erd.png" width="800">
 
 ## Git
 
 -   [Git Convention 노션](https://thinkable-bear-51d.notion.site/1a4c2f3f4a77815299c7feb0724d372c?pvs=4)
 -   [Git Wiki](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/Git)
 
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/a346ec25f97ab77fc9a721c486630031/git.gif" width="800">
+
 ## 이슈관리
 
-<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/592824257b27a603f99f9ed018c70d51/%EB%B2%88%EB%8B%A4%EC%9A%B4_%EC%B0%A8%ED%8A%B8.jpg">
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/592824257b27a603f99f9ed018c70d51/%EB%B2%88%EB%8B%A4%EC%9A%B4_%EC%B0%A8%ED%8A%B8.jpg" width="800">
 
 <br/>
 
@@ -194,7 +196,7 @@
 | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d133ed351edaa7dcc1fa7e2c2d38826d/%EC%A0%95%EC%9C%A0%EC%A7%84.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/8530717db2391c0185e8e20df9f3c8af/%EA%B9%80%EC%84%B1%EC%88%98.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/eadaad75c6a97002348a7ce31c94271d/%EA%B9%80%EC%A0%95%EC%96%B8.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/82b7121599bcc7b174aedb3600f6ce2b/%EB%8F%84%EC%8A%B9%EA%B5%AD.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d8fe9aca9307af2d17c50f5181a481b2/%EC%9D%B4%EC%83%81%ED%98%81.png){width="800" height="800"} | ![](https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/d524386635e6548591ff1eaa50b459f0/%EC%9D%B4%EC%86%A1%ED%9D%AC.png){width="800" height="800"} |
 |                                                                       Leader & AI Developer                                                                        |                                                                        &nbsp;Backend&nbsp;                                                                         |                                                                      &nbsp;AI Engineer&nbsp;                                                                       |                                                                    &nbsp;Infra & Backend&nbsp;                                                                     |                                                                        &nbsp;Frontend&nbsp;                                                                        |                                                                        &nbsp;Frontend&nbsp;                                                                        |
 
-<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/c91b455112206bb2d078056bb080e8f1/%EC%97%AD%ED%95%A0%EB%B6%84%EB%8B%B4.png">
+<img src="https://lab.ssafy.com/s12-ai-image-sub1/S12P21D101/-/wikis/uploads/c91b455112206bb2d078056bb080e8f1/%EC%97%AD%ED%95%A0%EB%B6%84%EB%8B%B4.png" width="800">
 
 <br/>
 
