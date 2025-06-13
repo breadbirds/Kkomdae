@@ -281,13 +281,13 @@
   </tr>
   <tr>
     <td align="center">
-      <sub>Leader & AI Developer</sub>
+      <sub>팀장 & 흠집 탐지 AI 개발</sub>
     </td>
     <td align="center">
       <sub>Backend</sub>
     </td>
     <td align="center">
-      <sub>AI Engineer</sub>
+      <sub>자동촬영, 노트북 탐지 AI 개발</sub>
     </td>
   </tr>
   <tr>
@@ -315,7 +315,7 @@
   </tr>
   <tr>
     <td align="center">
-      <sub>Infra & Backend</sub>
+      <sub>Infra & Backend & 자가점검 프로그램</sub>
     </td>
     <td align="center">
       <sub>Frontend</sub>
