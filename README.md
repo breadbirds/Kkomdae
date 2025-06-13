@@ -10,7 +10,7 @@
 
 ## ✨ 개요
 
-### 🥇 SSAFY 특화 PJT 1등 🥇 | [🥈영상 포트폴리오 2등 🥈](https://www.youtube.com/watch?v=AIQsZd09HSc)
+### 🥇 SSAFY 특화 PJT 1등 🥇 | [🥈영상 포트폴리오 2등 🥈](https://www.youtube.com/watch?v=AIQsZd09HSc) | SUPER APP 참여
 
 **서비스명** : 꼼대 ( 꼼꼼하게 대신 점검해드립니다 )
 
