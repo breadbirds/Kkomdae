@@ -10,13 +10,15 @@
 
 ## ✨ 개요
 
-### 🥇 SSAFY 특화 PJT 1등 🥇 | [🥈영상 포트폴리오 2등 🥈](https://www.youtube.com/watch?v=AIQsZd09HSc) | 🍕 SUPER APP 참여
+### 🥇 SSAFY 특화 PJT 1등 🥇 | [🥈영상 포트폴리오 2등 🥈](https://www.youtube.com/watch?v=AIQsZd09HSc) | 🍕 SUPER APP 참여 🍕
 
 **서비스명** : 꼼대 ( 꼼꼼하게 대신 점검해드립니다 )
 
 **한줄 설명** : AI 모델을 활용한 장비 상태 관리 서비스
 
 **도메인** : 영상 AI
+
+**팀원** : FE 2명 / BE 2명 / AI 2명
 
 **프로젝트 기간** : 2025.03.03 ~ 2025.04.11
 
@@ -243,8 +245,8 @@
 - [API 명세서](https://github.com/breadbirds/Kkomdae/wiki/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%82%B0%EC%B6%9C%EB%AC%BC#api-%EB%AA%85%EC%84%B8%EC%84%9C)
 - [ERD](https://github.com/breadbirds/Kkomdae/wiki/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%82%B0%EC%B6%9C%EB%AC%BC#erd)
 - [GIT](https://github.com/breadbirds/Kkomdae/wiki/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%82%B0%EC%B6%9C%EB%AC%BC#git)
-
 - 이슈관리
+- 
   <img src="/docs/번다운_차트.jpg" width="800">
 
 <br/>
