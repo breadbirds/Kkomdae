@@ -331,6 +331,9 @@
 
 ## 📒 메뉴얼 및 상세 문서
 
--   [포팅메뉴얼](https://github.com/breadbirds/Kkomdae/wiki/%ED%8F%AC%ED%8C%85-%EB%A9%94%EB%89%B4%EC%96%BC)
--   [Git](https://github.com/breadbirds/Kkomdae/wiki/Git)
 -   [서비스 화면](https://github.com/breadbirds/Kkomdae/wiki/%EC%84%9C%EB%B9%84%EC%8A%A4-%ED%99%94%EB%A9%B4)
+-   [포팅메뉴얼](https://github.com/breadbirds/Kkomdae/wiki/%ED%8F%AC%ED%8C%85-%EB%A9%94%EB%89%B4%EC%96%BC)
+-   [외부 서비스 정리 문서](https://github.com/breadbirds/Kkomdae/wiki/%EC%99%B8%EB%B6%80-%EC%84%9C%EB%B9%84%EC%8A%A4-%EC%A0%95%EB%B3%B4-%EC%A0%95%EB%A6%AC-%EB%AC%B8%EC%84%9C)
+-   [API 가이드](https://github.com/breadbirds/Kkomdae/wiki/Api-%EA%B0%80%EC%9D%B4%EB%93%9C)
+-  [프로젝트 산출물](https://github.com/breadbirds/Kkomdae/wiki/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%82%B0%EC%B6%9C%EB%AC%BC)
+-  -   [Git](https://github.com/breadbirds/Kkomdae/wiki/Git)
